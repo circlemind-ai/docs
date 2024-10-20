@@ -1,0 +1,46 @@
+---
+title: 'Configure Graph'
+description: 'Configure Graph'
+icon: 'brackets-curly'
+---
+
+Configuring the graph correctly is one of the **most important** steps to guarantee high-quality data representations. We are currently supporting all our beta users during their onboarding. 
+
+To request assistance with your configuration, we highly recommend reaching out to `support@circlemind.co`.
+
+Before using the client, make sure to [configure the API key in your environment](/essentials/getting-started#getting-started).
+
+You can configure a graph by using the `configure` method.
+
+```python
+  from circlemind import Circlemind
+
+  # Initialize the client
+  client = Circlemind()
+
+  # Configure the graph
+  client.configure(
+    graph_id="customer-id-123",
+    domain="Analyze this story and identify the characters, how they interact with each other, the locations they explore, and their relationships. Focus on magical objects and how they are used.",
+    example_queries=[
+        "Who is Harry’s family?",
+        "Which places did Hermione visit?",
+        "Who went to Diagon Alley?",
+        "Who is in charge of the wizard monetary system?",
+        "Who is Harry’s mentor?",
+        "What does the relationship between Harry and the Dursleys look like?",
+        "Who are Harry’s enemies?",
+        "Who are Harry’s close friends?",
+        "What does the Sorcerer's Stone do?"
+    ],
+    entity_types=[
+        "Character",
+        "Creature",
+        "Place",
+        "Object",
+        "Activity",
+        "Faction",
+        "Spell"
+    ]
+  )
+```
