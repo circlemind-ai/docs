@@ -6,7 +6,12 @@ icon: 'brackets-curly'
 
 Before adding memories, make sure to [configure the API key in your environment](/essentials/getting-started#getting-started).
 
-You can add memories to a graph by using the `add` method.
+You can add memories to a graph by using the `add` method. Add currently supports:
+- **Raw Text**: chunking will be handled automatically;
+- **PDFs**: parsing and chunking will be handled automatically;
+- ...and more coming soon!
+
+### Adding text
 
 ```python
   from circlemind import Circlemind
@@ -21,4 +26,16 @@ You can add memories to a graph by using the `add` method.
   )
 ```
 
-The `graph_id` is an optional parameter. If not set, it defaults to the `default` graph.
+The `graph_id` parameter is optional. If not set, it defaults to the `default` graph.
+
+### Adding PDFs
+
+```python
+  from pathlib import Path
+
+  # Add a file
+  client.add(
+    memory=Path("path/to/file.pdf"),
+    graph_id="customer-id-123"
+  )
+```
