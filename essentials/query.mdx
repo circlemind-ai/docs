@@ -23,9 +23,44 @@ You can query a graph by using the `query` method.
     graph_id="customer-id-123"
   )
 
-  print(res)
+  print(res.response)
 ```
 
 The `graph_id` is an optional parameter. If not set, it defaults to the `default` graph.
 
-The `res` response will be a natural language response to your query.
+The `res.response` will be a natural language response to your query.
+
+### Include references
+With the keyword `with_references`, it is possible to include the references to the sources used to generate an answer.
+These sources can be then injected into the answer with the function `.format_references`.
+
+```python
+  from circlemind import Circlemind
+
+  # Initialize the client
+  client = Circlemind()
+
+  # Query the memories
+  res = client.query(
+    query="Where does Sophie like to hike?",
+    graph_id="customer-id-123",
+    with_references=True
+  )
+
+  answer, references = res.format_references()
+  print(answer)  # Sophie likes to hike on the Alps [1]
+  print(references)  # {'1': {<metadata>}}
+  
+```
+
+It is possible to provide custom formatting when injecting the references by passing a custom replacing function to `.format_references` (the default being `lambda i, _: f"[{i}]"`).
+For example, assuming each memory's metadata contains a URL, we can provide markdown formatting with links to the sources used.
+
+```python
+  answer, references = res.format_references(
+    lambda i, metadata: f"[{i}]({metadata['url']})"
+  )
+  print(answer)  # Sophie likes to hike on the Alps [1](https://people/profiles/sophie/preferences)
+```
+
+where `i` is an incremental index automatically generated for each sourced used.

@@ -11,7 +11,7 @@ You can add memories to a graph by using the `add` method. Add currently support
 - **PDFs**: parsing and chunking will be handled automatically;
 - ...and more coming soon!
 
-### Adding text
+#### Adding text
 
 ```python
   from circlemind import Circlemind
@@ -28,7 +28,7 @@ You can add memories to a graph by using the `add` method. Add currently support
 
 The `graph_id` parameter is optional. If not set, it defaults to the `default` graph.
 
-### Adding PDFs
+#### Adding PDFs
 
 ```python
   from pathlib import Path
@@ -37,5 +37,21 @@ The `graph_id` parameter is optional. If not set, it defaults to the `default` g
   client.add(
     memory=Path("path/to/file.pdf"),
     graph_id="customer-id-123"
+  )
+```
+
+### Metadata
+
+You can also specify `metadata` to pass a dictionary of information that would be tied to the memory you're creating.
+For example, this can be the document URL that can be used, at query time, to [reference the sources used to produce an answer](/essentials/query#include-references).
+
+```python
+  from pathlib import Path
+
+  # Add a file
+  client.add(
+    memory=Path("path/to/file.pdf"),
+    graph_id="customer-id-123",
+    metadata={"url": "https://path/to/file.pdf"}
   )
 ```
