@@ -45,11 +45,11 @@ The Circlemind Python SDK provides a convenient interface to manage and query me
 3. **Basic Usage**
     - **Add a Memory**
       ```python
-      client.add(memory="Remember to check the project status")
+      client.add(memory="Sophie enjoys hiking in the Italian Alps.")
       ```
 
     - **Query Memories**
       ```python
-      results = client.query(query="Show recent reminders")
-      print(results)
+      res = client.query(query="Where does Sophie like to hike?")
+      print(res.response)
       ```
