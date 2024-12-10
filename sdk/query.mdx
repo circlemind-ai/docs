@@ -31,8 +31,8 @@ The `graph_id` is an optional parameter. If not set, it defaults to the `default
 The `res.response` will be a natural language response to your query.
 
 ### Include references
-With the keyword `with_references`, it is possible to include the references to the sources used to generate an answer.
-These sources can be then injected into the answer with the function `.format_references`.
+Using the keyword `with_references`, it is possible to include the references to the sources used to generate an answer.
+These sources can then be formatted and injected into the answer with the function `.format_references`.
 
 ```python
   from circlemind import Circlemind
@@ -63,4 +63,4 @@ For example, assuming each memory's metadata contains a URL, we can provide mark
   print(answer)  # Sophie likes to hike on the Alps [1](https://people/profiles/sophie/preferences)
 ```
 
-where `i` is an incremental index automatically generated for each sourced used.
+where `i` is an incremental index automatically generated for each source used.
