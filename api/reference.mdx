@@ -1,0 +1,45 @@
+---
+title: 'Reference'
+description: 'Rest API references'
+icon: 'terminal'
+---
+
+For the full and updated reference list please refere to [https://api.circlemind.co/redoc](https://api.circlemind.co/redoc).
+
+## Introduction
+
+The CircleMind REST API allows you to interact with our platform programmatically. You can use the API to perform various operations such as creating, reading, updating, and deleting resources.
+
+### Base URL
+
+All API requests are made to the following base URL:
+
+```
+https://api.circlemind.co/
+```
+
+### Authentication
+
+The API uses api key authentication. You need to include your API key in the `apiKey` header of each request:
+
+```
+apiKey: YOUR_API_KEY
+```
+
+### Request and Response Format
+
+All requests and responses are in JSON format. Make sure to set the `Content-Type` header to `application/json` for requests that include a body (unless otherwise specified).
+
+### Error Handling
+
+The API uses standard HTTP status codes to indicate the success or failure of a request. A 2xx status code indicates success, while a 4xx or 5xx status code indicates an error. The response body will include an error message with more details.
+
+### Example Request
+
+Here is an example of a request to fetch the list of your graphs:
+
+```bash
+curl -X GET "https://api.circlemind.co/list_graphs" -H "apiKey: YOUR_API_KEY"
+```
+
+For more detailed information on each endpoint, refer to the full API documentation at [https://api.circlemind.co/redoc](https://api.circlemind.co/redoc).

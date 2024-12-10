@@ -26,6 +26,11 @@
       "name": "Community",
       "icon": "discord",
       "url": "https://discord.gg/DvY2B8u4sA"
+    },
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/circlemind-ai/fast-graphrag"
     }
   ],
   "navigation": [
@@ -39,12 +44,18 @@
     {
       "group": "Python SDK",
       "pages": [
-        "essentials/getting-started",
-        "essentials/create-graph",
-        "essentials/configure-graph",
-        "essentials/list-graphs",
-        "essentials/add-memory",
-        "essentials/query"
+        "sdk/getting-started",
+        "sdk/create-graph",
+        "sdk/configure-graph",
+        "sdk/list-graphs",
+        "sdk/add-memory",
+        "sdk/query"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api/reference"
       ]
     }
   ]
