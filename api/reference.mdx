@@ -4,7 +4,7 @@ description: 'Rest API references'
 icon: 'terminal'
 ---
 
-For the full and updated reference list please refere to [https://api.circlemind.co/redoc](https://api.circlemind.co/redoc).
+For the full and updated reference list please refer to [https://api.circlemind.co/redoc](https://api.circlemind.co/redoc).
 
 ## Introduction
 
@@ -26,13 +26,13 @@ The API uses api key authentication. You need to include your API key in the `ap
 apiKey: YOUR_API_KEY
 ```
 
-### Request and Response Format
+### Response Format
 
-All requests and responses are in JSON format. Make sure to set the `Content-Type` header to `application/json` for requests that include a body (unless otherwise specified).
+All responses are in JSON format.
 
 ### Error Handling
 
-The API uses standard HTTP status codes to indicate the success or failure of a request. A 2xx status code indicates success, while a 4xx or 5xx status code indicates an error. The response body will include an error message with more details.
+The API uses standard HTTP status codes to indicate the success or failure of a request. A 2xx status code indicates success, while a 4xx or 5xx status code indicates an error. The response body will include an error message with more details (`.detail`).
 
 ### Example Request
 
@@ -41,5 +41,73 @@ Here is an example of a request to fetch the list of your graphs:
 ```bash
 curl -X GET "https://api.circlemind.co/list_graphs" -H "apiKey: YOUR_API_KEY"
 ```
+
+### Adding and Quering Memories
+After [creating a graph](https://api.circlemind.co/redoc#operation/create_graph_graph__graph_name__post), the two most important operations are [add](https://api.circlemind.co/redoc#operation/post_insert_graph__graph_name__insert_post) and [query](https://api.circlemind.co/redoc#operation/post_query_graph__graph_name__query_post). Both operations send a request to our workers that get switfly processed and can be tracked until completion.
+
+#### Add Request
+
+
+#### Query Request
+Here is an example of how to query using the CircleMind API in JavaScript:
+
+```javascript
+const axios = require('axios');
+
+const YOUR_API_KEY = 'YOUR_API_KEY';
+const graphName = 'your_graph_name';
+
+async function send_query_request(graphName: str, data: object) {
+    const url = `https://api.circlemind.co/graph/${graphName}/query`
+    const response = await axios.post(url, data, {
+        headers: {apiKey: YOUR_API_KEY}
+    });
+    return response.data;
+}
+
+async function get_query_response(handle: object) {
+    const url = `https://api.circlemind.co/graph/${graphName}/query/${handle.requestId}`;
+
+    let status = 'CREATED';
+    let data = null;
+
+    while (!['DONE', 'FAILED'].includes(status)) {
+        console.info('Waiting for response...');
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const response = await axios.get(url, {
+            headers: {apiKey: YOUR_API_KEY},
+            params: { requestTime: handle.requestTime }
+        });
+        data = await reponse.data
+        status = data.status;        
+    }
+
+    if (status === 'FAILED') {
+      throw new Error('Query failed.')
+    }
+
+    return [data.answer, data.context];
+}
+
+const data = {
+    query: 'Your query string here',
+    parameters: JSON.stringify({
+        only_context: true, // Set to true to return only the context of the query
+        with_references: false // Set to true to include text references in the response
+    })
+};
+
+send_query_request(graphName, data).then(
+    (handle) => get_query_response(handle)
+).then(([answer, context] => console.log(answer, context)))
+```
+
+In this example:
+- Replace `YOUR_API_KEY` with your actual API key.
+- Replace `your_graph_name` with the name of your graph.
+- The `query` field should contain your query.
+- The `parameters` field is an optional JSON string that can include:
+    - `only_context`: Set to `true` to return only the context of the query instead of processing it via an LLM.
+    - `with_references`: Set to `true` to include references in the response.
 
 For more detailed information on each endpoint, refer to the full API documentation at [https://api.circlemind.co/redoc](https://api.circlemind.co/redoc).
