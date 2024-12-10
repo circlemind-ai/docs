@@ -53,9 +53,9 @@
       ]
     },
     {
-      "group": "API Reference",
+      "group": "API Documentation",
       "pages": [
-        "api/reference"
+        "api/quickstart"
       ]
     }
   ]

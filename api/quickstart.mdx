@@ -1,5 +1,5 @@
 ---
-title: 'Reference'
+title: 'Quickstart'
 description: 'Rest API references'
 icon: 'terminal'
 ---
@@ -42,18 +42,40 @@ Here is an example of a request to fetch the list of your graphs:
 curl -X GET "https://api.circlemind.co/list_graphs" -H "apiKey: YOUR_API_KEY"
 ```
 
+All requests, except [add](https://api.circlemind.co/redoc#operation/post_insert_graph__graph_name__insert_post) and [query](https://api.circlemind.co/redoc#operation/post_query_graph__graph_name__query_post), immediately return a response.
+
 ### Adding and Quering Memories
 After [creating a graph](https://api.circlemind.co/redoc#operation/create_graph_graph__graph_name__post), the two most important operations are [add](https://api.circlemind.co/redoc#operation/post_insert_graph__graph_name__insert_post) and [query](https://api.circlemind.co/redoc#operation/post_query_graph__graph_name__query_post). Both operations send a request to our workers that get switfly processed and can be tracked until completion.
 
 #### Add Request
-
-
-#### Query Request
-Here is an example of how to query using the CircleMind API in JavaScript:
+In order to perform a memory addition, we need to send an `add` request to the workers. The processing is asynchronous and can be optionally [tracked](https://api.circlemind.co/redoc#operation/get_insert_status_graph__graph_name__insert__request_id__get) until completion. 
 
 ```javascript
 const axios = require('axios');
+const YOUR_API_KEY = 'YOUR_API_KEY';
+const graphName = 'your_graph_name';
 
+async function send_add_request(graphName, data) {
+    const url = `https://api.circlemind.co/graph/${graphName}/insert`;
+    const response = await axios.post(url, data, {
+        headers: { apiKey: YOUR_API_KEY }
+    });
+}
+
+const data = {
+    memory: 'Your memory text here',
+    metadata: JSON.stringify({
+        id: 'unique-id-123'
+    })
+};
+send_add_request(graphName, data);
+```
+
+#### Query Request
+Similarly, here is an example of how to query using the CircleMind API in JavaScript:
+
+```javascript
+const axios = require('axios');
 const YOUR_API_KEY = 'YOUR_API_KEY';
 const graphName = 'your_graph_name';
 
@@ -67,7 +89,6 @@ async function send_query_request(graphName: str, data: object) {
 
 async function get_query_response(handle: object) {
     const url = `https://api.circlemind.co/graph/${graphName}/query/${handle.requestId}`;
-
     let status = 'CREATED';
     let data = null;
 
@@ -78,14 +99,12 @@ async function get_query_response(handle: object) {
             headers: {apiKey: YOUR_API_KEY},
             params: { requestTime: handle.requestTime }
         });
-        data = await reponse.data
+        data = await reponse.data;
         status = data.status;        
     }
-
     if (status === 'FAILED') {
       throw new Error('Query failed.')
     }
-
     return [data.answer, data.context];
 }
 
@@ -110,4 +129,7 @@ In this example:
     - `only_context`: Set to `true` to return only the context of the query instead of processing it via an LLM.
     - `with_references`: Set to `true` to include references in the response.
 
-For more detailed information on each endpoint, refer to the full API documentation at [https://api.circlemind.co/redoc](https://api.circlemind.co/redoc).
+To get the answer, we track the status of the `query` request. Upon completion, the querying result can be found in `answer` (the LLM generated answer) and `context` (the context passed to the LLM).
+Note that the same procedure can be used to track `add` requests using the endpoint `https://api.circlemind.co/graph/{graph_name}/insert/{request_id}`.
+
+For more detailed information on each endpoint, refer to the full API reference at [https://api.circlemind.co/redoc](https://api.circlemind.co/redoc).
