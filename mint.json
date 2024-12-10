@@ -31,6 +31,12 @@
       "name": "GitHub",
       "icon": "github",
       "url": "https://github.com/circlemind-ai/fast-graphrag"
+    },
+    {
+      "name": "API Reference",
+      "openapi": "https://api.circlemind.co/openapi.json",
+      "url": "api-reference",
+      "icon": "square-terminal"
     }
   ],
   "navigation": [
