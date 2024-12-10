@@ -114,7 +114,6 @@ async function get_query_response(handle: object) {
 const data = {
     query: 'Your query string here',
     parameters: JSON.stringify({
-        only_context: true, // Set to true to return only the context of the query
         with_references: false // Set to true to include text references in the response
     })
 };
@@ -133,8 +132,6 @@ In this example:
 * The `query` field should contain your query.
 
 * The `parameters` field is an optional JSON string that can include:
-
-  * `only_context`: Set to `true` to return only the context of the query instead of processing it via an LLM.
 
   * `with_references`: Set to `true` to include references in the response.
 
