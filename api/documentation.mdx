@@ -8,7 +8,7 @@ For the full and updated reference list please refer to [https://api.circlemind.
 
 ## Introduction
 
-The CircleMind REST API allows you to interact with our platform programmatically. You can use the API to perform various operations such as creating, reading, updating, and deleting resources.
+The Circlemind REST API allows you to interact with our platform programmatically. You can use the API to perform various operations such as creating, reading, updating, and deleting resources.
 
 ### Base URL
 
@@ -45,10 +45,12 @@ curl -X GET "https://api.circlemind.co/list_graphs" -H "apiKey: YOUR_API_KEY"
 All requests, except [add](https://api.circlemind.co/redoc#operation/post_insert_graph__graph_name__insert_post) and [query](https://api.circlemind.co/redoc#operation/post_query_graph__graph_name__query_post), immediately return a response.
 
 ### Adding and Quering Memories
+
 After [creating a graph](https://api.circlemind.co/redoc#operation/create_graph_graph__graph_name__post), the two most important operations are [add](https://api.circlemind.co/redoc#operation/post_insert_graph__graph_name__insert_post) and [query](https://api.circlemind.co/redoc#operation/post_query_graph__graph_name__query_post). Both operations send a request to our workers that get switfly processed and can be tracked until completion.
 
 #### Add Request
-In order to perform a memory addition, we need to send an `add` request to the workers. The processing is asynchronous and can be optionally [tracked](https://api.circlemind.co/redoc#operation/get_insert_status_graph__graph_name__insert__request_id__get) until completion. 
+
+In order to perform a memory addition, we need to send an `add` request to the workers. The processing is asynchronous and can be optionally [tracked](https://api.circlemind.co/redoc#operation/get_insert_status_graph__graph_name__insert__request_id__get) until completion.
 
 ```javascript
 const axios = require('axios');
@@ -72,6 +74,7 @@ send_add_request(graphName, data);
 ```
 
 #### Query Request
+
 Similarly, here is an example of how to query using the CircleMind API in JavaScript:
 
 ```javascript
@@ -122,12 +125,18 @@ send_query_request(graphName, data).then(
 ```
 
 In this example:
-- Replace `YOUR_API_KEY` with your actual API key.
-- Replace `your_graph_name` with the name of your graph.
-- The `query` field should contain your query.
-- The `parameters` field is an optional JSON string that can include:
-    - `only_context`: Set to `true` to return only the context of the query instead of processing it via an LLM.
-    - `with_references`: Set to `true` to include references in the response.
+
+* Replace `YOUR_API_KEY` with your actual API key.
+
+* Replace `your_graph_name` with the name of your graph.
+
+* The `query` field should contain your query.
+
+* The `parameters` field is an optional JSON string that can include:
+
+  * `only_context`: Set to `true` to return only the context of the query instead of processing it via an LLM.
+
+  * `with_references`: Set to `true` to include references in the response.
 
 To get the answer, we track the status of the `query` request. Upon completion, the querying result can be found in `answer` (the LLM generated answer) and `context` (the context passed to the LLM).
 Note that the same procedure can be used to track `add` requests using the endpoint `https://api.circlemind.co/graph/{graph_name}/insert/{request_id}`.
