@@ -36,7 +36,7 @@
       "name": "API Reference",
       "openapi": "https://api.circlemind.co/openapi.json",
       "url": "api-reference",
-      "icon": "square-terminal"
+      "icon": "book-open-text"
     }
   ],
   "navigation": [
