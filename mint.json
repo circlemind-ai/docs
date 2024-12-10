@@ -61,7 +61,7 @@
     {
       "group": "API Documentation",
       "pages": [
-        "api/docs"
+        "rest/docs"
       ]
     }
   ]
