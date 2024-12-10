@@ -36,7 +36,7 @@
       "name": "API Reference",
       "openapi": "https://api.circlemind.co/openapi.json",
       "url": "api-reference",
-      "icon": "book-open-text"
+      "icon": "file"
     }
   ],
   "navigation": [
@@ -61,7 +61,7 @@
     {
       "group": "API Documentation",
       "pages": [
-        "api/documentation"
+        "api/docs"
       ]
     }
   ]
