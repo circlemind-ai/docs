@@ -4,7 +4,7 @@ description: 'Rest API references'
 icon: 'terminal'
 ---
 
-For the full and updated reference list please refer to [https://api.circlemind.co/redoc](https://api.circlemind.co/redoc).
+For the full and updated reference list please refer to [https://docs.circlemind.co/api-reference](https://docs.circlemind.co/api-reference).
 
 ## Introduction
 
@@ -42,15 +42,15 @@ Here is an example of a request to fetch the list of your graphs:
 curl -X GET "https://api.circlemind.co/list_graphs" -H "apiKey: YOUR_API_KEY"
 ```
 
-All requests, except [add](https://api.circlemind.co/redoc#operation/post_insert_graph__graph_name__insert_post) and [query](https://api.circlemind.co/redoc#operation/post_query_graph__graph_name__query_post), immediately return a response.
+All requests, except [add](https://docs.circlemind.co/api-reference/add-memory) and [query](https://docs.circlemind.co/api-reference/query-memory), immediately return a response.
 
 ### Adding and Quering Memories
 
-After [creating a graph](https://api.circlemind.co/redoc#operation/create_graph_graph__graph_name__post), the two most important operations are [add](https://api.circlemind.co/redoc#operation/post_insert_graph__graph_name__insert_post) and [query](https://api.circlemind.co/redoc#operation/post_query_graph__graph_name__query_post). Both operations send a request to our workers that get switfly processed and can be tracked until completion.
+After [creating a graph](https://docs.circlemind.co/api-reference/create-new-graph), the two most important operations are [add](https://docs.circlemind.co/api-reference/add-memory) and [query](https://docs.circlemind.co/api-reference/query-memory). Both operations send a request to our workers that get switfly processed and can be tracked until completion.
 
 #### Add Request
 
-In order to perform a memory addition, we need to send an `add` request to the workers. The processing is asynchronous and can be optionally [tracked](https://api.circlemind.co/redoc#operation/get_insert_status_graph__graph_name__insert__request_id__get) until completion.
+In order to perform a memory addition, we need to send an `add` request to the workers. The processing is asynchronous and can be optionally [tracked](https://docs.circlemind.co/api-reference/check-add-request-status) until completion.
 
 ```javascript
 const axios = require('axios');
@@ -141,4 +141,4 @@ In this example:
 To get the answer, we track the status of the `query` request. Upon completion, the querying result can be found in `answer` (the LLM generated answer) and `context` (the context passed to the LLM).
 Note that the same procedure can be used to track `add` requests using the endpoint `https://api.circlemind.co/graph/{graph_name}/insert/{request_id}`.
 
-For more detailed information on each endpoint, refer to the full API reference at [https://api.circlemind.co/redoc](https://api.circlemind.co/redoc).
+For more detailed information on each endpoint, refer to the full API reference at [https://docs.circlemind.co/api-reference](https://docs.circlemind.co/api-reference).
