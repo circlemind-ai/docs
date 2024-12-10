@@ -4,7 +4,7 @@ description: 'Add Memories'
 icon: 'brackets-curly'
 ---
 
-Before adding memories, make sure to [configure the API key in your environment](/essentials/getting-started#getting-started).
+Before adding memories, make sure to [configure the API key in your environment](/sdk/getting-started#getting-started).
 
 You can add memories to a graph by using the `add` method. Add currently supports:
 - **Raw Text**: chunking will be handled automatically;
@@ -43,7 +43,7 @@ The `graph_id` parameter is optional. If not set, it defaults to the `default` g
 ### Metadata
 
 You can also specify `metadata` to pass a dictionary of information that will be tied to the memory you're creating.
-For example, this can be the document URL that can be used, at query time, to [reference the sources used to produce an answer](/essentials/query#include-references).
+For example, this can be the document URL that can be used, at query time, to [reference the sources used to produce an answer](/sdk/query#include-references).
 
 ```python
   from pathlib import Path
