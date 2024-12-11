@@ -85,7 +85,7 @@ const graphName = 'your_graph_name';
 async function send_query_request(graphName: str, data: object) {
     const url = `https://api.circlemind.co/graph/${graphName}/query`
     const response = await axios.post(url, data, {
-        headers: {apiKey: YOUR_API_KEY}
+        headers: { apiKey: YOUR_API_KEY }
     });
     return response.data;
 }
@@ -99,7 +99,7 @@ async function get_query_response(handle: object) {
         console.info('Waiting for response...');
         await new Promise((resolve) => setTimeout(resolve, 1000));
         const response = await axios.get(url, {
-            headers: {apiKey: YOUR_API_KEY},
+            headers: { apiKey: YOUR_API_KEY },
             params: { requestTime: handle.requestTime }
         });
         data = await reponse.data;
