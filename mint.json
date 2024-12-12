@@ -5,7 +5,7 @@
     "dark": "/logo/logo_white.png",
     "light": "/logo/logo_black.png"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/logo.svg",
   "colors": {
     "primary": "#0D9373",
     "light": "#07C983",
@@ -13,6 +13,14 @@
     "anchors": {
       "from": "#0D9373",
       "to": "#07C983"
+    }
+  },
+  "font": {
+    "headings": {
+      "family": "Clash Display"
+    },
+    "body": {
+      "family": "Satoshi"
     }
   },
   "topbarLinks": [
@@ -36,7 +44,7 @@
       "name": "API Reference",
       "openapi": "https://api.circlemind.co/openapi.json",
       "url": "api-reference",
-      "icon": "file"
+      "icon": "square-terminal"
     }
   ],
   "navigation": [
@@ -59,7 +67,7 @@
       ]
     },
     {
-      "group": "API Documentation",
+      "group": "REST APIs",
       "pages": [
         "rest/docs"
       ]
