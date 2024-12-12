@@ -5,7 +5,7 @@
     "dark": "/logo/logo_white.png",
     "light": "/logo/logo_black.png"
   },
-  "favicon": "/logo.svg",
+  "favicon": "/favicon.svg",
   "colors": {
     "primary": "#0D9373",
     "light": "#07C983",
@@ -13,6 +13,18 @@
     "anchors": {
       "from": "#0D9373",
       "to": "#07C983"
+    }
+  },
+  "font": {
+    "headings": {
+      "family": "Clash Display",
+      "url": "https://api.fontshare.com/v2/css?f[]=satoshi@300,301,400,401,500,700&display=swap",
+      "format": "woff2"
+    },
+    "body": {
+      "family": "Satoshi",
+      "url": "https://api.fontshare.com/v2/css?f[]=satoshi@300,301,400,401,500,700&display=swap",
+      "format": "woff2"
     }
   },
   "topbarLinks": [
