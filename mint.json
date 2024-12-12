@@ -15,14 +15,6 @@
       "to": "#07C983"
     }
   },
-  "font": {
-    "headings": {
-      "family": "Clash Display"
-    },
-    "body": {
-      "family": "Satoshi"
-    }
-  },
   "topbarLinks": [
     {
       "name": "Support",
