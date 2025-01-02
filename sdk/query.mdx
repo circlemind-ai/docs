@@ -6,8 +6,8 @@ icon: 'brackets-curly'
 
 Before querying data, make sure to [configure the API key in your environment](/sdk/getting-started#getting-started).
 
-**In the current Beta version, memories are eventually consistent.** 
-Memories may not be available for querying for **up to 10 minutes** after adding them for the first time. We will soon release an update that will eliminate this limitation. Following this update, ingestion will be almost instantaneous. If you would like to request earlier access to this new feature, reach out at `support@circlemind.co`.   
+**In the current version, memories are eventually consistent.** 
+Memories may not be available for querying for **up to 5 minutes** after adding them for the first time.
 
 You can query a graph by using the `query` method.
 
@@ -64,3 +64,19 @@ For example, assuming each memory's metadata contains a URL, we can provide mark
 ```
 
 where `i` is an incremental index automatically generated for each source used.
+
+### Only context
+It is also possible to request only the context retrieved by Circlemind, skipping the answer generation step.
+This can be helpful if, for example, you want to control the style used to generate your answer or to use custom LLMs.
+To achieve this, it is simply necessary to specify the flag `only_context=True` when querying a graph.
+The context will be available via `.context`:
+
+```python
+res = client.query(
+    query="Where does Sophie like to hike?",
+    graph_id="customer-id-123",
+    only_context=True
+  )
+
+print(res.context)
+```
