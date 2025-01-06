@@ -80,3 +80,30 @@ res = client.query(
 
 print(res.context)
 ```
+
+### Context length
+By default, Circlemind reserves the following amount of tokens for each data source:
+
+|   Data   | # Tokens |
+|:--------:|---------:|
+| Entities |      4000|
+| Relations|      3000|
+|  Chunks  |      9000|
+
+This behaviour can be customised by specifiying new values for each data source using the parameters `entities_max_tokens`, `relations_max_tokens`, `chunks_max_tokens`. For example:
+```python
+res = client.query(
+    query="Where does Sophie like to hike?",
+    graph_id="customer-id-123",
+    with_references=True,
+    entities_max_tokens=-1,
+    relations_max_tokens=-1,
+    chunks_max_tokens=16000
+  )
+```
+will return exclusively the chunk data.
+
+Notes:
+ - when requesting a non-negative number of tokens, Circlemind will try to fill in any available token space from other sources
+(e.g., when reserving 100 tokens for entities and relations and 1000 for chunks, if the chunks only use 900 tokens, the remaining 100 available tokens will be distributed to entities and relations).
+ - use the special value "-1" to disable this behaviour and effectively reserve 0 tokens for the target data sources.
