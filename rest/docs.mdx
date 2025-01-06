@@ -138,6 +138,8 @@ In this example:
 
   * `with_references`: Set to `true` to include references in the response.
 
+  * `entities_max_tokens`, `relations_max_tokens`, `chunks_max_tokens` to control the maxmimum amount of tokens allowed in the context. Check the [sdk documentation](/sdk/query#context-length) for more information.
+
 To get the answer, we track the status of the `query` request. Upon completion, the querying result can be found in `answer` (the LLM generated answer) and `context` (the context passed to the LLM).
 Note that the same procedure can be used to track `add` requests using the endpoint `https://api.circlemind.co/graph/{graph_name}/insert/{request_id}`.
 
