@@ -1,0 +1,58 @@
+---
+title: "Flight search"
+description: "Search flights using Smooth"
+---
+
+## Overview
+
+This guide demonstrates how to use Smooth to search for flights using Google Flights.
+
+<Steps>
+  <Step title="Define Search Parameters">
+    Structure your flight search task prompt.
+
+    ```python Python
+    flight_search = """
+    Search for flights on Google Flights from New York to London, departing tomorrow, coming back in a week. Find the cheapest round-trip option and return:
+    - Flight details (airline, flight number, times)
+    - Price, duration, and number of stops
+    """
+    ```
+  </Step>
+  
+  <Step title="Execute Flight Search">
+    Run your flight search task.
+
+    ```python Python
+    from smooth import SmoothClient
+
+    smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+    
+    task = smooth_client.run(
+        task=flight_search,
+        enable_recording=True
+    )
+
+    print(f"Live URL: {task.live_url()}")
+    task_result = task.result()
+    print(f"Agent Response: {task_result.output}")
+    print(f"Task Video: {task_result.recording_url()}")
+    ```
+
+    The agent will navigate Google Flights, input your search criteria, and analyze the results to find the best option.
+  </Step>
+</Steps>
+
+<Note>
+  This is a fun task! You could use the same template for automating procurement, online orders, and more.
+</Note>
+
+## Community
+
+<Card
+  title="Join Discord"
+  icon="discord"
+  href="https://discord.gg/VcdgMwUmMG"
+>
+  Join our community for support and showcases
+</Card>

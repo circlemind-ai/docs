@@ -4,30 +4,29 @@ description: 'Example section for showcasing API endpoints'
 ---
 
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  If you're using Python, we recommend using our [Python SDK](/quickstart).
 </Note>
 
-## Welcome
+## Setting up
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+Get your free API key and start running tasks in minutes.
 
 <Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
+  title="Get your free API key"
+  icon="key"
+  href="https://zero.circlemind.co/developer"
+  horizontal
 >
-  View the OpenAPI specification file
+  Unlock your free welcome credits. No credit card required.
 </Card>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API endpoints are authenticated using your API key.
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```curl cURL highlight={2}
+curl -X POST https://api2.circlemind.co/api/v1/task \ 
+          -H "apikey: cm-YOUR_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{"task": "<your_task_description>"}'
 ```

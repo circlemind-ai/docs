@@ -1,0 +1,83 @@
+---
+title: "Scrape behind login walls"
+description: "Learn how to scrape data from protected websites"
+---
+
+## Overview
+
+This guide demonstrates how to scrape data from websites that require user authentication by using persistent browser sessions. You'll learn to launch a browser session, authenticate manually, and then run automated tasks using that authenticated session.
+
+<Steps>
+  <Step title="Launch Browser Session">
+    First, create a new browser session that will persist your authentication cookies. This session will return a `session_id` and `live_url` for manual authentication.
+
+    ```python Python
+    from smooth import SmoothClient
+
+    smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+    session = smooth_client.open_session(session_id="gmail-session")
+
+    print(f"Live URL: {session.live_url()}")
+    print(f"Session ID: {session.session_id}")
+    ```
+
+    The `live_url` opens an interactive browser window where you can manually authenticate.
+  </Step>
+  
+  <Step title="Authenticate Manually">
+    Open the `live_url` in your browser and manually log in to Gmail:
+
+    1. Navigate to the live URL provided by the session
+    2. Go to gmail.com in the browser
+    3. Enter your email address and password
+    4. Complete any two-factor authentication if required
+    5. Verify you're successfully logged in to your Gmail inbox
+
+    Your authentication cookies are now securely stored in the session and will persist for future tasks.
+  </Step>
+  
+  <Step title="Run Automated Task">
+    Now use the authenticated session to run an automated task. The agent will access Gmail as a logged-in user and retrieve your last email.
+
+    ```python Python
+    task = smooth_client.run(
+        task="Go to Gmail and get the subject and sender of the most recent email in my inbox",
+        session_id="gmail-session"
+    )
+
+    print(f"Live URL: {task.live_url()}")
+    result = task.result()
+    print(f"Last email details: {result}")
+    ```
+
+    The agent will automatically use the stored authentication from your session to access Gmail and extract the requested information.
+  </Step>
+</Steps>
+
+## Key Benefits
+
+- **Persistent Authentication**: Sessions maintain login state across multiple tasks
+- **Manual Control**: You handle the authentication process manually for security
+- **Automated Execution**: Once authenticated, agents can run complex tasks automatically
+- **Session Reuse**: The same session can be used for multiple related tasks
+
+## Best Practices
+
+- Use descriptive session IDs for better organization
+- Keep sessions secure and don't share session IDs
+- Test authentication manually before running automated tasks
+- Handle rate limits and be respectful to the target website
+
+<Note>
+  Sessions persist cookies and authentication state, making them perfect for accessing protected content while maintaining security through manual authentication.
+</Note>
+
+## Community
+
+<Card
+  title="Join Discord"
+  icon="discord"
+  href="https://discord.gg/VcdgMwUmMG"
+>
+  Join our community for support and showcases
+</Card>

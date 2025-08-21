@@ -1,0 +1,33 @@
+---
+title: "Video recording"
+description: "Get a video recording of the agent run"
+---
+
+## Overview
+
+When running a task, you can use `enable_recording` to record a video of the agent run.
+
+## Getting the URL
+
+Use `recording_url()` to get the video recording after the task completes.
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+task = smooth_client.run(
+  task="<my-task>",
+  enable_recording=True,
+)
+
+print(f"Live URL: {task.live_url()}")
+print(f"Session recording URL: {task.recording_url()}")  # Waits for task completion
+```
+
+</CodeGroup>
+
+<Note>
+  If Python is not your language of choice, check out our [API Reference](/api-reference/introduction).
+</Note>

@@ -1,0 +1,78 @@
+---
+title: "Government portals"
+description: "Extract data from government portals like SEC filings"
+---
+
+<Note>
+  This guide demonstrates accessing public information without authentication. For authenticated access take a look at our [Guide: Scrape behind login walls](/guides/scrape-behind-login-walls).
+</Note>
+
+## Overview
+
+This guide shows how to use Smooth to extract information from government portals. You'll learn to automate the search and extraction of financial data from complex government websites, perfect for financial analysis, compliance research, and due diligence.
+
+<Steps>
+  <Step title="Search SEC Filings">
+    Navigate to the SEC's EDGAR database and search for a specific company's filings.
+
+    ```python Python
+    sec_search_task = """
+    Go to https://www.sec.gov/search-filings and search for "Apple Inc".
+    
+    Find their most recent 10-K filing.
+    
+    Extract:
+    - Filing date
+    - Document title
+    - Total net sales figure for the most recent fiscal year
+
+    Return the extracted info.
+    """
+    ```
+  </Step>
+  
+  <Step title="Execute SEC Search">
+    Run the search task to find Apple's latest 10-K filing.
+
+    ```python Python
+    from smooth import SmoothClient
+
+    smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+    
+    task = smooth_client.run(
+        task=sec_search_task,
+        enable_recording=True
+    )
+
+    print(f"Live URL: {task.live_url()}")
+    task_result = task.result()
+    print(f"Agent Response: {task_result.output}")
+    print(f"Task Video: {task.recording_url()}")
+    ```
+
+    The agent will navigate to the SEC portal, perform the search, identify the most recent 10-K filing, and extract the total net sales.
+  </Step>
+</Steps>
+
+## Use Cases
+
+- **Financial Analysis**: Extract key financial metrics from public filings
+- **Compliance Research**: Monitor regulatory submissions and updates
+- **Due Diligence**: Gather comprehensive financial data for investment decisions
+- **Competitive Intelligence**: Track competitors' financial performance over time
+- **Regulatory Monitoring**: Stay updated on companies' regulatory disclosures
+- **Investment Research**: Access detailed financial statements and footnotes
+
+<Note>
+  Smooth can navigate complex government portal layouts and extract structured data even when document formats vary between filings.
+</Note>
+
+## Community
+
+<Card
+  title="Join Discord"
+  icon="discord"
+  href="https://discord.gg/VcdgMwUmMG"
+>
+  Join our community for support and showcases
+</Card>

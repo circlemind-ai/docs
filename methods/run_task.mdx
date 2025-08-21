@@ -1,0 +1,172 @@
+---
+title: 'Run task'
+description: 'Launch a browser agent'
+---
+
+## Setting up
+
+Get your free API key and start running tasks in minutes.
+
+<Card
+  title="Get your free API key"
+  icon="key"
+  href="https://zero.circlemind.co/developer"
+  horizontal
+>
+  Unlock your free welcome credits. No credit card required.
+</Card>
+
+## Launch a task using the Python SDK
+
+Launch your first task in 4 lines of code.
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+task = smooth_client.run("Go to google flights and find the cheapest flight from London to Paris today")
+
+print(f"Live URL: {task.live_url()}")
+print(f"Agent response: {task.result()}")
+```
+
+</CodeGroup>
+
+<Note>
+  If Python is not your language of choice, check out our [API Reference](/api-reference/introduction).
+</Note>
+
+## Request
+
+All parameters available when running a task. 
+
+<ResponseField name="task" type="string" required>
+  The task for the agent to execute.
+  
+  Example: `Go to Google Flights and find the cheapest flight from London to Paris today`
+</ResponseField>
+
+<ResponseField name="agent" type="string">
+  The agent that will run the task. Currently, only `smooth` is available. Default: `smooth`.
+  
+  Example: `smooth`
+</ResponseField>
+
+<ResponseField name="session_id" type="string">
+  The browser session ID to be utilized. Each session retains its own state, including login credentials and cookies.
+  
+  Example: `session_12345`
+</ResponseField>
+
+<ResponseField name="max_steps" type="int">
+  The upper limit on the number of steps the agent can take during task execution. The range is from 2 to 64. Default: 32.
+  
+  Example: `64`
+</ResponseField>
+
+<ResponseField name="device" type="string">
+  The type of device for the task execution. Choose between `mobile` or `desktop`. Default: `mobile`.
+  
+  Example: `desktop`
+</ResponseField>
+
+<ResponseField name="enable_recording" type="boolean">
+  Toggles the option to record a video of the task execution. Default: False.
+  
+  Example: `True`
+</ResponseField>
+
+<ResponseField name="stealth_mode" type="boolean">
+  Activates stealth mode for the browser, which helps in avoiding detection. Default: False.
+  
+  Example: `True`
+</ResponseField>
+
+<ResponseField name="proxy_server" type="string">
+  The hostname or IP address of the proxy server that will be used for the session.
+  
+  Example: `proxy.example.com`
+</ResponseField>
+
+<ResponseField name="proxy_username" type="string">
+  The username for authenticating with the proxy server, if authentication is required.
+  
+  Example: `user123`
+</ResponseField>
+
+<ResponseField name="proxy_password" type="string">
+  The password for authenticating with the proxy server, if authentication is required.
+  
+  Example: `password123`
+</ResponseField>
+
+## Response
+
+Returns a `TaskHandle` with the following attributes.
+
+<ResponseField name="id" type="string">
+  The ID of the task.
+</ResponseField>
+
+<ResponseField name="live_url()" type="method">
+  Returns a live URL where you can see the agent in action.
+  
+  Set `interactive=True` to get an interactive view. 
+  
+  Set `embed=True` to get an embeddable view (ideal for iframes).
+</ResponseField>
+
+<ResponseField name="result()" type="method">
+  Waits for the task completion and returns a `TaskResponse` upon completion.
+</ResponseField>
+
+<ResponseField name="recording_url()" type="method">
+  Waits for the task completion and returns a recording URL upon completion. You can use this link to download the video recording of the task. The video will be ready shortly after the task completes.
+</ResponseField>
+
+## Waiting for task completion
+
+Use `result()` to wait for task completion.
+
+<CodeGroup>
+
+```python Python highlight={6}
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+task = smooth_client.run("Go to google flights and find the cheapest flight from London to Paris today")
+
+task_result = task.result()  # Waits for the agent response
+
+if task_result.status == "done":
+  print(f"Agent response: {task_result.output}")
+  print(f"Total cost: ${task_result.credits_used * 0.01}")
+else:
+  print(f"There was an error: {task_result.error}")
+```
+
+</CodeGroup>
+
+Returns a `TaskHandle` with the following attributes.
+
+<ResponseField name="id" type="string">
+  The ID of the task.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  The status of the task. One of: ["waiting", "running", "done", "failed"]
+</ResponseField>
+
+<ResponseField name="output" type="string">
+  The final response from the agent.
+</ResponseField>
+
+<ResponseField name="credits_used" type="int">
+  The number of credits used. Multiply by 0.01 to obtain the dollar amount.
+</ResponseField>
+
+<ResponseField name="device" type="string">
+  The device type used for the task. One of: ["mobile", "desktop"]
+</ResponseField>

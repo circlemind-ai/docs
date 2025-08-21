@@ -1,0 +1,53 @@
+---
+title: "Live share"
+description: "Get an interactive live view of the browser"
+---
+
+## Overview
+
+When running a task, you will receive a `live_url`, which can be used to view the agent actions live.
+
+## Getting the URL
+
+A `live_url` is returned when you run a task.
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+task = smooth_client.run(
+  task="<my-task>",
+)
+
+print(f"Live URL: {task.live_url()}")
+```
+
+</CodeGroup>
+
+<Note>
+  If Python is not your language of choice, check out our [API Reference](/api-reference/introduction).
+</Note>
+
+## Customizations
+
+You can customize the URL to make it interactive or full screen. Just pass the following parameters
+
+- `interactive=true` to get an interactive view
+- `embed=true` to get an embeddable view (ideal for iframes)
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+task = smooth_client.run(
+  task="<my-task>",
+)
+
+print(f"Live URL: {task.live_url(interactive=True, embed=True)}")
+```
+
+</CodeGroup>

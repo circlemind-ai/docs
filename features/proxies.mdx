@@ -1,0 +1,42 @@
+---
+title: "Proxies"
+description: "Learn how to use a proxy with Smooth"
+---
+
+## Overview
+
+Proxies act as intermediaries between Smooth and the internet. They can help you bypass restrictions and enhance stealth mode. 
+Using proxies with Smooth allows you to run tasks from a different IP address, which can be useful for web scraping and automation tasks.
+
+## Benefits of Using Proxies
+
+1. **Stealth**: Proxies can be used to enhance stealth mode.
+2. **Intranet**: Access content that is only available within your company's intranet.
+3. **Load Balancing**: Distribute requests across multiple proxies to avoid hitting rate limits on target websites.
+
+## Using Proxies with Smooth
+
+To use a proxy with Smooth, you need to specify the proxy server details in your task parameters. Here’s how you can do it:
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+task = smooth_client.run(
+  task="<my-task>",
+  proxy_server="<my-proxy-url>",
+  proxy_username="<my-proxy-username>",
+  proxy_password="<my-proxy-password>",
+)
+
+print(f"Live URL: {task(.live_url())}")
+print(f"Agent response: {task.result()}")
+```
+
+</CodeGroup>
+
+<Note>
+  If Python is not your language of choice, check out our [API Reference](/api-reference/introduction).
+</Note>

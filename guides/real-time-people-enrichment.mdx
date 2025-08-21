@@ -1,0 +1,97 @@
+---
+title: "Real-time people enrichment"
+description: "Enrich contact profiles with real-time data"
+---
+
+<Note>
+  This guide demonstrates unauthenticated lookups. For authenticated access take a look at our [Guide: Scrape behind login walls](/guides/scrape-behind-login-walls).
+</Note>
+
+## Overview
+
+This guide shows how to use Smooth to enrich people profiles with real-time social media data. You'll learn to extract public data from LinkedIn and Twitter, perfect for sales research, lead qualification, and competitive intelligence.
+
+<Steps>
+  <Step title="Find Latest LinkedIn Article">
+    Extract the title and details of someone's most recent LinkedIn article or post.
+
+    ```python Python
+    linkedin_enrichment_task = """
+    Go to Bill Gates' LinkedIn profile and find his latest article.
+    
+    Extract:
+    - Title of the latest article/post
+    - Publication date
+    - Brief summary of the content (2-3 sentences)
+    - Number of likes/reactions if visible
+    """
+    ```
+  </Step>
+  
+  <Step title="Execute LinkedIn Lookup">
+    Run the enrichment task to get the latest LinkedIn article.
+
+    ```python Python
+    from smooth import SmoothClient
+
+    smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+    
+    task = smooth_client.run(
+        task=linkedin_enrichment_task,
+        enable_recording=True
+    )
+
+    print(f"Live URL: {task.live_url()}")
+    task_result = task.result()
+    print(f"Agent Response: {task_result.output}")
+    print(f"Task Video: {task_result.recording_url}")
+    ```
+
+    The agent will navigate to the LinkedIn profile, identify the most recent article, and extract the relevant details.
+  </Step>
+
+  <Step title="Analyze Twitter Highlighted Posts">
+    Extract topics and themes from someone's Twitter profile.
+
+    ```python Python
+    twitter_enrichment_task = """
+    Go to Bill Gates' Twitter profile and analyze the visible posts.
+    
+    Identify the top 3-5 themes or topics he frequently discusses.
+    
+    Return the top themes and topics he frequently discusses.
+    """
+
+    task = smooth_client.run(
+        task=twitter_enrichment_task,
+        enable_recording=True
+    )
+
+    result = task.result()
+    print(f"Agent response: {result.output}")
+    ```
+  </Step>
+</Steps>
+
+## Use Cases
+
+- **Sales Intelligence**: Research prospects before outreach calls
+- **Competitive Analysis**: Track competitor executives' public statements
+- **Partnership Research**: Understand potential partners' current focus areas
+- **Media Monitoring**: Stay updated on key industry leaders' perspectives
+- **Lead Qualification**: Assess prospect engagement and interests
+- **Content Strategy**: Identify trending topics among target audiences
+
+<Note>
+  Smooth adapts and finds alternative ways to access the information even when social media platforms update their layouts.
+</Note>
+
+## Community
+
+<Card
+  title="Join Discord"
+  icon="discord"
+  href="https://discord.gg/VcdgMwUmMG"
+>
+  Join our community for support and showcases
+</Card>

@@ -1,0 +1,87 @@
+---
+title: "Social media automation"
+description: "Automate actions on social media using Smooth"
+---
+
+## Overview
+
+This guide demonstrates how to use Smooth to automate sending a LinkedIn connection. You'll learn to manually authenticate to LinkedIn and then run automated tasks to connect with specific professionals.
+
+<Steps>
+  <Step title="Launch LinkedIn Session">
+    Create a new browser session for LinkedIn that will persist your authentication cookies. This approach ensures secure access while maintaining your login state.
+
+    ```python Python
+    from smooth import SmoothClient
+
+    smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+    session = smooth_client.open_session(session_id="linkedin-automation")
+
+    print(f"Live URL: {session.live_url()}")
+    print(f"Session ID: {session.session_id}")
+    ```
+
+    The `live_url` provides an interactive browser window for manual authentication.
+  </Step>
+  
+  <Step title="Authenticate to LinkedIn">
+    Open the `live_url` in your browser and manually log in to LinkedIn:
+
+    1. Navigate to the live URL provided by the session
+    2. Go to linkedin.com in the browser
+    3. Enter your LinkedIn email and password
+    4. Complete any security verification if prompted
+    5. Verify you're successfully logged into your LinkedIn home feed
+
+    Your authentication cookies are now stored in the session for automated tasks.
+  </Step>
+  
+  <Step title="Automate Connection Request">
+    Use the authenticated session to automatically find and connect with Antonio Vespoli from Circlemind.
+
+    ```python Python
+    connection_task = """
+    Search for "Antonio Vespoli Circlemind" on LinkedIn. Find his profile and send a connection request with the message: "Hi Antonio, I love Smooth. Would love to connect!"
+    """
+
+    task = smooth_client.run(
+        task=connection_task,
+        session_id="linkedin-automation",
+        enable_recording=True
+    )
+
+    print(f"Live URL: {task.live_url()}")
+    result = task.result()
+    print(f"Agent Response: {result.output}")
+    print(f"Task video: {result.recording_url}")
+    ```
+
+    The agent will search LinkedIn, locate Antonio's profile, and send a personalized connection request.
+  </Step>
+</Steps>
+
+## Advanced Use Cases
+
+- **Bulk Connections**: Connect with multiple professionals in your industry
+- **Content Engagement**: Automatically like and comment on posts from your network on Twitter, Linkedin, and more
+- **Lead Generation**: Find and connect with potential customers or partners
+- **Profile Management**: Update your status, share content, or manage your profile
+
+## Best Practices
+
+- **Respect Rate Limits**: LinkedIn has strict limits on daily connection requests
+- **Respect Website Terms**: Use your best judgment to respect the website Terms of Service.
+
+<Note>
+  Always follow LinkedIn's Terms of Service and use automation responsibly. Manual authentication ensures compliance with security policies while enabling powerful automation capabilities.
+</Note>
+
+## Community
+
+<Card
+  title="Join Discord"
+  icon="discord"
+  href="https://discord.gg/VcdgMwUmMG"
+>
+  Join our community for support and showcases
+</Card>

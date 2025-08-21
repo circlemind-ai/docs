@@ -1,0 +1,124 @@
+---
+title: "Invoice retrieval"
+description: "Learn how to retrieve invoice information with Smooth"
+---
+
+## Overview
+
+This guide demonstrates how to use Smooth to retrieve invoice information from subscription services like Calendly. You'll learn to authenticate manually (once), and have Smooth navigate to billing sections to extract payment data from your most recent invoice automatically.
+
+<Steps>
+  <Step title="Launch Authenticated Session">
+    Create a persistent browser session for Calendly authentication. This session will maintain your login state across tasks.
+
+    ```python Python
+    from smooth import SmoothClient
+
+    smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+    session = smooth_client.open_session(session_id="calendly-billing")
+
+    print(f"Live URL: {session.live_url()}")
+    print(f"Session ID: {session.session_id}")
+    ```
+
+    The `live_url` opens an interactive browser window where you can manually authenticate.
+  </Step>
+  
+  <Step title="Authenticate Manually">
+    Open the `live_url` in your browser and manually log in to your Calendly account:
+
+    1. Navigate to the live URL provided by the session
+    2. Go to calendly.com and click "Log In"
+    3. Enter your email address and password
+    4. Complete any two-factor authentication if required
+    5. Verify you're successfully logged in to your Calendly dashboard
+
+    Your authentication cookies are now securely stored in the session for automated tasks.
+  </Step>
+  
+  <Step title="Extract Invoice Amount">
+    Use the authenticated session to navigate to your billing section and retrieve the last payment amount.
+
+    ```python Python
+    invoice_task = """
+    Go to the Calendly billing page and find my most recent invoice.
+    
+    Extract:
+    - Invoice date
+    - Amount paid
+    
+    Return this information.
+    """
+
+    task = smooth_client.run(
+        task=invoice_task,
+        session_id="calendly-billing",
+        enable_recording=True
+    )
+
+    print(f"Live URL: {task.live_url()}")
+    result = task.result()
+    print(f"Agent response: {result.output}")
+    print(f"Task Video: {task.recording_url()}")
+    ```
+
+    The agent will navigate to your billing page, locate the most recent invoice, and extract the payment information.
+  </Step>
+
+  <Step title="Format for Integration">
+    Request structured data output for easy integration with accounting or expense tracking systems.
+
+    ```python Python
+    structured_invoice_task = """
+    Go to my Calendly billing page and get the most recent invoice details.
+    
+    Return the data in this JSON format:
+    {
+      "invoice_date": "YYYY-MM-DD",
+      "amount_paid": 12.00,
+      "currency": "USD",
+      "payment_method": "Card ending in 1234",
+      "billing_period": "January 2025",
+      "invoice_number": "INV-123456"
+    }
+    
+    Use None for any missing information.
+    """
+
+    task = smooth_client.run(
+        task=structured_invoice_task,
+        session_id="calendly-billing"
+    )
+
+    result = task.result()
+    
+    # Parse the structured invoice data
+    import json
+    invoice_data = json.loads(result.output)
+    
+    print(f"Last payment: ${invoice_data['amount_paid']} on {invoice_data['invoice_date']}")
+    print(f"Paid with: {invoice_data['payment_method']}")
+    ```
+  </Step>
+</Steps>
+
+## Use Cases
+
+- **Expense Tracking**: Automatically extract billing information for accounting
+- **Budget Monitoring**: Track recurring payments across multiple services
+- **Invoice Automation**: Integrate payment data with expense management systems
+- **Audit Compliance**: Maintain accurate records of business subscriptions
+
+<Note>
+  This approach works with any web service that has a billing dashboard. The key is authenticating manually first, then letting the agent navigate to extract the specific invoice data you need.
+</Note>
+
+## Community
+
+<Card
+  title="Join Discord"
+  icon="discord"
+  href="https://discord.gg/VcdgMwUmMG"
+>
+  Join our community for support and showcases
+</Card>

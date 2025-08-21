@@ -1,0 +1,103 @@
+---
+title: "QA testing"
+description: "Automate QA testing workflows"
+---
+
+## Overview
+
+This guide demonstrates how to use Smooth for automated QA testing. You'll learn to create comprehensive test scenarios that validate user workflows, form submissions, and application functionality.
+
+<Steps>
+  <Step title="Define Test Scenarios">
+    Structure your QA test with clear validation criteria. Define what constitutes success and failure for each test case.
+
+    ```python Python
+    test_scenario = """
+    Test this flow on apple.com:
+    
+    1. Navigate to the apple website
+    2. Go to the page to buy the latest iphone
+    3. Select the basic configuration, black, maximum storage
+    4. No trade in
+    5. Return the price options
+    """
+    ```
+  </Step>
+  
+  <Step title="Run Comprehensive Tests">
+    Execute your test scenario.
+
+    ```python Python
+    from smooth import SmoothClient
+
+    smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+    
+    task = smooth_client.run(
+        task=test_scenario,
+        enable_recording=True  # For QA testing, we recommend enabling recording for later analysis
+    )
+
+    print(f"Live URL: {task.live_url()}")
+    task_result = task.result()
+    print(f"Agent Response: {task_result.output}")
+    print(f"Task Video: {task_result.recording_url}")
+    ```
+
+    The agent will systematically execute each test step and provide the requested information.
+  </Step>
+
+  <Step title="Validate Edge Cases">
+    Test boundary conditions and error handling by creating scenarios with invalid inputs or unusual user behavior.
+
+    ```python Python
+    edge_case_test = """
+    Test form validation on https://github.com/signup:
+    
+    1. Try submitting with empty required fields
+    2. Enter invalid email formats (test@, @example.com, plain text)
+    3. Verify error messages are clear and helpful
+    
+    Report any issues. If none, just say it.
+    """
+    
+    task = smooth_client.run(task=edge_case_test, max_steps=24)
+    task_result = task.result()
+    print(f"Agent Response: {task_result.output}")
+    print(f"Task Video: {task_result.recording_url}")
+    ```
+  </Step>
+</Steps>
+
+## Key Benefits
+
+- **Automated Regression Testing**: Run consistent tests across application updates
+- **Test Responsive Behavior**: Verify functionality across different screen sizes
+- **User Experience Verification**: Validate complete user journeys from start to finish
+- **Error Detection**: Identify UI bugs, broken links, and form validation issues
+
+## Best Practices
+
+- **Write Detailed Test Cases**: Include specific validation criteria and expected outcomes
+- **Test User Journeys**: Focus on complete workflows rather than isolated features
+- **Document Failures Clearly**: Capture videos for later analysis
+
+## Common QA Test Types
+
+You can automate various testing scenarios:
+- **Functional Testing**: Verify features work as intended
+- **Form Validation**: Test input validation and error handling
+- **Navigation Testing**: Ensure all links and menus function correctly
+
+<Note>
+  QA testing with Smooth provides real browser interaction, making it ideal for testing web applications and complex user interfaces that traditional testing tools might miss.
+</Note>
+
+## Community
+
+<Card
+  title="Join Discord"
+  icon="discord"
+  href="https://discord.gg/VcdgMwUmMG"
+>
+  Join our community for support and showcases
+</Card>

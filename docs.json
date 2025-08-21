@@ -1,48 +1,61 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Smooth",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#0081ff",
+    "light": "#0081ff",
+    "dark": "#0081ff"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
             "group": "Getting started",
             "pages": [
               "index",
               "quickstart",
-              "development"
+              "pricing",
+              "performance"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Agent",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "methods/run_task"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "Session",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "methods/launch_browser",
+              "methods/list_sessions"
             ]
           },
           {
-            "group": "AI tools",
+            "group": "Features",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "features/persistent-sessions",
+              "features/proxies",
+              "features/live-share",
+              "features/session-recording"
+            ]
+          },
+          {
+            "group": "Use cases",
+            "pages": [
+              "guides/scrape-behind-login-walls",
+              "guides/fill-in-multi-step-dynamic-forms",
+              "guides/qa-testing",
+              "guides/flight-search",
+              "guides/social-media-automation",
+              "guides/lead-capture",
+              "guides/real-time-people-enrichment",
+              "guides/government-portals",
+              "guides/invoice-retrieval"
             ]
           }
         ]
@@ -57,13 +70,8 @@
             ]
           },
           {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
+            "group": "Endpoints",
+            "openapi": "/api-reference/openapi.json"
           }
         ]
       }
@@ -71,19 +79,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "Playground",
+          "href": "https://zero.circlemind.co/developer",
+          "icon": "play"
         },
         {
           "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "href": "https://discord.gg/VcdgMwUmMG",
+          "icon": "discord"
         }
       ]
     }
@@ -96,13 +99,13 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:hi@circlemind.co"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Get an API key",
+      "href": "https://zero.circlemind.co"
     }
   },
   "contextual": {

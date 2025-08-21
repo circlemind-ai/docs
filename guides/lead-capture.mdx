@@ -1,0 +1,115 @@
+---
+title: "Lead capture"
+description: "Extract structured contact data for lead generation"
+---
+
+## Overview
+
+This guide demonstrates how to use Smooth to capture leads from conference speaker directories. You'll learn to extract speaker information from The AI Summit London website and format the output as structured data for your CRM or lead generation workflows.
+
+<Steps>
+  <Step title="Define Data Extraction Task">
+    Structure your lead capture task with specific requirements for the data you want to extract.
+
+    ```python Python
+    lead_capture_task = """
+    Go to https://london.theaisummit.com/conference-agenda/speakers-2025 and extract information about all speakers. 
+    For each speaker, collect:
+    - Full name
+    - Speaker description
+    
+    Return the data in JSON format as an array of speaker objects.
+    """
+    ```
+  </Step>
+  
+  <Step title="Execute Lead Capture">
+    Run your lead capture task to extract all speaker information from the conference website.
+
+    ```python Python
+    from smooth import SmoothClient
+
+    smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+    
+    task = smooth_client.run(
+        task=lead_capture_task,
+        enable_recording=True
+    )
+
+    print(f"Live URL: {task.live_url()}")
+    task_result = task.result()
+    print(f"Agent Response: {task_result.output}")
+    print(f"Task Video: {task_result.recording_url}")
+    ```
+
+    The agent will navigate the speaker directory, extract information from each profile, and return structured JSON data.
+  </Step>
+
+  <Step title="Request Specific Output Format">
+    For more control over the output structure, specify exactly how you want the data formatted.
+
+    ```python Python
+    structured_extraction = """
+    Go to https://london.theaisummit.com/conference-agenda/speakers-2025 and extract speaker information.
+    
+    Return the data in this exact JSON format:
+    {
+      "total_speakers": <number>,
+      "speakers": [
+        {
+          "name": "Full Name",
+          "title": "Job Title",
+          "company": "Company Name",
+        }
+      ]
+    }
+    
+    Ensure all fields are included even if empty (use None for missing data).
+    """
+
+    task = smooth_client.run(
+        task=structured_extraction,
+        enable_recording=True
+    )
+
+    result = task.result()
+    speakers_data = result.output
+    
+    # Parse and use the structured data
+    import json
+    speaker_list = json.loads(speakers_data)
+    print(f"Found {speaker_list['total_speakers']} speakers")
+    
+    for speaker in speaker_list['speakers']:
+        print(f"- {speaker['name']} at {speaker['company']}")
+    ```
+  </Step>
+</Steps>
+
+## Use Cases
+
+- **Conference Networking**: Build prospect lists from industry events
+- **Competitor Research**: Analyze speaker lineups at competitor events  
+- **Partnership Opportunities**: Identify potential collaborators or customers
+- **Market Intelligence**: Track industry thought leaders and trends
+- **Sales Prospecting**: Generate targeted outreach lists
+
+## Best Practices
+
+- **Respect Website Terms**: Always check robots.txt and terms of service
+- **Data Quality**: Validate extracted data before importing to your systems
+- **Privacy Compliance**: Follow GDPR and other privacy regulations
+
+<Note>
+  This approach works for any public directory or listing page. The key is being specific about the data structure you want in your task prompt.
+</Note>
+
+## Community
+
+<Card
+  title="Join Discord"
+  icon="discord"
+  href="https://discord.gg/VcdgMwUmMG"
+>
+  Join our community for support and showcases
+</Card>

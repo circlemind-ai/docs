@@ -1,0 +1,78 @@
+---
+title: "Dynamic multi-step forms"
+description: "Automate filling in complex multi-step forms"
+---
+
+## Overview
+
+This guide demonstrates how to use Smooth to fill in complex, multi-step forms. You'll learn how to structure the task prompt for these tasks.
+
+<Steps>
+  <Step title="Write the task instruction">
+    Write detailed instructions that tell the agent exactly what to do. The best practice for form filling is to structure the prompt in 3 parts:
+    1. The goal
+    2. All information needed to fill-in the form
+    3. The expected output
+
+    ```python Python
+    task_instructions = """
+    Go to octopus.energy and get a quote for gas + electricity. Use the following information:
+    
+    - 1, Garlic Row, Cambridge CB5 8HW
+    - Medium consumption
+
+    Return the final monthly estimate for all available tariffs.
+    """
+    ```
+  </Step>
+  
+  <Step title="Run the task">
+    Run the task with a higher number of steps.
+
+    ```python Python
+    task = smooth_client.run(
+        task=task_instructions,
+        max_steps=64,  # Multi-step forms may require many steps
+    )
+
+    print(f"Live URL: {task.live_url()}")
+    
+    # Get the result
+    result = task.result()
+    print(f"Insurance quote result: {result}")
+    ```
+  </Step>
+
+  <Step title="Done!">
+    The agent will adapt to the form's structure, whether it's a single long page or multiple sequential steps, and handle dynamic fields that appear based on previous selections.
+  </Step>
+</Steps>
+
+## Key Benefits
+
+- **Dynamic Adaptation**: Agent handles forms that change based on user input
+- **Multi-Step Navigation**: Seamlessly moves through complex form sequences
+- **Error Recovery**: Can handle validation errors and retry with corrected information
+
+## Best Practices
+- **Give Clear Default Instructions**: Specify how to handle missing information scenarios
+- **Set Adequate Step Limits**: Multi-step forms often require more steps than simple tasks
+- **Include Guidance**: If needed, tell the agent how to handle common pitfalls
+
+## Common Use Cases
+You can use this approach for automating a variety of tasks, such as:
+- Transfering data across systems
+- Getting quotes
+- Submitting forms
+
+## Community
+
+<Card
+  title="Join Discord"
+  icon="discord"
+  href="https://discord.gg/VcdgMwUmMG"
+>
+  Join our community for support and showcases
+</Card>
+
+
