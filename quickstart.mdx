@@ -35,7 +35,7 @@ Submit a task in seconds
 ```python Python
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 task = smooth_client.run("Go to google flights and find the cheapest flight from London to Paris today")
 
 print(f"Live URL: {task.live_url()}")
@@ -55,7 +55,7 @@ fetch('https://api2.circlemind.co/api/v1/task/smooth', {
 
 ```curl cURL
 curl -X POST https://api2.circlemind.co/api/v1/task/smooth \ 
-          -H "apikey: cm-YOUR_API_KEY" \
+          -H "apikey: cmzr-YOUR_API_KEY" \
           -H "Content-Type: application/json" \
           -d '{"max_steps": 32, "task": "your_task_description"}'
 ```

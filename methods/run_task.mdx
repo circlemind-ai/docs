@@ -25,7 +25,7 @@ Launch your first task in 4 lines of code.
 ```python Python
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 task = smooth_client.run("Go to google flights and find the cheapest flight from London to Paris today")
 
 print(f"Live URL: {task.live_url()}")
@@ -135,7 +135,7 @@ Use `result()` to wait for task completion.
 ```python Python highlight={6}
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 task = smooth_client.run("Go to google flights and find the cheapest flight from London to Paris today")
 
 task_result = task.result()  # Waits for the agent response

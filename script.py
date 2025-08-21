@@ -87,7 +87,7 @@ def run_task(smooth_client, task_description, device=None):
         }
 
 def main():
-    smooth_client = SmoothClient(api_key="cm-YOUR_API_KEY")
+    smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
     
     print(f"Running {len(tasks)} tasks in parallel...")
     
