@@ -340,6 +340,11 @@
             ],
             "description": "The session ID to open in the browser. If None, a new session will be created with a random name.",
             "title": "Session Id"
+          },
+          "live_view": {
+            "type": "boolean",
+            "description": "Whether to open a live browser instance using the specified session.",
+            "title": "Live View"
           }
         },
         "type": "object",
@@ -348,20 +353,19 @@
       },
       "BrowserSessionResponse": {
         "properties": {
-          "live_url": {
-            "type": "string",
-            "title": "Live Url",
-            "description": "The live URL to interact with the browser session."
-          },
           "session_id": {
             "type": "string",
             "title": "Session Id",
             "description": "The ID of the browser session associated with the opened browser instance."
+          },
+          "live_url": {
+            "type": "string",
+            "title": "Live Url",
+            "description": "The live URL to interact with the browser session."
           }
         },
         "type": "object",
         "required": [
-          "live_url",
           "session_id"
         ],
         "title": "BrowserSessionResponse",
@@ -391,6 +395,12 @@
             "type": "string",
             "title": "Task",
             "description": "The task to run."
+          },
+          "response_model": {
+            "type": "object",
+            "title": "Response Model",
+            "description": "If provided, the JSON schema describing the desired output structure.",
+            "default": null
           },
           "agent": {
             "type": "string",

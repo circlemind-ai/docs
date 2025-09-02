@@ -3,6 +3,7 @@ title: 'Run task'
 description: 'Launch a browser agent'
 ---
 
+
 ## Setting up
 
 Get your free API key and start running tasks in minutes.
@@ -15,6 +16,7 @@ Get your free API key and start running tasks in minutes.
 >
   Unlock your free welcome credits. No credit card required.
 </Card>
+
 
 ## Launch a task using the Python SDK
 
@@ -39,6 +41,7 @@ print(f"Agent response: {task.result()}")
   If Python is not your language of choice, check out our [API Reference](/api-reference/introduction).
 </Note>
 
+
 ## Request
 
 All parameters available when running a task. 
@@ -47,6 +50,25 @@ All parameters available when running a task.
   The task for the agent to execute.
   
   Example: `Go to Google Flights and find the cheapest flight from London to Paris today`
+</ResponseField>
+
+<ResponseField name="response_model" type="dict | BaseModel">
+  If provided, enforces a specific output structure.
+  It can either be a dictionary describing a JSON schema or a Pydantic Model.
+  Default: `None`.
+  
+  Example:
+  ```json
+  {
+    "type": "object",
+    "properties": {
+      "output": {
+        "type": "integer",
+        "description": "The integer part of the result of the calculation"
+      }
+    }
+  }
+  ```
 </ResponseField>
 
 <ResponseField name="agent" type="string">
@@ -107,8 +129,8 @@ All parameters available when running a task.
 
 Returns a `TaskHandle` with the following attributes.
 
-<ResponseField name="id" type="string">
-  The ID of the task.
+<ResponseField name="id()" type="method">
+  Returns the ID of the task.
 </ResponseField>
 
 <ResponseField name="live_url()" type="method">
@@ -126,6 +148,7 @@ Returns a `TaskHandle` with the following attributes.
 <ResponseField name="recording_url()" type="method">
   Waits for the task completion and returns a recording URL upon completion. You can use this link to download the video recording of the task. The video will be ready shortly after the task completes.
 </ResponseField>
+
 
 ## Waiting for task completion
 
@@ -150,7 +173,7 @@ else:
 
 </CodeGroup>
 
-Returns a `TaskHandle` with the following attributes.
+Returns a `TaskResponse` with the following attributes.
 
 <ResponseField name="id" type="string">
   The ID of the task.
@@ -160,7 +183,7 @@ Returns a `TaskHandle` with the following attributes.
   The status of the task. One of: ["waiting", "running", "done", "failed"]
 </ResponseField>
 
-<ResponseField name="output" type="string">
+<ResponseField name="output" type="any">
   The final response from the agent.
 </ResponseField>
 
@@ -171,3 +194,40 @@ Returns a `TaskHandle` with the following attributes.
 <ResponseField name="device" type="string">
   The device type used for the task. One of: ["mobile", "desktop"]
 </ResponseField>
+
+
+## Structured output
+
+Smooth supports structured output, simply set the `response_model` field by passing either a Pydantic Model or a JSON schema.
+
+<CodeGroup>
+
+```python Python
+# pip install smooth-py
+from smooth import SmoothClient
+from pydantic import BaseModel
+
+class MyStructuredOutput(BaseModel):
+  my_output_data: list[int] = Field(description="A list of random numbers.")
+
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+task = smooth_client.run("Output five random numbers.", response_model=MyStructuredOutput)
+
+# or
+# ..., response_model = {
+#   "type": "object",
+#   "properties": {
+#     "my_output_data": {
+#       "description": "A list of random numbers.",
+#       "items": {
+#         "type": "integer"
+#       },
+#       "type": "array"
+#     }
+#   }
+# }
+
+print(f"Agent response: {task.result()}")
+```
+
+</CodeGroup>

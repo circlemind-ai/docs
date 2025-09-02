@@ -66,14 +66,25 @@ All parameters available when opening a browser session.
   Example: `my-test-session`
 </ResponseField>
 
-## Response
+<ResponseField name="live_view" type="boolean">
+  Request a live URL to interact with the browser session. Default: `True`.
 
-Returns a `BrowserSessionResponse` with the following attributes.
-
-<ResponseField name="session_id" type="string">
-  The ID of the session.
+  Set it to `True` if you want to manually interact with the browser to perform logins or other authentications.
+  Set it to `False` if you want to simply create an empty browser profile for Smooth to interact with in future tasks.
 </ResponseField>
 
-<ResponseField name="live_url" type="string">
-  The live url where you can interact with the browser.
+## Response
+
+Returns a `BrowserSessionHandle` with the following attributes.
+
+<ResponseField name="session_id()" type="method">
+  Returns ID of the session.
+</ResponseField>
+
+<ResponseField name="live_url()" type="method">
+  Returns a live URL where you can interact with the browser (requires `live_view=True`).
+
+  Set `interactive=True` to get an interactive view. 
+  
+  Set `embed=True` to get an embeddable view (ideal for iframes).
 </ResponseField>
