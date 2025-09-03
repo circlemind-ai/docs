@@ -149,6 +149,11 @@ Returns a `TaskHandle` with the following attributes.
   Waits for the task completion and returns a recording URL upon completion. You can use this link to download the video recording of the task. The video will be ready shortly after the task completes.
 </ResponseField>
 
+<Warning>
+  `TaskResponse` contains also `live_url` and `recording_url` to be compatible with the API structure.
+  Use `TaskHandle.live_url()` and `TaskHandle.recording_url()` as they handle the underlying API polling for you.
+</Warning>
+
 
 ## Waiting for task completion
 
