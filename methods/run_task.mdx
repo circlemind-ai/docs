@@ -99,6 +99,24 @@ All parameters available when running a task.
   Example: `desktop`
 </ResponseField>
 
+<ResponseField name="url" type="string">
+  The starting url for the task.
+  
+  Example: `https://amazon.com`
+</ResponseField>
+
+<ResponseField name="metadata" type="string">
+  A map containing variables or parameters that will be passed to the agent.
+  
+  Example: `{"username": "my_username"}`
+</ResponseField>
+
+<ResponseField name="agent" type="string">
+  The agent that will run the task. Currently, only `smooth` is available. Default: `smooth`.
+  
+  Example: `smooth`
+</ResponseField>
+
 <ResponseField name="enable_recording" type="boolean">
   Toggles the option to record a video of the task execution. Default: False.
   
