@@ -402,6 +402,29 @@
             "description": "If provided, the JSON schema describing the desired output structure.",
             "default": null
           },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url",
+            "description": "The starting URL for the task. If not provided, the agent will start from a blank page.",
+            "default": null
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Metadata",
+            "description": "A dictionary containing variables or parameters that will be passed to the agent.",
+            "default": null
+          },
           "agent": {
             "type": "string",
             "enum": [
