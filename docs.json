@@ -41,7 +41,8 @@
               "features/persistent-sessions",
               "features/proxies",
               "features/live-share",
-              "features/session-recording"
+              "features/session-recording",
+              "features/structured-output"
             ]
           },
           {
