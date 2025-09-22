@@ -17,13 +17,14 @@ This guide demonstrates how to use Smooth to upload files to websites.
     smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
     file = smooth_client.upload_file(
-      name="meaningful_file_name.png", 
-      file=open("/path/to/file.png", "rb")
+      file=open("/path/to/file.png", "rb"),
+      name="meaningful_file_name.png"
     )
     ```
 
     <Note>
       When uploading multiple files, we recommend using meaningful file names to help Smooth disambiguate their content.
+      An optional `purpose` can be given to further highlight the role of the file (i.e., `purpose="the bank statement pdf"`).
     </Note>
   </Step>
   
