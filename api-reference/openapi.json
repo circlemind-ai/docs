@@ -323,6 +323,118 @@
           }
         ]
       }
+    },
+    "/file": {
+      "post": {
+        "summary": "Upload File",
+        "description": "Upload a file to be used by tasks. The uploaded file can be accessed in the task via the `file://<file_id>` URL.",
+        "operationId": "upload_file_file_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File successfully uploaded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadFileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request"
+          },
+          "422": {
+            "description": "Validation Error"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "cURL",
+            "source": "curl -X POST \"https://api2.circlemind.co/api/v1/file\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -F \"file=@/path/to/your/file.txt\""
+          },
+          {
+            "lang": "python",
+            "label": "Python (sync)",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nwith open(\"/path/to/your/file.txt\", \"rb\") as f:\n    upload_response = client.upload_file(f)\nprint(f\"File uploaded with ID: {upload_response.id}\")"
+          },
+          {
+            "lang": "python",
+            "label": "Python (async)",
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def upload_file():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    with open(\"/path/to/your/file.txt\", \"rb\") as f:\n        upload_response = await client.upload_file(f)\n    print(f\"File uploaded with ID: {upload_response.id}\")\n\nasyncio.run(upload_file())"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api2.circlemind.co/api/v1/file';\n\nasync function uploadFile(file) {\n  const formData = new FormData();\n  formData.append('file', file);\n\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'apikey': apiKey\n      },\n      body: formData\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('File uploaded with ID:', data.r.id);\n  } catch (error) {\n    console.error('Error uploading file:', error);\n  }\n}\n\n// Usage example (in a browser environment):\n// const fileInput = document.querySelector('input[type=\"file\"]');\n// fileInput.addEventListener('change', (event) => {\n//   const file = event.target.files[0];\n//   uploadFile(file);\n// });"
+          }
+        ]
+      }
+    },
+    "/file/{file_id}": {
+      "delete": {
+        "summary": "Delete File",
+        "description": "Delete an uploaded file by its ID.",
+        "operationId": "delete_file_file__file_id__delete",
+        "parameters": [
+          {
+            "name": "file_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File successfully deleted."
+          },
+          "404": {
+            "description": "File not found."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "cURL",
+            "source": "curl -X DELETE \"https://api2.circlemind.co/api/v1/file/YOUR_FILE_ID\" \\\n     -H \"apikey: YOUR_API_KEY\""
+          },
+          {
+            "lang": "python",
+            "label": "Python (sync)",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nclient.delete_file(file_id=\"YOUR_FILE_ID\")"
+          },
+          {
+            "lang": "python",
+            "label": "Python (async)",
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def delete_file():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    await client.delete_file(file_id=\"YOUR_FILE_ID\")\n    await client.close()\n\nasyncio.run(delete_file())"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst fileId = 'YOUR_FILE_ID'; // The ID of the file to delete\nconst url = `https://api2.circlemind.co/api/v1/file/${fileId}`;\n\nasync function deleteFile() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`File '${fileId}' deleted successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error deleting file:', error);\n  }\n}\n\ndeleteFile();"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -608,6 +720,20 @@
         ],
         "title": "TaskResponse",
         "description": "Task response model."
+      },
+      "UploadFileResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID assigned to the uploaded file."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "UploadFileResponse",
+        "description": "Response model for uploading a file."
       }
     },
     "securitySchemes": {
