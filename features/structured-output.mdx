@@ -1,0 +1,41 @@
+---
+title: "Structured output"
+description: "Learn how to use structured outputs"
+---
+
+## Overview
+
+Structured outputs allow you to write deterministic code based on the agent's output. 
+To activate structured outputs, set the `response_model` field by passing either a Pydantic Model or a JSON schema.
+
+<CodeGroup>
+
+```python Python
+# pip install smooth-py
+from smooth import SmoothClient
+from pydantic import BaseModel
+
+class MyStructuredOutput(BaseModel):
+  my_output_data: list[int] = Field(description="A list of random numbers.")
+
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+task = smooth_client.run("Output five random numbers.", response_model=MyStructuredOutput)
+
+# or
+# ..., response_model = {
+#   "type": "object",
+#   "properties": {
+#     "my_output_data": {
+#       "description": "A list of random numbers.",
+#       "items": {
+#         "type": "integer"
+#       },
+#       "type": "array"
+#     }
+#   }
+# }
+
+print(f"Agent response: {task.result()}")
+```
+
+</CodeGroup>

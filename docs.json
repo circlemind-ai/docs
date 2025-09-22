@@ -41,7 +41,8 @@
               "features/persistent-sessions",
               "features/proxies",
               "features/live-share",
-              "features/session-recording"
+              "features/session-recording",
+              "features/structured-output"
             ]
           },
           {
@@ -55,7 +56,8 @@
               "guides/lead-capture",
               "guides/real-time-people-enrichment",
               "guides/government-portals",
-              "guides/invoice-retrieval"
+              "guides/invoice-retrieval",
+              "guides/file-uploads"
             ]
           }
         ]

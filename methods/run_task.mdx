@@ -53,8 +53,8 @@ All parameters available when running a task.
 </ResponseField>
 
 <ResponseField name="response_model" type="dict | BaseModel">
-  If provided, enforces a specific output structure.
-  It can either be a dictionary describing a JSON schema or a Pydantic Model.
+  If provided, enforces a structured output schema.
+  It can be a dictionary describing a JSON schema or a Pydantic Model.
   Default: `None`.
   
   Example:
@@ -69,10 +69,6 @@ All parameters available when running a task.
     }
   }
   ```
-
-  <Note>
-    If you set `response_model`, Smooth will see it, no need to include it in `task`.
-  </Note>
 </ResponseField>
 
 <ResponseField name="agent" type="string">
@@ -111,10 +107,10 @@ All parameters available when running a task.
   Example: `{"username": "my_username"}`
 </ResponseField>
 
-<ResponseField name="agent" type="string">
-  The agent that will run the task. Currently, only `smooth` is available. Default: `smooth`.
+<ResponseField name="files" type="list">
+  A list of file ids to be passed to the agent. 
   
-  Example: `smooth`
+  Check out our guide on [File uploads](/guides/file-uploads)
 </ResponseField>
 
 <ResponseField name="enable_recording" type="boolean">
@@ -171,12 +167,6 @@ Returns a `TaskHandle` with the following attributes.
   Waits for the task completion and returns a recording URL upon completion. You can use this link to download the video recording of the task. The video will be ready shortly after the task completes.
 </ResponseField>
 
-<Warning>
-  `TaskResponse` contains also `live_url` and `recording_url` to be compatible with the API structure.
-  Use `TaskHandle.live_url()` and `TaskHandle.recording_url()` as they handle the underlying API polling for you.
-</Warning>
-
-
 ## Waiting for task completion
 
 Use `result()` to wait for task completion.
@@ -221,40 +211,3 @@ Returns a `TaskResponse` with the following attributes.
 <ResponseField name="device" type="string">
   The device type used for the task. One of: ["mobile", "desktop"]
 </ResponseField>
-
-
-## Structured output
-
-Smooth supports structured output, simply set the `response_model` field by passing either a Pydantic Model or a JSON schema.
-
-<CodeGroup>
-
-```python Python
-# pip install smooth-py
-from smooth import SmoothClient
-from pydantic import BaseModel
-
-class MyStructuredOutput(BaseModel):
-  my_output_data: list[int] = Field(description="A list of random numbers.")
-
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-task = smooth_client.run("Output five random numbers.", response_model=MyStructuredOutput)
-
-# or
-# ..., response_model = {
-#   "type": "object",
-#   "properties": {
-#     "my_output_data": {
-#       "description": "A list of random numbers.",
-#       "items": {
-#         "type": "integer"
-#       },
-#       "type": "array"
-#     }
-#   }
-# }
-
-print(f"Agent response: {task.result()}")
-```
-
-</CodeGroup>

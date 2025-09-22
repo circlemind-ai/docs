@@ -1,0 +1,67 @@
+---
+title: "File uploads"
+description: "Learn how to give files to Smooth"
+---
+
+## Overview
+
+This guide demonstrates how to use Smooth to upload files to websites.
+
+<Steps>
+  <Step title="Upload the file">
+    You can use the `upload_file()` method to upload files that you will pass on to Smooth.
+
+    ```python Python
+    from smooth import SmoothClient
+
+    smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+
+    file = smooth_client.upload_file(
+      name="meaningful_file_name.png", 
+      file=open("/path/to/file.png", "rb")
+    )
+    ```
+
+    <Note>
+      When uploading multiple files, we recommend using meaningful file names to help Smooth disambiguate their content.
+    </Note>
+
+    <Note>
+      Files are automatically removed after 24 hours.
+    </Note>
+  </Step>
+  
+  <Step title="Run the task">
+    Run your task using the `files` parameter.
+
+    ```python Python
+    task = smooth_client.run(
+        task="Give me an alt text for this image",
+        url="https://pallyy.com/tools/alt-text-generator",
+        files=[file.id]
+    )
+
+    print(f"Live URL: {task.live_url()}")
+    task_result = task.result()
+    print(f"Agent Response: {task_result.output}")
+    print(f"Task Video: {task_result.recording_url()}")
+    ```
+
+    The agent will navigate to the website, upload the file, and return the alt text.
+  </Step>
+</Steps>
+
+## Best Practices
+- **Use Descriptive File Names**: Choose meaningful names for your files to make it easier to identify their content later.
+- **Check File Size Limits**: Ensure your files do not exceed the maximum size limits set by the platform you are uploading to.
+- **Include File Types**: When specifying a file name, make sure to include the file extension, such as `.pdf` or `.png`
+
+## Community
+
+<Card
+  title="Join Discord"
+  icon="discord"
+  href="https://discord.gg/VcdgMwUmMG"
+>
+  Join our community for support and showcases
+</Card>
