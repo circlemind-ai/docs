@@ -339,6 +339,14 @@
                   "file": {
                     "type": "string",
                     "format": "binary"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Optional custom name for the file. If not provided, the original file name will be used."
+                  },
+                  "purpose": {
+                    "type": "string",
+                    "description": "Optional short description of the file to describe its purpose (i.e., 'the bank statement pdf')."
                   }
                 },
                 "required": [
