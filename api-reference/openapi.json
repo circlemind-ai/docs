@@ -327,7 +327,7 @@
     "/file": {
       "post": {
         "summary": "Upload File",
-        "description": "Upload a file to be used by tasks. The uploaded file can be accessed in the task via the `file://<file_id>` URL.",
+        "description": "Upload a file to be used by tasks.",
         "operationId": "upload_file_file_post",
         "requestBody": {
           "required": true,
@@ -398,6 +398,7 @@
         "parameters": [
           {
             "name": "file_id",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string"
