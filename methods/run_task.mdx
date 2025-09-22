@@ -71,30 +71,6 @@ All parameters available when running a task.
   ```
 </ResponseField>
 
-<ResponseField name="agent" type="string">
-  The agent that will run the task. Currently, only `smooth` is available. Default: `smooth`.
-  
-  Example: `smooth`
-</ResponseField>
-
-<ResponseField name="session_id" type="string">
-  The browser session ID to be utilized. Each session retains its own state, including login credentials and cookies.
-  
-  Example: `session_12345`
-</ResponseField>
-
-<ResponseField name="max_steps" type="int">
-  The upper limit on the number of steps the agent can take during task execution. The range is from 2 to 64. Default: 32.
-  
-  Example: `64`
-</ResponseField>
-
-<ResponseField name="device" type="string">
-  The type of device for the task execution. Choose between `mobile` or `desktop`. Default: `mobile`.
-  
-  Example: `desktop`
-</ResponseField>
-
 <ResponseField name="url" type="string">
   The starting URL for the task. If not provided, the agent will infer it from the task.
   
@@ -113,10 +89,40 @@ All parameters available when running a task.
   Check out our guide on [File uploads](/guides/file-uploads)
 </ResponseField>
 
+<ResponseField name="agent" type="string">
+  The agent that will run the task. Currently, only `smooth` is available. Default: `smooth`.
+  
+  Example: `smooth`
+</ResponseField>
+
+<ResponseField name="max_steps" type="int">
+  The upper limit on the number of steps the agent can take during task execution. The range is from 2 to 64. Default: 32.
+  
+  Example: `64`
+</ResponseField>
+
+<ResponseField name="device" type="string">
+  The type of device for the task execution. Choose between `mobile` or `desktop`. Default: `mobile`.
+  
+  Example: `desktop`
+</ResponseField>
+
+<ResponseField name="allowed_urls" type="string">
+  List of allowed URL patterns using wildcard syntax. If None, all URLs are allowed.
+  
+  Example: ["google.com/*", "*mydomain.*/*]
+</ResponseField>
+
 <ResponseField name="enable_recording" type="boolean">
   Toggles the option to record a video of the task execution. Default: False.
   
   Example: `True`
+</ResponseField>
+
+<ResponseField name="session_id" type="string">
+  The browser session ID to be utilized. Each session retains its own state, including login credentials and cookies.
+  
+  Example: `session_12345`
 </ResponseField>
 
 <ResponseField name="stealth_mode" type="boolean">
