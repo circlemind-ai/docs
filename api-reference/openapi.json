@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "servers": [
     {
-      "url": "https://api2.circlemind.co/api/v1"
+      "url": "https://api.smooth.sh/api/v1"
     }
   ],
   "info": {
@@ -77,7 +77,7 @@
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X POST \"https://api2.circlemind.co/api/v1/task\" \\\n     -H \"Content-Type: application/json\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -d '{\n       \"task\": \"Go to hacker news and get the top 5 stories.\",\n       \"device\": \"desktop\",\n       \"max_steps\": 32,\n       \"enable_recording\": true\n     }'"
+            "source": "curl -X POST \"https://api.smooth.sh/api/v1/task\" \\\n     -H \"Content-Type: application/json\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -d '{\n       \"task\": \"Go to hacker news and get the top 5 stories.\",\n       \"device\": \"desktop\",\n       \"max_steps\": 32,\n       \"enable_recording\": true\n     }'"
           },
           {
             "lang": "python",
@@ -92,7 +92,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api2.circlemind.co/api/v1/task';\n\nconst payload = {\n  task: 'Go to hacker news and get the top 5 stories.',\n  device: 'desktop',\n  max_steps: 32,\n  enable_recording: true\n};\n\nasync function runTask() {\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'Content-Type': 'application/json',\n        'apikey': apiKey\n      },\n      body: JSON.stringify(payload)\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Task submitted:', data);\n    // You can now use data.r.id to poll the get task endpoint\n  } catch (error) {\n    console.error('Error running task:', error);\n  }\n}\n\nrunTask();"
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/task';\n\nconst payload = {\n  task: 'Go to hacker news and get the top 5 stories.',\n  device: 'desktop',\n  max_steps: 32,\n  enable_recording: true\n};\n\nasync function runTask() {\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'Content-Type': 'application/json',\n        'apikey': apiKey\n      },\n      body: JSON.stringify(payload)\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Task submitted:', data);\n    // You can now use data.r.id to poll the get task endpoint\n  } catch (error) {\n    console.error('Error running task:', error);\n  }\n}\n\nrunTask();"
           }
         ]
       }
@@ -145,7 +145,7 @@
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X GET \"https://api2.circlemind.co/api/v1/task/YOUR_TASK_ID\" \\\n     -H \"apikey: YOUR_API_KEY\""
+            "source": "curl -X GET \"https://api.smooth.sh/api/v1/task/YOUR_TASK_ID\" \\\n     -H \"apikey: YOUR_API_KEY\""
           },
           {
             "lang": "python",
@@ -160,57 +160,49 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst taskId = 'YOUR_TASK_ID';\nconst url = `https://api2.circlemind.co/api/v1/task/${taskId}`;\n\nasync function getTaskStatus() {\n  try {\n    const response = await fetch(url, {\n      method: 'GET',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Task status:', data);\n\n    // You can poll this endpoint until status is 'done' or 'failed'\n    if (data.r.status === 'running' || data.r.status === 'waiting') {\n      console.log('Task is still in progress...');\n    }\n\n  } catch (error) {\n    console.error('Error fetching task status:', error);\n  }\n}\n\ngetTaskStatus();"
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst taskId = 'YOUR_TASK_ID';\nconst url = `https://api.smooth.sh/api/v1/task/${taskId}`;\n\nasync function getTaskStatus() {\n  try {\n    const response = await fetch(url, {\n      method: 'GET',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Task status:', data);\n\n    // You can poll this endpoint until status is 'done' or 'failed'\n    if (data.r.status === 'running' || data.r.status === 'waiting') {\n      console.log('Task is still in progress...');\n    }\n\n  } catch (error) {\n    console.error('Error fetching task status:', error);\n  }\n}\n\ngetTaskStatus();"
           }
         ]
-      }
-    },
-    "/browser/session": {
-      "get": {
-        "summary": "List Sessions",
-        "description": "List all browser session IDs for the user.",
+      },
+      "delete": {
+        "summary": "Cancel Task",
+        "description": "Cancel a running task by its ID.",
         "tags": [
-          "Session"
+          "Agent"
         ],
-        "operationId": "list_browser_sessions_browser_session_get",
+        "operationId": "cancel_task_task__task_id__delete",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BrowserSessionsResponse"
-                }
-              }
-            }
+            "description": "Task successfully cancelled."
+          },
+          "404": {
+            "description": "Task not found or already completed."
           }
         },
         "x-codeSamples": [
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X GET \"https://api2.circlemind.co/api/v1/browser/session\" \\\n     -H \"apikey: YOUR_API_KEY\""
-          },
-          {
-            "lang": "python",
-            "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nsessions = client.list_sessions()\nprint(sessions.session_ids)"
-          },
-          {
-            "lang": "python",
-            "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def list_sessions():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    sessions = await client.list_sessions()\n    print(sessions.session_ids)\n    await client.close()\n\nasyncio.run(list_sessions())"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api2.circlemind.co/api/v1/browser/session';\n\nasync function listSessions() {\n  try {\n    const response = await fetch(url, {\n      method: 'GET',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Available sessions:', data.r.session_ids);\n  } catch (error) {\n    console.error('Error listing sessions:', error);\n  }\n}\n\nlistSessions();"
+            "source": "curl -X DELETE \"https://api.smooth.sh/api/v1/task/YOUR_TASK_ID\" \\\n     -H \"apikey: YOUR_API_KEY\""
           }
         ]
-      },
+      }
+    },
+    "/browser/session": {
       "post": {
         "summary": "Open Session",
-        "description": "Open an interactive browser instance for 5 minutes. You can either create a new session or resume an existing one by providing its `session_id`.",
+        "description": "Open an interactive browser instance for 5 minutes. You can either create a new profile or load an existing one by providing its `profile_id`.",
         "tags": [
           "Session"
         ],
@@ -243,7 +235,7 @@
             "description": "Validation Error"
           },
           "429": {
-            "description": "Maximum number of browser sessions reached."
+            "description": "Maximum number of concurrent browser sessions reached."
           },
           "503": {
             "description": "Service unavailable. Please try again later."
@@ -253,7 +245,7 @@
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X POST \"https://api2.circlemind.co/api/v1/browser/session\" \\\n     -H \"Content-Type: application/json\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -d '{\n       \"session_id\": \"my-persistent-session\"\n     }'"
+            "source": "curl -X POST \"https://api.smooth.sh/api/v1/browser/session\" \\\n     -H \"Content-Type: application/json\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -d '{\n       \"session_id\": \"my-persistent-session\"\n     }'"
           },
           {
             "lang": "python",
@@ -268,19 +260,19 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api2.circlemind.co/api/v1/browser/session';\n\n// To create a new session with a random ID, omit the payload or send an empty object\nconst payload = {\n  session_id: 'my-persistent-session' // or null to create a new one\n};\n\nasync function openSession() {\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'Content-Type': 'application/json',\n        'apikey': apiKey\n      },\n      body: JSON.stringify(payload)\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Session opened:', data);\n    console.log('Live URL:', data.r.live_url);\n  } catch (error) {\n    console.error('Error opening session:', error);\n  }\n}\n\nopenSession();"
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/browser/session';\n\n// To create a new session with a random ID, omit the payload or send an empty object\nconst payload = {\n  session_id: 'my-persistent-session' // or null to create a new one\n};\n\nasync function openSession() {\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'Content-Type': 'application/json',\n        'apikey': apiKey\n      },\n      body: JSON.stringify(payload)\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Session opened:', data);\n    console.log('Live URL:', data.r.live_url);\n  } catch (error) {\n    console.error('Error opening session:', error);\n  }\n}\n\nopenSession();"
           }
         ]
       }
     },
     "/browser/session/{session_id}": {
       "delete": {
-        "summary": "Delete Session",
-        "description": "Delete a specific browser session for a user.",
+        "summary": "Close Session",
+        "description": "Close an interactive browser session by its `session_id`.",
         "tags": [
           "Session"
         ],
-        "operationId": "delete_browser_session_browser_session__session_id__delete",
+        "operationId": "close_browser_session_browser_session__session_id__delete",
         "parameters": [
           {
             "name": "session_id",
@@ -294,32 +286,127 @@
         ],
         "responses": {
           "200": {
-            "description": "Session successfully deleted"
+            "description": "Session successfully closed."
           },
           "404": {
-            "description": "Session not found"
+            "description": "Session not found."
           }
         },
         "x-codeSamples": [
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X DELETE \"https://api2.circlemind.co/api/v1/browser/session/my-session\" \\\n     -H \"apikey: YOUR_API_KEY\""
+            "source": "curl -X DELETE \"https://api.smooth.sh/api/v1/browser/session/my-session\" \\\n     -H \"apikey: YOUR_API_KEY\""
           },
           {
             "lang": "python",
             "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nclient.delete_session(\"my-session\")\nprint(\"Session 'my-session' deleted.\")"
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nclient.close_session(\"my-session\")\nprint(\"Session 'my-session' closed.\")"
           },
           {
             "lang": "python",
             "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def delete_session():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    await client.delete_session(\"my-session\")\n    print(\"Session 'my-session' deleted.\")\n    await client.close()\n\nasyncio.run(delete_session())"
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def close_session():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    await client.close_session(\"my-session\")\n    print(\"Session 'my-session' closed.\")\n    await client.close()\n\nasyncio.run(close_session())"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst sessionId = 'my-session'; // The ID of the session to delete\nconst url = `https://api2.circlemind.co/api/v1/browser/session/${sessionId}`;\n\nasync function deleteSession() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`Session '${sessionId}' deleted successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error deleting session:', error);\n  }\n}\n\ndeleteSession();"
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst sessionId = 'my-session'; // The ID of the session to close\nconst url = `https://api.smooth.sh/api/v1/browser/session/${sessionId}`;\n\nasync function closeSession() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`Session '${sessionId}' closed successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error closing session:', error);\n  }\n}\n\ncloseSession();"
+          }
+        ]
+      }
+    },
+    "/browser/profile": {
+      "get": {
+        "summary": "List Profiles",
+        "description": "List all browser profiles for the user.",
+        "tags": [
+          "Profile"
+        ],
+        "operationId": "list_browser_profiles_browser_profile_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserProfilesResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "cURL",
+            "source": "curl -X GET \"https://api.smooth.sh/api/v1/browser/profile\" \\\n     -H \"apikey: YOUR_API_KEY\""
+          },
+          {
+            "lang": "python",
+            "label": "Python (sync)",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nprofiles = client.list_profiles()\nprint(profiles.profile_ids)"
+          },
+          {
+            "lang": "python",
+            "label": "Python (async)",
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def list_profiles():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    profiles = await client.list_profiles()\n    print(profiles.profile_ids)\n    await client.close()\n\nasyncio.run(list_profiles())"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/browser/profile';\n\nasync function listProfiles() {\n  try {\n    const response = await fetch(url, {\n      method: 'GET',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Available profiles:', data.r.profile_ids);\n  } catch (error) {\n    console.error('Error listing profiles:', error);\n  }\n}\n\nlistProfiles();"
+          }
+        ]
+      }
+    },
+    "/browser/profile/{profile_id}": {
+      "delete": {
+        "summary": "Delete Profile",
+        "description": "Delete a specific browser profile for a user.",
+        "tags": [
+          "Profile"
+        ],
+        "operationId": "delete_browser_profile_browser_profile__profile_id__delete",
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile successfully deleted"
+          },
+          "404": {
+            "description": "Profile not found"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "cURL",
+            "source": "curl -X DELETE \"https://api.smooth.sh/api/v1/browser/profile/my-profile\" \\\n     -H \"apikey: YOUR_API_KEY\""
+          },
+          {
+            "lang": "python",
+            "label": "Python (sync)",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nclient.delete_profile(\"my-profile\")\nprint(\"Profile 'my-profile' deleted.\")"
+          },
+          {
+            "lang": "python",
+            "label": "Python (async)",
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def delete_profile():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    await client.delete_profile(\"my-profile\")\n    print(\"Profile 'my-profile' deleted.\")\n    await client.close()\n\nasyncio.run(delete_profile())"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst profileId = 'my-profile'; // The ID of the profile to delete\nconst url = `https://api.smooth.sh/api/v1/browser/profile/${profileId}`;\n\nasync function deleteProfile() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`Profile '${profileId}' deleted successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error deleting profile:', error);\n  }\n}\n\ndeleteProfile();"
           }
         ]
       }
@@ -328,6 +415,9 @@
       "post": {
         "summary": "Upload File",
         "description": "Upload a file to be used by tasks.",
+        "tags": [
+          "Files"
+        ],
         "operationId": "upload_file_file_post",
         "requestBody": {
           "required": true,
@@ -378,7 +468,7 @@
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X POST \"https://api2.circlemind.co/api/v1/file\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -F \"file=@/path/to/your/file.txt\""
+            "source": "curl -X POST \"https://api.smooth.sh/api/v1/file\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -F \"file=@/path/to/your/file.txt\""
           },
           {
             "lang": "python",
@@ -393,7 +483,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api2.circlemind.co/api/v1/file';\n\nasync function uploadFile(file) {\n  const formData = new FormData();\n  formData.append('file', file);\n\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'apikey': apiKey\n      },\n      body: formData\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('File uploaded with ID:', data.r.id);\n  } catch (error) {\n    console.error('Error uploading file:', error);\n  }\n}\n\n// Usage example (in a browser environment):\n// const fileInput = document.querySelector('input[type=\"file\"]');\n// fileInput.addEventListener('change', (event) => {\n//   const file = event.target.files[0];\n//   uploadFile(file);\n// });"
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/file';\n\nasync function uploadFile(file) {\n  const formData = new FormData();\n  formData.append('file', file);\n\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'apikey': apiKey\n      },\n      body: formData\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('File uploaded with ID:', data.r.id);\n  } catch (error) {\n    console.error('Error uploading file:', error);\n  }\n}\n\n// Usage example (in a browser environment):\n// const fileInput = document.querySelector('input[type=\"file\"]');\n// fileInput.addEventListener('change', (event) => {\n//   const file = event.target.files[0];\n//   uploadFile(file);\n// });"
           }
         ]
       }
@@ -402,6 +492,9 @@
       "delete": {
         "summary": "Delete File",
         "description": "Delete an uploaded file by its ID.",
+        "tags": [
+          "Files"
+        ],
         "operationId": "delete_file_file__file_id__delete",
         "parameters": [
           {
@@ -425,7 +518,7 @@
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X DELETE \"https://api2.circlemind.co/api/v1/file/YOUR_FILE_ID\" \\\n     -H \"apikey: YOUR_API_KEY\""
+            "source": "curl -X DELETE \"https://api.smooth.sh/api/v1/file/YOUR_FILE_ID\" \\\n     -H \"apikey: YOUR_API_KEY\""
           },
           {
             "lang": "python",
@@ -440,7 +533,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst fileId = 'YOUR_FILE_ID'; // The ID of the file to delete\nconst url = `https://api2.circlemind.co/api/v1/file/${fileId}`;\n\nasync function deleteFile() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`File '${fileId}' deleted successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error deleting file:', error);\n  }\n}\n\ndeleteFile();"
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst fileId = 'YOUR_FILE_ID'; // The ID of the file to delete\nconst url = `https://api.smooth.sh/api/v1/file/${fileId}`;\n\nasync function deleteFile() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`File '${fileId}' deleted successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error deleting file:', error);\n  }\n}\n\ndeleteFile();"
           }
         ]
       }
@@ -450,7 +543,7 @@
     "schemas": {
       "BrowserSessionRequest": {
         "properties": {
-          "session_id": {
+          "profile_id": {
             "anyOf": [
               {
                 "type": "string"
@@ -459,12 +552,12 @@
                 "type": "null"
               }
             ],
-            "description": "The session ID to open in the browser. If None, a new session will be created with a random name.",
-            "title": "Session Id"
+            "description": "The profile ID to open in the browser. If None, a new profile will be created with a random name.",
+            "title": "Profile ID"
           },
           "live_view": {
             "type": "boolean",
-            "description": "Whether to open a live browser instance using the specified session.",
+            "description": "Whether to open a live browser instance using the specified profile.",
             "title": "Live View"
           }
         },
@@ -474,10 +567,15 @@
       },
       "BrowserSessionResponse": {
         "properties": {
-          "session_id": {
+          "profile_id": {
             "type": "string",
-            "title": "Session Id",
-            "description": "The ID of the browser session associated with the opened browser instance."
+            "title": "Profile ID",
+            "description": "The ID of the browser profile associated with the opened browser session."
+          },
+          "live_id": {
+            "type": "string",
+            "title": "Live ID",
+            "description": "The unique identifier for the live browser session."
           },
           "live_url": {
             "type": "string",
@@ -487,28 +585,28 @@
         },
         "type": "object",
         "required": [
-          "session_id"
+          "profile_id"
         ],
         "title": "BrowserSessionResponse",
         "description": "Browser session response model."
       },
-      "BrowserSessionsResponse": {
+      "BrowserProfilesResponse": {
         "properties": {
-          "session_ids": {
+          "profile_ids": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "title": "Session Ids",
-            "description": "The IDs of the browser sessions."
+            "title": "Profile IDs",
+            "description": "The IDs of the browser profiles."
           }
         },
         "type": "object",
         "required": [
-          "session_ids"
+          "profile_ids"
         ],
-        "title": "BrowserSessionsResponse",
-        "description": "Response model for listing browser sessions."
+        "title": "BrowserProfilesResponse",
+        "description": "Response model for listing browser profiles."
       },
       "TaskRequest": {
         "properties": {
@@ -573,13 +671,23 @@
             "description": "Device type for the task. Default is mobile.",
             "default": "mobile"
           },
+          "allowed_urls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "title": "Allowed Urls",
+            "description": "List of URL patterns using wildcard syntax (e.g., https://\\*example.com/\\*) the agent is allowed to visit. If not provided, the agent can visit any URL.",
+            "default": null
+          },
           "enable_recording": {
             "type": "boolean",
             "title": "Enable Recording",
             "description": "Enable video recording of the task execution. Default is False",
             "default": false
           },
-          "session_id": {
+          "profile_id": {
             "anyOf": [
               {
                 "type": "string"
@@ -588,8 +696,14 @@
                 "type": "null"
               }
             ],
-            "title": "Session Id",
-            "description": "Browser session ID to use. Each session maintains its own state, such as login credentials."
+            "title": "Profile ID",
+            "description": "Browser profile ID to use. Each profile maintains its own state, such as login credentials."
+          },
+          "profile_read_only": {
+            "type": "boolean",
+            "title": "Profile Read Only",
+            "description": "If true, the profile specified by `profile_id` will be loaded in read-only mode. Changes made during the task will not be saved back to the profile.",
+            "default": false
           },
           "stealth_mode": {
             "type": "boolean",
@@ -632,6 +746,14 @@
             ],
             "title": "Proxy Password",
             "description": "Proxy server password."
+          },
+          "experimental_features": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "any"
+            },
+            "title": "Experimental Features",
+            "description": "A dictionary of experimental features to enable or disable."
           }
         },
         "type": "object",
@@ -654,7 +776,8 @@
               "waiting",
               "running",
               "done",
-              "failed"
+              "failed",
+              "cancelled"
             ],
             "title": "Status",
             "description": "The status of the task."
@@ -680,6 +803,18 @@
             ],
             "title": "Credits Used",
             "description": "The amount of credits used to perform the task."
+          },
+          "credits_balance": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credits Balance",
+            "description": "The amount of credits remaining on the account."
           },
           "device": {
             "anyOf": [

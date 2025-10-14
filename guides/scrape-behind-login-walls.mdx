@@ -5,20 +5,20 @@ description: "Learn how to scrape data from protected websites"
 
 ## Overview
 
-This guide demonstrates how to scrape data from websites that require user authentication by using persistent browser sessions. You'll learn to launch a browser session, authenticate manually, and then run automated tasks using that authenticated session.
+This guide demonstrates how to scrape data from websites that require user authentication by using persistent browser sessions. You'll learn to launch a browser session to create a browser profile, authenticate manually, and then run automated tasks using that authenticated profile.
 
 <Steps>
   <Step title="Launch Browser Session">
-    First, create a new browser session that will persist your authentication cookies. This session will return a `session_id` and `live_url` for manual authentication.
+    First, open a browser session to create a new browser profile that will persist your authentication cookies. This session will return a `profile_id` and `live_url` for manual authentication.
 
     ```python Python
     from smooth import SmoothClient
 
     smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-    session = smooth_client.open_session(session_id="gmail-session")
+    session = smooth_client.open_session(profile_id="gmail-session")
 
     print(f"Live URL: {session.live_url()}")
-    print(f"Session ID: {session.session_id}")
+    print(f"Session ID: {session.profile_id()}")
     ```
 
     The `live_url` opens an interactive browser window where you can manually authenticate.
@@ -33,16 +33,28 @@ This guide demonstrates how to scrape data from websites that require user authe
     4. Complete any two-factor authentication if required
     5. Verify you're successfully logged in to your Gmail inbox
 
-    Your authentication cookies are now securely stored in the session and will persist for future tasks.
+    Your authentication cookies are now securely stored in the browser profile and will persist for future tasks.
+  </Step>
+
+  <Step title="Close  Browser Session">
+    Use the returned `live_id` to close the interactive session and save the browser profile
+
+    ```python Python
+    smooth_client.close_session(live_id=session.live_id())
+    ```
+
+    <Note>
+      If the browser session is not manually closed, the profile is saved when the 5 minutes time limit is reached and the browser session closed automatically.
+    </Note>
   </Step>
   
   <Step title="Run Automated Task">
-    Now use the authenticated session to run an automated task. The agent will access Gmail as a logged-in user and retrieve your last email.
+    Now use the authenticated profile to run an automated task. The agent will access Gmail as a logged-in user and retrieve your last email.
 
     ```python Python
     task = smooth_client.run(
         task="Go to Gmail and get the subject and sender of the most recent email in my inbox",
-        session_id="gmail-session"
+        profile_id="gmail-session"
     )
 
     print(f"Live URL: {task.live_url()}")
@@ -50,26 +62,26 @@ This guide demonstrates how to scrape data from websites that require user authe
     print(f"Last email details: {result}")
     ```
 
-    The agent will automatically use the stored authentication from your session to access Gmail and extract the requested information.
+    The agent will automatically use the stored authentication from your profile to access Gmail and extract the requested information.
   </Step>
 </Steps>
 
 ## Key Benefits
 
-- **Persistent Authentication**: Sessions maintain login state across multiple tasks
+- **Persistent Authentication**: Profiles maintain login state across multiple tasks
 - **Manual Control**: You handle the authentication process manually for security
 - **Automated Execution**: Once authenticated, agents can run complex tasks automatically
-- **Session Reuse**: The same session can be used for multiple related tasks
+- **Session Reuse**: The same profile can be used for multiple related tasks
 
 ## Best Practices
 
-- Use descriptive session IDs for better organization
-- Keep sessions secure and don't share session IDs
+- Use descriptive profile IDs for better organization
+- Keep profiles secure and don't share profile IDs
 - Test authentication manually before running automated tasks
 - Handle rate limits and be respectful to the target website
 
 <Note>
-  Sessions persist cookies and authentication state, making them perfect for accessing protected content while maintaining security through manual authentication.
+  Browser profiles persist cookies and authentication state, making them perfect for accessing protected content while maintaining security through manual authentication.
 </Note>
 
 ## Community

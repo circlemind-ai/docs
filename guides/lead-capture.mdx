@@ -75,13 +75,7 @@ This guide demonstrates how to use Smooth to capture leads from conference speak
     result = task.result()
     speakers_data = result.output
     
-    # Parse and use the structured data
-    import json
-    speaker_list = json.loads(speakers_data)
-    print(f"Found {speaker_list['total_speakers']} speakers")
-    
-    for speaker in speaker_list['speakers']:
-        print(f"- {speaker['name']} at {speaker['company']}")
+    print(speakers_data)
     ```
   </Step>
 </Steps>

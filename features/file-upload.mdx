@@ -1,0 +1,42 @@
+---
+title: "File Upload"
+description: "Learn how to use Smooth to upload files"
+---
+
+## Overview
+
+The following demonstrates how to instruct Smooth to handle custom data files.
+
+<CodeGroup>
+
+```python Python
+# pip install smooth-py
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+file_handle = client.upload_file(open("README.md", "rb"))
+task = smooth_client.run("Upload the given file to https://www.azurespeed.com/Azure/UploadLargeFile to test the upload speed.", files=[file_handle.id])
+
+...
+```
+
+</CodeGroup>
+
+Files can be reused across multiple tasks but are automatically deleted from our servers after 24 hours.
+If you want to manually delete a file when it is no longer necessary, you can use `.delete_file`.
+
+<Note>
+Smooth has access to the file content and can analyze it if requested. Be careful when dealing with sensitive data.
+</Note>
+
+## Guides
+
+Check out our example for an in-depth tutorial.
+
+<Card
+  title="Guide: File Uploads"
+  icon="book"
+  href="/guides/file-uploads"
+>
+  Learn how to use Smooth to upload files.
+</Card>

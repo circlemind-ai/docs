@@ -9,16 +9,16 @@ This guide demonstrates how to use Smooth to automate sending a LinkedIn connect
 
 <Steps>
   <Step title="Launch LinkedIn Session">
-    Create a new browser session for LinkedIn that will persist your authentication cookies. This approach ensures secure access while maintaining your login state.
+    Create a new browser profile for LinkedIn that will persist your authentication cookies. This approach ensures secure access while maintaining your login state.
 
     ```python Python
     from smooth import SmoothClient
 
     smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-    session = smooth_client.open_session(session_id="linkedin-automation")
+    session = smooth_client.open_session(profile_id="linkedin-automation")
 
     print(f"Live URL: {session.live_url()}")
-    print(f"Session ID: {session.session_id}")
+    print(f"Session ID: {session.profile_id()}")
     ```
 
     The `live_url` provides an interactive browser window for manual authentication.
@@ -33,11 +33,11 @@ This guide demonstrates how to use Smooth to automate sending a LinkedIn connect
     4. Complete any security verification if prompted
     5. Verify you're successfully logged into your LinkedIn home feed
 
-    Your authentication cookies are now stored in the session for automated tasks.
+    Your authentication cookies are now stored in the profile for automated tasks.
   </Step>
   
   <Step title="Automate Connection Request">
-    Use the authenticated session to automatically find and connect with Antonio Vespoli from Circlemind.
+    Use the authenticated profile to automatically find and connect with Antonio Vespoli from Circlemind.
 
     ```python Python
     connection_task = """
@@ -46,7 +46,7 @@ This guide demonstrates how to use Smooth to automate sending a LinkedIn connect
 
     task = smooth_client.run(
         task=connection_task,
-        session_id="linkedin-automation",
+        profile_id="linkedin-automation",
         enable_recording=True
     )
 

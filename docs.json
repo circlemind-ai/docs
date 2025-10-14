@@ -25,19 +25,20 @@
           {
             "group": "Agent",
             "pages": [
-              "methods/run_task"
+              "methods/agent"
             ]
           },
           {
-            "group": "Session",
+            "group": "Sessions & Profiles",
             "pages": [
-              "methods/launch_browser",
-              "methods/list_sessions"
+              "methods/sessions",
+              "methods/profiles"
             ]
           },
           {
             "group": "Features",
             "pages": [
+              "features/file-upload",
               "features/persistent-sessions",
               "features/proxies",
               "features/live-share",

@@ -110,7 +110,7 @@ All parameters available when running a task.
 <ResponseField name="allowed_urls" type="list">
   List of allowed URL patterns using wildcard syntax. If None, all URLs are allowed.
   
-  Example: ["google.com/&ast;", "&ast;mydomain.&ast;/&ast;]
+  Example: ["google.com/&ast;", "&ast;mydomain.&ast;/&ast;"]
 </ResponseField>
 
 <ResponseField name="enable_recording" type="boolean">
@@ -119,10 +119,14 @@ All parameters available when running a task.
   Example: `True`
 </ResponseField>
 
-<ResponseField name="session_id" type="string">
-  The browser session ID to be utilized. Each session retains its own state, including login credentials and cookies.
+<ResponseField name="profile_id" type="string">
+  The browser profile ID to be utilized. Each profile retains its own state, including login credentials and cookies.
   
-  Example: `session_12345`
+  Example: `profile_12345`
+</ResponseField>
+
+<ResponseField name="profile_read_only" type="boolean">
+  If true, the profile specified by `profile_id` will be loaded in read-only mode. Changes made during the task will not be saved back to the profile. Default: False.
 </ResponseField>
 
 <ResponseField name="stealth_mode" type="boolean">
@@ -149,6 +153,10 @@ All parameters available when running a task.
   Example: `password123`
 </ResponseField>
 
+<ResponseField name="experimental_features" type="dict">
+  Experimental features to enable for the task.
+</ResponseField>
+
 ## Response
 
 Returns a `TaskHandle` with the following attributes.
@@ -171,6 +179,10 @@ Returns a `TaskHandle` with the following attributes.
 
 <ResponseField name="recording_url()" type="method">
   Waits for the task completion and returns a recording URL upon completion. You can use this link to download the video recording of the task. The video will be ready shortly after the task completes.
+</ResponseField>
+
+<ResponseField name="stop()" type="method">
+  Cancel the task execution.
 </ResponseField>
 
 ## Waiting for task completion
@@ -217,3 +229,24 @@ Returns a `TaskResponse` with the following attributes.
 <ResponseField name="device" type="string">
   The device type used for the task. One of: ["mobile", "desktop"]
 </ResponseField>
+
+## Cancelling a running task
+
+Use `stop()` to cancel a running task.
+
+<CodeGroup>
+
+```python Python highlight={6}
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+task = smooth_client.run("Go to google flights and find the cheapest flight from London to Paris today")
+
+task.stop()  # Cancel the task execution
+
+task_result = task.result()  # Waits for the agent response
+
+assert task_result.status == "cancelled"
+```
+
+</CodeGroup>

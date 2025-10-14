@@ -9,16 +9,16 @@ This guide demonstrates how to use Smooth to retrieve invoice information from s
 
 <Steps>
   <Step title="Launch Authenticated Session">
-    Create a persistent browser session for Calendly authentication. This session will maintain your login state across tasks.
+    Create a persistent browser profile for Calendly authentication. This profile will maintain your login state across tasks.
 
     ```python Python
     from smooth import SmoothClient
 
     smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-    session = smooth_client.open_session(session_id="calendly-billing")
+    session = smooth_client.open_session(profile_id="calendly-billing")
 
     print(f"Live URL: {session.live_url()}")
-    print(f"Session ID: {session.session_id}")
+    print(f"Profile ID: {session.profile_id()}")
     ```
 
     The `live_url` opens an interactive browser window where you can manually authenticate.
@@ -33,11 +33,11 @@ This guide demonstrates how to use Smooth to retrieve invoice information from s
     4. Complete any two-factor authentication if required
     5. Verify you're successfully logged in to your Calendly dashboard
 
-    Your authentication cookies are now securely stored in the session for automated tasks.
+    Your authentication cookies are now securely stored in the profile for automated tasks.
   </Step>
   
   <Step title="Extract Invoice Amount">
-    Use the authenticated session to navigate to your billing section and retrieve the last payment amount.
+    Use the authenticated profile to navigate to your billing section and retrieve the last payment amount.
 
     ```python Python
     invoice_task = """
@@ -52,7 +52,7 @@ This guide demonstrates how to use Smooth to retrieve invoice information from s
 
     task = smooth_client.run(
         task=invoice_task,
-        session_id="calendly-billing",
+        profile_id="calendly-billing",
         enable_recording=True
     )
 
@@ -91,13 +91,9 @@ This guide demonstrates how to use Smooth to retrieve invoice information from s
     )
 
     result = task.result()
+    invoice_data = result.output
     
-    # Parse the structured invoice data
-    import json
-    invoice_data = json.loads(result.output)
-    
-    print(f"Last payment: ${invoice_data['amount_paid']} on {invoice_data['invoice_date']}")
-    print(f"Paid with: {invoice_data['payment_method']}")
+    print(invoice_data)
     ```
   </Step>
 </Steps>
