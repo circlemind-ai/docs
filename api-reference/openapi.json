@@ -685,7 +685,7 @@
             "type": "boolean",
             "title": "Enable Recording",
             "description": "Enable video recording of the task execution. Default is False",
-            "default": false
+            "default": true
           },
           "profile_id": {
             "anyOf": [
