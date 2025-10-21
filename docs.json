@@ -83,7 +83,7 @@
       "anchors": [
         {
           "anchor": "Playground",
-          "href": "https://zero.circlemind.co/developer",
+          "href": "https://app.smooth.sh",
           "icon": "play"
         },
         {
@@ -108,7 +108,7 @@
     "primary": {
       "type": "button",
       "label": "Get an API key",
-      "href": "https://zero.circlemind.co"
+      "href": "https://app.smooth.sh"
     }
   },
   "contextual": {
