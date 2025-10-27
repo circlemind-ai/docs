@@ -265,22 +265,22 @@
         ]
       }
     },
-    "/browser/session/{session_id}": {
+    "/browser/session/{live_id}": {
       "delete": {
         "summary": "Close Session",
-        "description": "Close an interactive browser session by its `session_id`.",
+        "description": "Close an interactive browser session by its `live_id`.",
         "tags": [
           "Session"
         ],
-        "operationId": "close_browser_session_browser_session__session_id__delete",
+        "operationId": "close_browser_session_browser_session__live_id__delete",
         "parameters": [
           {
-            "name": "session_id",
+            "name": "live_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Session Id"
+              "title": "Live Id"
             }
           }
         ],
