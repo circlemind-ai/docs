@@ -43,7 +43,7 @@ print(f"Agent response: {task.result()}")
 ```
 
 ```javascript Javascript
-fetch('https://api2.circlemind.co/api/v1/task/smooth', {
+fetch('https://api.smooth.sh/api/v1/task/smooth', {
   method: 'POST',
   headers: {
     'apikey': 'YOUR_API_KEY',
@@ -54,7 +54,7 @@ fetch('https://api2.circlemind.co/api/v1/task/smooth', {
 ```
 
 ```curl cURL
-curl -X POST https://api2.circlemind.co/api/v1/task/smooth \ 
+curl -X POST https://api.smooth.sh/api/v1/task/smooth \ 
           -H "apikey: cmzr-YOUR_API_KEY" \
           -H "Content-Type: application/json" \
           -d '{"max_steps": 32, "task": "your_task_description"}'
