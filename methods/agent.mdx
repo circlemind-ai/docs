@@ -153,6 +153,16 @@ All parameters available when running a task.
   Example: `password123`
 </ResponseField>
 
+<ResponseField name="certificates" type="list">
+  List of client certificates to use when accessing secure websites. Each certificate is a dictionary with the following fields:
+   - `file`: p12 file object to be uploaded (e.g., open('cert.p12', 'rb'));
+   - `password` (optional): The password for the certificate file, if applicable.
+</ResponseField>
+
+<ResponseField name="use_adblock" type="boolean">
+  Enable adblock for the browser session. Default is True.
+</ResponseField>
+
 <ResponseField name="experimental_features" type="dict">
   Experimental features to enable for the task.
 </ResponseField>
@@ -178,7 +188,11 @@ Returns a `TaskHandle` with the following attributes.
 </ResponseField>
 
 <ResponseField name="recording_url()" type="method">
-  Waits for the task completion and returns a recording URL upon completion. You can use this link to download the video recording of the task. The video will be ready shortly after the task completes.
+  Waits for the task completion and returns a recording URL upon completion if `enable_recording` was enabled. You can use this link to download the video recording of the task. The video will be ready shortly after the task completes.
+</ResponseField>
+
+<ResponseField name="downloads_url()" type="method">
+  Waits for the task completion and returns a URL of the archive containing the files downloaded during the execution. If no file was downloaded raises ApiError(404).
 </ResponseField>
 
 <ResponseField name="stop()" type="method">

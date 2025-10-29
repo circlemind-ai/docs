@@ -669,7 +669,7 @@
             ],
             "title": "Device",
             "description": "Device type for the task. Default is mobile.",
-            "default": "mobile"
+            "default": "desktop"
           },
           "allowed_urls": {
             "type": "array",
@@ -709,7 +709,7 @@
             "type": "boolean",
             "title": "Stealth Mode",
             "description": "Run the browser in stealth mode.",
-            "default": false
+            "default": true
           },
           "proxy_server": {
             "anyOf": [
@@ -746,6 +746,34 @@
             ],
             "title": "Proxy Password",
             "description": "Proxy server password."
+          },
+          "certificates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "description": "Base64 encoded p12 client certificate file."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The password for the certificate file, if applicable."
+                }
+              },
+              "required": [
+                "file"
+              ]
+            },
+            "title": "Certificates",
+            "description": "List of client certificates to use when accessing secure websites.",
+            "default": null
+          },
+          "use_adblock": {
+            "type": "boolean",
+            "title": "Use Adblock",
+            "description": "Enable ad-blocking in the browser to improve performance and reduce distractions.",
+            "default": true
           },
           "experimental_features": {
             "type": "object",
@@ -855,6 +883,30 @@
             ],
             "title": "Recording Url",
             "description": "The URL to view the task recording."
+          },
+          "downloads_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Downloads Url",
+            "description": "The URL to download files generated during the task."
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At",
+            "description": "The timestamp when the task was created."
           }
         },
         "type": "object",
