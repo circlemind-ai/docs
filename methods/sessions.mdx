@@ -67,6 +67,16 @@ All parameters available when opening a browser session.
   Set it to `False` if you want to simply create an empty browser profile for Smooth to interact with in future tasks.
 </ResponseField>
 
+<ResponseField name="device" type="string">
+  The device type used for the session. One of: ["mobile", "desktop"].
+
+  Note that `mobile` does not support navigation via the search bar, so a starting URL must be provided.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  The starting URL for the session.
+</ResponseField>
+
 ## Response
 
 Returns a `BrowserSessionHandle` with the following attributes.
@@ -85,7 +95,7 @@ Returns a `BrowserSessionHandle` with the following attributes.
 
 
 <ResponseField name="live_id()" type="method">
-  Returns the live ID for the browser session. It can be passed to `close_session` to close the session and save the browser profile.
+  Returns the live ID for the browser session. It can be passed to `.close_session` to close the session and save the browser profile.
   
   <Note>
     If the browser session is not manually closed, the profile is saved automatically when the 5 minutes time limit is reached.
