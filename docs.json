@@ -39,6 +39,7 @@
             "group": "Features",
             "pages": [
               "features/file-upload",
+              "features/file-download",
               "features/persistent-sessions",
               "features/proxies",
               "features/live-share",
