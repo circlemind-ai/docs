@@ -114,6 +114,16 @@
               "type": "string",
               "title": "Task Id"
             }
+          },
+          {
+            "name": "downloads",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Downloads",
+              "description": "Whether to download the task result files after the task is completed. If true, the response will include the download link for the files."
+            }
           }
         ],
         "responses": {
@@ -559,6 +569,35 @@
             "type": "boolean",
             "description": "Whether to open a live browser instance using the specified profile.",
             "title": "Live View"
+          },
+          "device": {
+            "type": "string",
+            "anyOf": [
+              {
+                "enum": [
+                  "desktop",
+                  "mobile"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The device type for the browser session. Note that `mobile` does not support navigation via the search bar, so a starting URL must be provided.",
+            "title": "Device"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The starting URL to open in the browser session. If None, a blank page will be opened.",
+            "title": "Url"
           }
         },
         "type": "object",
