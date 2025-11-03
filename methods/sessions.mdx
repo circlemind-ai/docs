@@ -19,7 +19,7 @@ Use the provided live_url to log in to any target platform (e.g., your project m
 3. **Execute Tasks with the Profile ID**
 When running an agent task, simply include the profile_id. The agent will use the stored authentication from that profile, allowing it to immediately access the platform as a logged-in user.
 
-## Open a browser session using the Python SDK
+## Open a browser session
 
 Open a browser session and create a profile in 4 lines of code.
 
@@ -96,8 +96,27 @@ Returns a `BrowserSessionHandle` with the following attributes.
 
 <ResponseField name="live_id()" type="method">
   Returns the live ID for the browser session. It can be passed to `.close_session` to close the session and save the browser profile.
-  
-  <Note>
-    If the browser session is not manually closed, the profile is saved automatically when the 5 minutes time limit is reached.
-  </Note>
 </ResponseField>
+
+## Close a browser session
+
+To close a live browser session, simply call `.close_session`.
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+
+...  # open session
+
+smooth_client.close_session(sesion_handle.live_id())
+```
+
+</CodeGroup>
+
+<Note>
+  If the browser session is not manually closed, the profile is saved automatically when the 5 minutes time limit is reached.
+</Note>
+
