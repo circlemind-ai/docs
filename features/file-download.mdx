@@ -1,0 +1,29 @@
+---
+title: "File Download"
+description: "Learn how to use Smooth to download files"
+---
+
+## Overview
+
+The following demonstrates how to instruct Smooth to download and return files from the web.
+
+<CodeGroup>
+
+```python Python
+# pip install smooth-py
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+task = smooth_client.run("Go to https://pdfobject.com/examples/passing-element-styled.html and download the pdf file.")
+
+print(f"Agent response: {task.result()}")
+print(f"Downloaded file archive URL: {task.downloads_url()}")
+```
+
+</CodeGroup>
+
+Downloaded files are automatically deleted from our servers after 24 hours.
+
+<Note>
+Smooth has access to the file content and can analyze it if requested. Be careful when dealing with sensitive data.
+</Note>
