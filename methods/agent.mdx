@@ -107,12 +107,6 @@ All parameters available when running a task.
   Example: `desktop`
 </ResponseField>
 
-<ResponseField name="allowed_urls" type="list">
-  List of allowed URL patterns using wildcard syntax. If None, all URLs are allowed.
-  
-  Example: ["google.com/&ast;", "&ast;mydomain.&ast;/&ast;"]
-</ResponseField>
-
 <ResponseField name="enable_recording" type="boolean">
   Toggles the option to record a video of the task execution. Default: True.
   
@@ -127,6 +121,12 @@ All parameters available when running a task.
 
 <ResponseField name="profile_read_only" type="boolean">
   If true, the profile specified by `profile_id` will be loaded in read-only mode. Changes made during the task will not be saved back to the profile. Default: False.
+</ResponseField>
+
+<ResponseField name="allowed_urls" type="list">
+  List of allowed URL patterns using wildcard syntax. If None, all URLs are allowed.
+  
+  Example: ["google.com/&ast;", "&ast;mydomain.&ast;/&ast;"]
 </ResponseField>
 
 <ResponseField name="stealth_mode" type="boolean">
@@ -155,12 +155,44 @@ All parameters available when running a task.
 
 <ResponseField name="certificates" type="list">
   List of client certificates to use when accessing secure websites. Each certificate is a dictionary with the following fields:
-   - `file`: p12 file object to be uploaded (e.g., open('cert.p12', 'rb'));
+   - `file`: p12 file object to be uploaded (e.g., open('my_cert.p12', 'rb'));
    - `password` (optional): The password for the certificate file, if applicable.
+
+   <CodeGroup>
+   ```python Python
+   task = client.run(
+    ...,
+    certificates=[{
+      "file": open("my_cert.p12", "rb"),
+      "password": "my_password"
+    }]
+   )
+   ```
+   </CodeGroup>
 </ResponseField>
 
 <ResponseField name="use_adblock" type="boolean">
   Enable adblock for the browser session. Default is True.
+</ResponseField>
+
+<ResponseField name="additional_tools" type="dict">
+  Additional tools to enable for the task. Each tool is to a `{tool_name: tool_kwargs} pair.
+
+  Currently supported tools are:
+  | Tool | Params | Purpose |
+  |------|--------|---------|
+  |`screenshot`| - `full_page (boolean)`: whether to take a full page screenshot rather than just the viewport. Default is False | Allows Smooth to take screenshot of the browser viewport |
+
+  <CodeGroup>
+   ```python Python
+   task = client.run(
+    ...,
+    additional_tools={
+      "screenshot": {"full_page": True}  # or `"screenshot": None`
+    }
+   )
+   ```
+   </CodeGroup>
 </ResponseField>
 
 <ResponseField name="experimental_features" type="dict">
