@@ -77,6 +77,24 @@ All parameters available when opening a browser session.
   The starting URL for the session.
 </ResponseField>
 
+<ResponseField name="proxy_server" type="string">
+  The hostname or IP address of the proxy server that will be used for the session.
+  
+  Example: `proxy.example.com`
+</ResponseField>
+
+<ResponseField name="proxy_username" type="string">
+  The username for authenticating with the proxy server, if authentication is required.
+  
+  Example: `user123`
+</ResponseField>
+
+<ResponseField name="proxy_password" type="string">
+  The password for authenticating with the proxy server, if authentication is required.
+  
+  Example: `password123`
+</ResponseField>
+
 ## Response
 
 Returns a `BrowserSessionHandle` with the following attributes.

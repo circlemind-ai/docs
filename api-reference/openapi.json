@@ -598,6 +598,42 @@
             ],
             "description": "The starting URL to open in the browser session. If None, a blank page will be opened.",
             "title": "Url"
+          },
+          "proxy_server": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Proxy server address to route browser traffic through.",
+            "title": "Proxy Server"
+          },
+          "proxy_username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Username for proxy server authentication, if required.",
+            "title": "Proxy Username"
+          },
+          "proxy_password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Password for proxy server authentication, if required.",
+            "title": "Proxy Password"
           }
         },
         "type": "object",
@@ -760,7 +796,7 @@
               }
             ],
             "title": "Proxy Server",
-            "description": "Proxy server url to route browser traffic through. Must include the protocol to use (e.g. http:// or https://)"
+            "description": "Proxy server address to route browser traffic through."
           },
           "proxy_username": {
             "anyOf": [
