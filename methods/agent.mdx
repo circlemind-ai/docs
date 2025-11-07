@@ -178,19 +178,17 @@ All parameters available when running a task.
 </ResponseField>
 
 <ResponseField name="additional_tools" type="dict">
-  Additional tools to enable for the task. Each tool is to a `{tool_name: tool_kwargs}` pair. Use `tool_kwargs = None` for the default configuration of any tool.
+  Additional tools to enable for the task. Each tool is a `{tool_name: tool_kwargs}` pair. Use `tool_kwargs = None` for the default configuration of any tool.
 
-  Currently supported tools are:
-  | Tool | Params | Purpose |
-  | ---- | ------ | ------- |
-  | `screenshot`| - `full_page (boolean)`: whether to take a full page screenshot rather than just the viewport. Default is False. | Allows Smooth to take screenshots of the browser viewport. The acquired screenshots can be accessed via `.downloads_url()`. |
+  See the [Tools](/methods/tools) page for a complete list of available tools and their configuration options.
 
   <CodeGroup>
    ```python Python
    task = client.run(
     ...,
     additional_tools={
-      "screenshot": {"full_page": True}  # or `"screenshot": None`
+      "screenshot": {"full_page": True},
+      "hover": None
     }
    )
    ```

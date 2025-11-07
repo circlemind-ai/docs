@@ -36,6 +36,12 @@
             ]
           },
           {
+            "group": "Tools",
+            "pages": [
+              "methods/tools"
+            ]
+          },
+          {
             "group": "Features",
             "pages": [
               "features/file-upload",
