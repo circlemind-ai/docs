@@ -50,7 +50,8 @@
               "features/proxies",
               "features/live-share",
               "features/session-recording",
-              "features/structured-output"
+              "features/structured-output",
+              "features/custom-extensions"
             ]
           },
           {

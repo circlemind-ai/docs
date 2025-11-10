@@ -1,0 +1,73 @@
+---
+title: "Custom Extensions"
+description: "Learn how to use custom browser extensions with Smooth"
+---
+
+## Overview
+
+Custom extensions allow you to load your own Chrome extensions into the browser session. This is useful adding guardrails, taking determistic actions, or for testing extensions.
+
+<CodeGroup>
+
+```python Python
+# pip install smooth-py
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+
+# Upload a custom extension (must be a .zip file)
+extension = smooth_client.upload_extension(file=open("comic-sans-extension.zip", "rb"))
+
+# Get the extension ID
+extension_id = extension.id
+
+# Use the extension in a task
+task = smooth_client.run(
+    "Navigate to example.com and take a screenshot",
+    extensions=[extension_id]
+)
+
+# List all uploaded extensions
+extensions = smooth_client.list_extensions()
+for ext in extensions:
+    print(f"Extension ID: {ext.id}")
+
+# Delete extension
+smooth_client.delete_extension(extension_id)
+```
+
+</CodeGroup>
+
+<Note>
+Extensions must be packaged as Chrome extension .zip files with a valid manifest.json. The extension will be loaded into the browser session and remain active for the duration of the task.
+</Note>
+
+## Extension Lifecycle
+
+Extensions are uploaded to Smooth servers and can be reused across multiple tasks. Use `.delete_extension()` to permanently delete it.
+
+```python
+# Upload once
+extension = smooth_client.upload_extension(file=open("my-extension.zip", "rb"))
+
+# Use multiple times
+task1 = smooth_client.run("Task 1", extensions=[extension.id])
+task2 = smooth_client.run("Task 2", extensions=[extension.id])
+
+# Delete extension
+smooth_client.delete_extension(extension.id)
+```
+
+## Multiple Extensions
+
+You can load multiple extensions in a single session by passing a list of extension IDs:
+
+```python
+extension1 = smooth_client.upload_extension(file=open("extension1.zip", "rb"))
+extension2 = smooth_client.upload_extension(file=open("extension2.zip", "rb"))
+
+task = smooth_client.run(
+    "Your task here",
+    extensions=[extension1.id, extension2.id]
+)
+```
