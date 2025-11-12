@@ -23,6 +23,10 @@
     {
       "name": "Session",
       "description": "Operations related to the browser sessions"
+    },
+    {
+      "name": "Extension",
+      "description": "Operations related to browser extensions"
     }
   ],
   "paths": {
@@ -547,6 +551,168 @@
           }
         ]
       }
+    },
+    "/browser/extension": {
+      "post": {
+        "summary": "Upload Extension",
+        "description": "Upload a browser extension (.zip file) to be used in tasks.",
+        "tags": [
+          "Extension"
+        ],
+        "operationId": "upload_extension_browser_extension_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The zipped extension file to upload (.zip format)."
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Extension successfully uploaded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadExtensionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request"
+          },
+          "422": {
+            "description": "Validation Error"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "cURL",
+            "source": "curl -X POST \"https://api.smooth.sh/api/v1/browser/extension\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -F \"file=@/path/to/your/extension.zip\""
+          },
+          {
+            "lang": "python",
+            "label": "Python (sync)",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nwith open(\"/path/to/your/extension.zip\", \"rb\") as f:\n    upload_response = client.upload_extension(f)\nprint(f\"Extension uploaded with ID: {upload_response.id}\")"
+          },
+          {
+            "lang": "python",
+            "label": "Python (async)",
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def upload_extension():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    with open(\"/path/to/your/extension.zip\", \"rb\") as f:\n        upload_response = await client.upload_extension(f)\n    print(f\"Extension uploaded with ID: {upload_response.id}\")\n    await client.close()\n\nasyncio.run(upload_extension())"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/browser/extension';\n\nasync function uploadExtension(file) {\n  const formData = new FormData();\n  formData.append('file', file);\n\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'apikey': apiKey\n      },\n      body: formData\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Extension uploaded with ID:', data.r.id);\n  } catch (error) {\n    console.error('Error uploading extension:', error);\n  }\n}\n\n// Usage example (in a browser environment):\n// const fileInput = document.querySelector('input[type=\"file\"]');\n// fileInput.addEventListener('change', (event) => {\n//   const file = event.target.files[0];\n//   uploadExtension(file);\n// });"
+          }
+        ]
+      },
+      "get": {
+        "summary": "List Extensions",
+        "description": "List all uploaded browser extensions.",
+        "tags": [
+          "Extension"
+        ],
+        "operationId": "list_extensions_browser_extension_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListExtensionsResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "cURL",
+            "source": "curl -X GET \"https://api.smooth.sh/api/v1/browser/extension\" \\\n     -H \"apikey: YOUR_API_KEY\""
+          },
+          {
+            "lang": "python",
+            "label": "Python (sync)",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nextensions = client.list_extensions()\nfor ext in extensions.extensions:\n    print(f\"ID: {ext.id}, Name: {ext.name}\")"
+          },
+          {
+            "lang": "python",
+            "label": "Python (async)",
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def list_extensions():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    extensions = await client.list_extensions()\n    for ext in extensions.extensions:\n        print(f\"ID: {ext.id}, Name: {ext.name}\")\n    await client.close()\n\nasyncio.run(list_extensions())"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/browser/extension';\n\nasync function listExtensions() {\n  try {\n    const response = await fetch(url, {\n      method: 'GET',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Available extensions:', data.r.extensions);\n  } catch (error) {\n    console.error('Error listing extensions:', error);\n  }\n}\n\nlistExtensions();"
+          }
+        ]
+      }
+    },
+    "/browser/extension/{extension_id}": {
+      "delete": {
+        "summary": "Delete Extension",
+        "description": "Delete an uploaded browser extension by its ID.",
+        "tags": [
+          "Extension"
+        ],
+        "operationId": "delete_extension_browser_extension__extension_id__delete",
+        "parameters": [
+          {
+            "name": "extension_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Extension successfully deleted."
+          },
+          "404": {
+            "description": "Extension not found."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "cURL",
+            "source": "curl -X DELETE \"https://api.smooth.sh/api/v1/browser/extension/YOUR_EXTENSION_ID\" \\\n     -H \"apikey: YOUR_API_KEY\""
+          },
+          {
+            "lang": "python",
+            "label": "Python (sync)",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nclient.delete_extension(extension_id=\"YOUR_EXTENSION_ID\")"
+          },
+          {
+            "lang": "python",
+            "label": "Python (async)",
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def delete_extension():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    await client.delete_extension(extension_id=\"YOUR_EXTENSION_ID\")\n    await client.close()\n\nasyncio.run(delete_extension())"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst extensionId = 'YOUR_EXTENSION_ID'; // The ID of the extension to delete\nconst url = `https://api.smooth.sh/api/v1/browser/extension/${extensionId}`;\n\nasync function deleteExtension() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`Extension '${extensionId}' deleted successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error deleting extension:', error);\n  }\n}\n\ndeleteExtension();"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -857,6 +1023,22 @@
             },
             "title": "Experimental Features",
             "description": "A dictionary of experimental features to enable or disable."
+          },
+          "extensions": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extensions",
+            "description": "List of extension IDs to load into the browser for this task.",
+            "default": null
           }
         },
         "type": "object",
@@ -1005,6 +1187,65 @@
         ],
         "title": "UploadFileResponse",
         "description": "Response model for uploading a file."
+      },
+      "Extension": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "The unique identifier for the extension."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the extension."
+          },
+          "created_at": {
+            "type": "integer",
+            "title": "Created At",
+            "description": "The timestamp when the extension was uploaded."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "created_at"
+        ],
+        "title": "Extension",
+        "description": "Extension model."
+      },
+      "UploadExtensionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID assigned to the uploaded extension."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "UploadExtensionResponse",
+        "description": "Response model for uploading an extension."
+      },
+      "ListExtensionsResponse": {
+        "properties": {
+          "extensions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Extension"
+            },
+            "title": "Extensions",
+            "description": "List of uploaded extensions."
+          }
+        },
+        "type": "object",
+        "required": [
+          "extensions"
+        ],
+        "title": "ListExtensionsResponse",
+        "description": "Response model for listing extensions."
       }
     },
     "securitySchemes": {
