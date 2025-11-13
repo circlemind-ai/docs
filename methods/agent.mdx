@@ -195,6 +195,12 @@ All parameters available when running a task.
    </CodeGroup>
 </ResponseField>
 
+<ResponseField name="custom_tools" type="list">
+  A list of custom Python functions that the agent can call during task execution. Custom tools run in your local environment and can be used for OTP handling, human-in-the-loop scenarios, database operations, API integrations, and more.
+
+  See the [Custom Tools](/methods/custom-tools) page for detailed documentation and examples.
+</ResponseField>
+
 <ResponseField name="experimental_features" type="dict">
   Experimental features to enable for the task.
 </ResponseField>

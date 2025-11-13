@@ -1,0 +1,182 @@
+---
+title: 'Custom tools'
+description: 'Extend Smooth with custom Python functions that run in your environment'
+---
+
+## Overview
+
+Custom tools allow you to give Smooth any arbitrary Python function that will run in your local environment. This is similar to MCP (Model Context Protocol) but without having to deal with servers or additional infrastructure.
+
+Custom tools can be used for virtually anything, including:
+
+- **Handling OTP scenarios** - Retrieve one-time passwords from your email or SMS service
+- **Human-in-the-loop** - Ask questions and get input from a human operator
+- **Database operations** - Add, update, or query data in your local or remote databases
+- **API integrations** - Call external APIs that require credentials or complex logic
+- **File system operations** - Read configuration files, process local data, etc.
+- **Custom validation** - Implement business-specific validation logic
+
+## Basic Usage
+
+Use the `@client.tool()` decorator to register a Python function as a custom tool:
+
+<CodeGroup>
+
+```python Python (Sync)
+from smooth import SmoothClient, ToolCallError
+
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+
+@client.tool(
+    name="get_secret_password",
+    description="Retrieves a secret password. You must provide the correct unlock_key to access it.",
+    inputs={
+        "unlock_key": {
+            "type": "string",
+            "description": "The unlock key required to retrieve the secret password",
+        }
+    },
+    output="string"
+)
+def get_secret_password(unlock_key: str):
+    """
+    This tool simulates a secure vault that only returns the secret password
+    if the correct unlock key is provided.
+    """
+    CORRECT_UNLOCK_KEY = "open_sesame_123"
+    SECRET_PASSWORD = "ultra_secret_password_xyz789"
+
+    if unlock_key == CORRECT_UNLOCK_KEY:
+        return SECRET_PASSWORD
+    else:
+        raise ToolCallError("Access denied: incorrect unlock key")
+
+# Use the custom tool in a task
+task = client.run(
+    task="Get the secret password using the unlock key 'open_sesame_123' and then use it to log in to example.com",
+    custom_tools=[get_secret_password]
+)
+```
+
+```python Python (Async)
+import asyncio
+from smooth import SmoothAsyncClient, ToolCallError
+
+async def main():
+    client = SmoothAsyncClient(api_key="cmzr-YOUR_API_KEY")
+
+    @client.tool(
+        name="get_secret_password",
+        description="Retrieves a secret password. You must provide the correct unlock_key to access it.",
+        inputs={
+            "unlock_key": {
+                "type": "string",
+                "description": "The unlock key required to retrieve the secret password",
+            }
+        },
+        output="string"
+    )
+    async def get_secret_password(unlock_key: str):
+        """Async tool implementation"""
+        CORRECT_UNLOCK_KEY = "open_sesame_123"
+        SECRET_PASSWORD = "ultra_secret_password_xyz789"
+
+        if unlock_key == CORRECT_UNLOCK_KEY:
+            return SECRET_PASSWORD
+        else:
+            raise ToolCallError("Access denied: incorrect unlock key")
+
+    # Use the custom tool in a task
+    task = await client.run(
+        task="Get the secret password and use it to log in",
+        custom_tools=[get_secret_password]
+    )
+
+    result = await task.result()
+    await client.close()
+
+asyncio.run(main())
+```
+
+</CodeGroup>
+
+## Tool Decorator Parameters
+
+The `@client.tool()` decorator accepts the following parameters:
+
+<ParamField path="name" type="string" required>
+  The name of the tool that the agent will see and use to call it. Use descriptive, clear names.
+</ParamField>
+
+<ParamField path="description" type="string" required>
+  A clear description of what the tool does and when to use it. The agent uses this to decide when to call your tool.
+</ParamField>
+
+<ParamField path="inputs" type="dict" required>
+  A dictionary describing the input parameters for the tool. Each key is a parameter name, and the value is an object with:
+  - `type` (string): The data type (e.g., "string", "number", "boolean", "object", "array")
+  - `description` (string): A clear description of what this parameter is for
+</ParamField>
+
+<ParamField path="output" type="string" required>
+  The return type of the tool (e.g., "string", "number", "boolean", "object", "array")
+</ParamField>
+
+## Error Handling
+
+Custom tools support two types of error handling:
+
+### ToolCallError (Non-Fatal)
+
+Use `ToolCallError` for expected errors that the agent should handle gracefully. The error message will be sent to the agent, allowing it to retry or adjust its approach.
+
+```python
+from smooth import ToolCallError
+
+@client.tool(
+    name="validate_code",
+    description="Validates a verification code",
+    inputs={"code": {"type": "string", "description": "The code to validate"}},
+    output="boolean"
+)
+def validate_code(code: str):
+    if not code.isdigit():
+        raise ToolCallError("Code must contain only digits")
+    if len(code) != 6:
+        raise ToolCallError("Code must be exactly 6 digits")
+    return True
+```
+
+### Fatal Exceptions
+
+Any other exception raised by your code is considered fatal and will immediately interrupt the task execution.
+
+```python
+@client.tool(
+    name="query_database",
+    description="Queries the user database",
+    inputs={"user_id": {"type": "string", "description": "User ID to query"}},
+    output="object"
+)
+def query_database(user_id: str):
+    try:
+        # Database query logic
+        result = db.query(user_id)
+        return result
+    except ConnectionError:
+        # This will stop the task immediately
+        raise Exception("Database connection failed - critical error")
+```
+
+<Tip>
+**Tool Descriptions**: Write clear, specific descriptions for your tools and inputs. The agent relies on these descriptions to decide when and how to use your tools effectively.
+</Tip>
+
+## Best Practices
+
+1. **Keep tools simple to use** - Each tool should do one thing well
+2. **Use descriptive names** - Name tools clearly so the agent knows when to use them
+3. **Handle errors gracefully** - Use `ToolCallError` for recoverable errors
+4. **Validate inputs** - Check that inputs are in the expected format before processing
+5. **Return meaningful values** - Provide clear, actionable responses that help the agent continue
+6. **Test independently** - Test your tool functions separately before using them in tasks

@@ -38,7 +38,8 @@
           {
             "group": "Tools",
             "pages": [
-              "methods/tools"
+              "methods/tools",
+              "methods/custom-tools"
             ]
           },
           {
