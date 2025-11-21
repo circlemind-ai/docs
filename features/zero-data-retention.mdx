@@ -1,0 +1,36 @@
+---
+title: "Zero Data Retention"
+description: "Enable Zero Data Retention for enhanced data privacy"
+---
+
+## Overview
+
+Zero Data Retention is an enterprise feature that provides enhanced data privacy by allowing you to delete all data associated with completed tasks. When enabled, you have full control over when task data is removed from our systems.
+
+This feature is available upon request on the **Enterprise plan**. Contact us to request Zero Data Retention for your organization.
+
+## Deleting Task Data
+
+Once Zero Data Retention is enabled for your account, you can request the deletion of data for any completed task using our dedicated API endpoint.
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE http://api.smooth.sh/api/v1/task/<task_id>/data \
+  -H "apikey: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+<Warning>
+Task data deletion is permanent and cannot be undone. Make sure you have retrieved any necessary information before deleting task data.
+</Warning>
+
+## Use Cases
+
+Zero Data Retention is ideal for organizations that:
+
+- Handle sensitive or confidential information
+- Must comply with strict data retention policies
+- Want to minimize their data footprint
+- Require enhanced privacy controls
