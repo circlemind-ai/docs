@@ -5,12 +5,13 @@ description: 'Extend Smooth with custom Python functions that run in your enviro
 
 ## Overview
 
-Custom tools allow you to give Smooth any arbitrary Python function that will run in your local environment. This is similar to MCP (Model Context Protocol) but without having to deal with servers or additional infrastructure.
+Custom tools allow you to give Smooth any arbitrary function as a tool. This is similar to MCP (Model Context Protocol) but without having to deal with servers or additional infrastructure.
 
 Custom tools can be used for virtually anything, including:
 
-- **Handling OTP scenarios** - Retrieve one-time passwords from your email or SMS service
+- **Browser interaction** - Execute JavaScript to manipulate the DOM or extract data
 - **Human-in-the-loop** - Ask questions and get input from a human operator
+- **Handling OTP scenarios** - Retrieve one-time passwords from your email or SMS service
 - **Database operations** - Add, update, or query data in your local or remote databases
 - **API integrations** - Call external APIs that require credentials or complex logic
 - **File system operations** - Read configuration files, process local data, etc.
@@ -22,83 +23,84 @@ Use the `@client.tool()` decorator to register a Python function as a custom too
 
 <CodeGroup>
 
-```python Python (Sync)
-from smooth import SmoothClient, ToolCallError
+```python Python
+from smooth import SmoothClient
 
 client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
 @client.tool(
-    name="get_secret_password",
-    description="Retrieves a secret password. You must provide the correct unlock_key to access it.",
+    name="ask_human",
+    description="Asks a human operator for input when you need clarification or additional information.",
     inputs={
-        "unlock_key": {
+        "question": {
             "type": "string",
-            "description": "The unlock key required to retrieve the secret password",
+            "description": "The question to ask the human operator",
         }
     },
     output="string"
 )
-def get_secret_password(unlock_key: str):
+def ask_human(question: str):
     """
-    This tool simulates a secure vault that only returns the secret password
-    if the correct unlock key is provided.
+    Prompts a human operator for input and returns their response.
+    Useful for human-in-the-loop workflows.
     """
-    CORRECT_UNLOCK_KEY = "open_sesame_123"
-    SECRET_PASSWORD = "ultra_secret_password_xyz789"
-
-    if unlock_key == CORRECT_UNLOCK_KEY:
-        return SECRET_PASSWORD
-    else:
-        raise ToolCallError("Access denied: incorrect unlock key")
+    print(f"\nQuestion for human: {question}")
+    response = input("Your answer: ")
+    return response
 
 # Use the custom tool in a task
 task = client.run(
-    task="Get the secret password using the unlock key 'open_sesame_123' and then use it to log in to example.com",
-    custom_tools=[get_secret_password]
+    task="Ask the human for their favorite book and then find the price on Amazon",
+    custom_tools=[ask_human]
 )
 ```
 
-```python Python (Async)
-import asyncio
-from smooth import SmoothAsyncClient, ToolCallError
+</CodeGroup>
 
-async def main():
-    client = SmoothAsyncClient(api_key="cmzr-YOUR_API_KEY")
+## Browser JavaScript Execution
 
-    @client.tool(
-        name="get_secret_password",
-        description="Retrieves a secret password. You must provide the correct unlock_key to access it.",
-        inputs={
-            "unlock_key": {
-                "type": "string",
-                "description": "The unlock key required to retrieve the secret password",
-            }
-        },
-        output="string"
-    )
-    async def get_secret_password(unlock_key: str):
-        """Async tool implementation"""
-        CORRECT_UNLOCK_KEY = "open_sesame_123"
-        SECRET_PASSWORD = "ultra_secret_password_xyz789"
+Within custom tools, you can execute JavaScript directly in the browser context. Your JavaScript code can access to the DOM, browser APIs, and page state.
 
-        if unlock_key == CORRECT_UNLOCK_KEY:
-            return SECRET_PASSWORD
-        else:
-            raise ToolCallError("Access denied: incorrect unlock key")
+To use this feature, add a `task: smooth.TaskHandle` parameter to your tool function:
 
-    # Use the custom tool in a task
-    task = await client.run(
-        task="Get the secret password and use it to log in",
-        custom_tools=[get_secret_password]
-    )
+<CodeGroup>
 
-    result = await task.result()
-    await client.close()
+```python Python
+import smooth
 
-asyncio.run(main())
+client = smooth.SmoothClient(api_key="cmzr-YOUR_API_KEY")
+
+@client.tool(
+    name="extract_page_data",
+    description="Extracts and analyzes data from the current page using JavaScript",
+    inputs={},
+    output="any"
+)
+def extract_page_data(task: smooth.TaskHandle):
+    # Execute JavaScript in the browser and return the result
+    result = task.exec_js("""
+        () => {
+            // Full access to DOM and browser APIs
+            const data = {
+                title: document.title,
+                url: window.location.href,
+                links: Array.from(document.querySelectorAll('a')).map(a => a.href),
+                hasLoginForm: !!document.querySelector('input[type="password"]'),
+                visibleText: document.body.innerText.substring(0, 50)
+            };
+            return data;
+        }
+    """)
+
+    # Process the result in Python
+    return f"Extracted {len(result['links'])} links on {result['title']}"
 ```
 
 </CodeGroup>
+
+<Tip>
+Use JavaScript for browser-level automation and data extraction, and Python for backend processing and integrations. Combine both for powerful workflows.
+</Tip>
 
 ## Tool Decorator Parameters
 
