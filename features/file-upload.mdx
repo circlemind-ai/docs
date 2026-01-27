@@ -10,14 +10,22 @@ The following demonstrates how to instruct Smooth to handle custom data files.
 <CodeGroup>
 
 ```python Python
-# pip install smooth-py
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-file_handle = client.upload_file(open("README.md", "rb"))
-task = smooth_client.run("Upload the given file to https://www.azurespeed.com/Azure/UploadLargeFile to test the upload speed.", files=[file_handle.id])
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
-...
+# 1. Upload the file
+file = client.upload_file(open("report.pdf", "rb"))
+
+# 2. Use it in a task
+result = client.run(
+    task="Upload this report to the portal",
+    files=[file.id]
+)
+
+# 3. Or use it in a session
+with client.session(files=[file.id]) as session:
+    session.run_task("Analyze the uploaded report")
 ```
 
 </CodeGroup>

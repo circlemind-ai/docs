@@ -36,16 +36,16 @@ with client.session(profile_id="my-session") as session:
     session.goto("https://news.ycombinator.com")
 
     # 2. Run an automated task
-    # Note: run_task preserves browser state (like highlighting or current URL)
-    # but starts with a fresh agent memory.
-    session.run_task("Find the top story and remember its title")
+    # Note: run_task preserves browser state but starts with a fresh agent memory.
+    # It returns the result directly.
+    result = session.run_task("Find the top story and remember its title")
     
-    # 3. If you want to use information from a previous task, 
-    # you can pass it in the prompt explicitly.
-    last_result = session.result().result
-    session.run_task(f"The previous story was '{last_result}'. Now find the second story and compare them.")
+    # 3. Use information from the previous task result
+    session.run_task(f"The previous story was '{result.result}'. Now find the second story and compare them.")
 
-    print(f"Final Session Result: {session.result().result}")
+# After the session is closed, you can access the final result and recording
+print(f"Final session result: {session.result().result}")
+print(f"Recording URL: {session.recording_url()}")
 ```
 
 </CodeGroup>
@@ -88,6 +88,10 @@ These parameters are passed to `client.session()` to configure the browser envir
 
 <ResponseField name="profile_id" type="string">
   The unique identifier for the browser profile. Use this to persist cookies and logins.
+</ResponseField>
+
+<ResponseField name="profile_read_only" type="boolean">
+  If `True`, the profile will be loaded in read-only mode. Changes made during the session will not be saved back to the profile. Default: `False`.
 </ResponseField>
 
 <ResponseField name="url" type="string">
@@ -153,11 +157,27 @@ Once you have a `session` object, you can call the following methods.
 </ResponseField>
 
 <ResponseField name="result" type="method">
-  Returns the summary result of the last task executed in the session.
+  Returns the final summary of the session. 
+  
+  <Note>
+    Can only be called **after** the session is closed (e.g., outside the `with` block).
+  </Note>
 </ResponseField>
 
-<ResponseField name="close" type="method">
-  Closes the session manually. Only necessary if not using a context manager.
+<ResponseField name="recording_url" type="method">
+  Returns the URL of the video recording.
+  
+  <Note>
+    Can only be called **after** the session is closed.
+  </Note>
+</ResponseField>
+
+<ResponseField name="downloads_url" type="method">
+  Returns the URL of the archive containing any files downloaded.
+  
+  <Note>
+    Can only be called **after** the session is closed.
+  </Note>
 </ResponseField>
 
 

@@ -86,12 +86,12 @@
           {
             "lang": "python",
             "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n\ntask_handle = client.run(\n    task=\"Go to hacker news and get the top 5 stories.\",\n    device=\"desktop\",\n    max_steps=32\n)\n\nprint(f\"Task ID: {task_handle.id}\")\n# Wait for the result\nresult = task_handle.result()\nprint(result)"
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n\n# client.run() returns the task result directly\nresult = client.run(\n    task=\"Go to hacker news and get the top 5 stories.\",\n    device=\"desktop\",\n    max_steps=32\n)\n\nprint(result.output)"
           },
           {
             "lang": "python",
             "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def run_task():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    task_handle = await client.run(\n        task=\"Go to hacker news and get the top 5 stories.\",\n        device=\"desktop\",\n        max_steps=32\n    )\n    print(f\"Task ID: {task_handle.id}\")\n    # Wait for the result\n    result = await task_handle.result()\n    print(result)\n    await client.close()\n\nasyncio.run(run_task())"
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def run_task():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    # client.run() returns the task result directly\n    result = await client.run(\n        task=\"Go to hacker news and get the top 5 stories.\",\n        device=\"desktop\",\n        max_steps=32\n    )\n    print(result.output)\n    await client.close()\n\nasyncio.run(run_task())"
           },
           {
             "lang": "javascript",
@@ -213,10 +213,54 @@
         ]
       }
     },
+    "/task/{task_id}/event": {
+      "post": {
+        "summary": "Send Task Event",
+        "description": "Send an event to a running task. This is used to interact with the browser in real-time.",
+        "tags": [
+          "Agent"
+        ],
+        "operationId": "send_task_event_task__task_id__event_post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event successfully sent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskEventResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/browser/session": {
       "post": {
-        "summary": "Open Session",
-        "description": "Open an interactive browser instance for 5 minutes. You can either create a new profile or load an existing one by providing its `profile_id`.",
+        "summary": "Open Session (Deprecated)",
+        "description": "Deprecated: Use `/task` instead with `task: null` to open a session. Open an interactive browser instance for 5 minutes. You can either create a new profile or load an existing one by providing its `profile_id`.",
+        "deprecated": true,
         "tags": [
           "Session"
         ],
@@ -281,8 +325,9 @@
     },
     "/browser/session/{live_id}": {
       "delete": {
-        "summary": "Close Session",
-        "description": "Close an interactive browser session by its `live_id`.",
+        "summary": "Close Session (Deprecated)",
+        "description": "Deprecated: Use `DELETE /task/{task_id}` instead. Close an interactive browser session by its `live_id`.",
+        "deprecated": true,
         "tags": [
           "Session"
         ],
@@ -370,6 +415,58 @@
             "lang": "javascript",
             "label": "JavaScript",
             "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/browser/profile';\n\nasync function listProfiles() {\n  try {\n    const response = await fetch(url, {\n      method: 'GET',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Available profiles:', data.r.profile_ids);\n  } catch (error) {\n    console.error('Error listing profiles:', error);\n  }\n}\n\nlistProfiles();"
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create Profile",
+        "description": "Create a new browser profile. Profiles persist cookies and authentication state across sessions.",
+        "tags": [
+          "Profile"
+        ],
+        "operationId": "create_browser_profile_browser_profile_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profile_id": {
+                    "type": "string",
+                    "description": "Optional custom ID for the profile. If not provided, a random one will be generated."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "cURL",
+            "source": "curl -X POST \"https://api.smooth.sh/api/v1/browser/profile\" \\\n     -H \"Content-Type: application/json\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -d '{\n       \"profile_id\": \"my-profile\"\n     }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python (sync)",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nprofile = client.create_profile(profile_id=\"my-profile\")\nprint(f\"Created profile: {profile.id}\")"
+          },
+          {
+            "lang": "python",
+            "label": "Python (async)",
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def create_profile():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    profile = await client.create_profile(profile_id=\"my-profile\")\n    print(f\"Created profile: {profile.id}\")\n    await client.close()\n\nasyncio.run(create_profile())"
           }
         ]
       }
@@ -831,6 +928,27 @@
         "title": "BrowserSessionResponse",
         "description": "Browser session response model."
       },
+      "ProfileResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "The ID of the profile."
+          },
+          "created_at": {
+            "type": "number",
+            "title": "Created At",
+            "description": "The timestamp when the profile was created."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created_at"
+        ],
+        "title": "ProfileResponse",
+        "description": "Profile response model."
+      },
       "BrowserProfilesResponse": {
         "properties": {
           "profile_ids": {
@@ -852,9 +970,16 @@
       "TaskRequest": {
         "properties": {
           "task": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Task",
-            "description": "The task to run."
+            "description": "The task to run. If null, opens a blank browser and waits for further instructions."
           },
           "response_model": {
             "type": "object",
@@ -879,10 +1004,29 @@
           "metadata": {
             "type": "object",
             "additionalProperties": {
-              "type": "string"
+              "anyOf": [
+                { "type": "string" },
+                { "type": "integer" },
+                { "type": "number" },
+                { "type": "boolean" }
+              ]
             },
             "title": "Metadata",
             "description": "A dictionary containing variables or parameters that will be passed to the agent.",
+            "default": null
+          },
+          "files": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Files",
+            "description": "A list of file IDs to pass to the agent.",
             "default": null
           },
           "agent": {
@@ -1016,6 +1160,39 @@
             "description": "Enable ad-blocking in the browser to improve performance and reduce distractions.",
             "default": true
           },
+          "additional_tools": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "anyOf": [
+                    { "type": "object" },
+                    { "type": "null" }
+                  ]
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Tools",
+            "description": "Additional tools to enable for the task."
+          },
+          "custom_tools": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ToolSignature"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Tools",
+            "description": "Custom tools to register for the task."
+          },
           "experimental_features": {
             "type": "object",
             "additionalProperties": {
@@ -1042,9 +1219,6 @@
           }
         },
         "type": "object",
-        "required": [
-          "task"
-        ],
         "title": "TaskRequest",
         "description": "Run task request model."
       },
@@ -1214,6 +1388,85 @@
         ],
         "title": "Extension",
         "description": "Extension model."
+      },
+      "ToolSignature": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the tool."
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "A description of what the tool does."
+          },
+          "inputs": {
+            "type": "object",
+            "title": "Inputs",
+            "description": "The inputs the tool accepts, as a JSON schema."
+          },
+          "output": {
+            "type": "string",
+            "title": "Output",
+            "description": "A description of the tool's output."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "inputs",
+          "output"
+        ],
+        "title": "ToolSignature",
+        "description": "A signature for a custom tool."
+      },
+      "TaskEvent": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "The name of the event."
+          },
+          "id": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "null" }
+            ],
+            "title": "Id",
+            "description": "The ID of the event."
+          },
+          "payload": {
+            "anyOf": [
+              { "type": "object" },
+              { "type": "null" }
+            ],
+            "title": "Payload",
+            "description": "The payload of the event."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "TaskEvent",
+        "description": "A task event model."
+      },
+      "TaskEventResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "The ID of the event."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "TaskEventResponse",
+        "description": "A task event response model."
       },
       "UploadExtensionResponse": {
         "properties": {

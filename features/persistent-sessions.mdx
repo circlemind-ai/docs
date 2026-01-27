@@ -32,8 +32,8 @@ with client.session(profile_id=profile.id) as session:
 
 # 3. Later, run an automated task using the same profile
 with client.session(profile_id="gmail-user") as session:
-    session.run_task("Read my latest email")
-    print(session.result())
+    result = session.run_task("Read my latest email")
+    print(result.output)
 ```
 
 </CodeGroup>

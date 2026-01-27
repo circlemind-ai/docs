@@ -17,11 +17,11 @@ from smooth import SmoothClient
 
 client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
-task = client.run(
+result = client.run(
   task="Take a screenshot of the homepage",
   additional_tools={
     "screenshot": {"full_page": True},
-    "hover": None
+    "hover": {}
   }
 )
 ```
@@ -31,7 +31,7 @@ task = client.run(
 
 ### Screenshot
 
-Allows the agent to take screenshots of the browser viewport. The acquired screenshots can be accessed via `.downloads_url()`.
+Allows the agent to take screenshots of the browser viewport. The acquired screenshots can be accessed via `.downloads_url`.
 
 **Parameters:**
 
@@ -43,7 +43,7 @@ Allows the agent to take screenshots of the browser viewport. The acquired scree
 
 <CodeGroup>
 ```python Python
-task = client.run(
+result = client.run(
   task="Take a full page screenshot",
   additional_tools={
     "screenshot": {"full_page": True}
@@ -60,10 +60,10 @@ Allows the agent to hover over elements on the page. This tool has no configurab
 
 <CodeGroup>
 ```python Python
-task = client.run(
+result = client.run(
   task="Hover over the menu to reveal submenu items",
   additional_tools={
-    "hover": None
+    "hover": {}
   }
 )
 ```

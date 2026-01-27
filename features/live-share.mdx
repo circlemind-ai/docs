@@ -9,19 +9,18 @@ When running a task, you will receive a `live_url`, which can be used to view th
 
 ## Getting the URL
 
-A `live_url` is returned when you run a task.
+A `live_url` is available on the session object.
 
 <CodeGroup>
 
 ```python Python
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-task = smooth_client.run(
-  task="<my-task>",
-)
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
-print(f"Live URL: {task.live_url()}")
+with client.session() as session:
+    print(f"Live URL: {session.live_url()}")
+    session.run_task("Go to Hacker News")
 ```
 
 </CodeGroup>
@@ -32,22 +31,14 @@ print(f"Live URL: {task.live_url()}")
 
 ## Customizations
 
-You can customize the URL to make it interactive or full screen. Just pass the following parameters
-
-- `interactive=true` to get an interactive view
-- `embed=true` to get an embeddable view (ideal for iframes)
+You can customize the URL to make it interactive or full screen.
 
 <CodeGroup>
 
 ```python Python
-from smooth import SmoothClient
-
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-task = smooth_client.run(
-  task="<my-task>",
-)
-
-print(f"Live URL: {task.live_url(interactive=True, embed=True)}")
+with client.session() as session:
+    print(f"Live URL: {session.live_url(interactive=True, embed=True)}")
+    session.run_task("Go to Hacker News")
 ```
 
 </CodeGroup>

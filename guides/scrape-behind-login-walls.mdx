@@ -41,8 +41,8 @@ This guide demonstrates how to scrape data from websites that require user authe
     ```python Python
     # Use the same profile_id
     with client.session(profile_id="my-secure-session") as session:
-        session.run_task("Summarize my most recent notifications")
-        print(session.result())
+        result = session.run_task("Summarize my most recent notifications")
+        print(result.result)
     ```
   </Step>
 </Steps>

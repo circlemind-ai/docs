@@ -86,13 +86,16 @@ client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 # Sessions provide a context manager for complex workflows
 with client.session() as session:
     session.goto("https://news.ycombinator.com")
-    session.run_task("Find the title of the top story")
+    
+    # run_task returns the result directly
+    first_task = session.run_task("Find the title of the top story")
     
     # Pass information from the previous task to the next one
-    top_story = session.result().result
+    top_story = first_task.result
     session.run_task(f"The top story is '{top_story}'. Now find the second story and tell me which one sounds more interesting.")
-    
-    print(f"Final Result: {session.result().result}")
+
+# Final results and recordings are available after the session closes
+print(f"Final Result: {session.result().result}")
 ```
 
 </CodeGroup>

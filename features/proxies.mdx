@@ -16,23 +16,32 @@ Using proxies with Smooth allows you to run tasks from a different IP address, w
 
 ## Using Proxies with Smooth
 
-To use a proxy with Smooth, you need to specify the proxy server details in your task parameters. Here’s how you can do it:
+To use a proxy with Smooth, you can specify the proxy server details when running a task or opening a session.
 
 <CodeGroup>
 
 ```python Python
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-task = smooth_client.run(
-  task="<my-task>",
-  proxy_server="<my-proxy-url>",
-  proxy_username="<my-proxy-username>",
-  proxy_password="<my-proxy-password>",
-)
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
-print(f"Live URL: {task(.live_url())}")
-print(f"Agent response: {task.result()}")
+# 1. Using the run shortcut
+result = client.run(
+  task="Check my IP on icanhazip.com",
+  proxy_server="http://proxy.example.com:8080",
+  proxy_username="my_username",
+  proxy_password="my_password",
+)
+print(result.output)
+
+# 2. Within a session
+with client.session(
+    proxy_server="http://proxy.example.com:8080",
+    proxy_username="my_username",
+    proxy_password="my_password"
+) as session:
+    result = session.run_task("Check my IP")
+    print(result.output)
 ```
 
 </CodeGroup>

@@ -10,14 +10,23 @@ The following demonstrates how to instruct Smooth to download and return files f
 <CodeGroup>
 
 ```python Python
-# pip install smooth-py
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-task = smooth_client.run("Go to https://pdfobject.com/examples/passing-element-styled.html and download the pdf file.")
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
-print(f"Agent response: {task.result()}")
-print(f"Downloaded file archive URL: {task.downloads_url()}")
+# 1. Using the run shortcut
+result = client.run("Go to https://example.com/report.pdf and download it")
+
+print(f"Agent response: {result.output}")
+print(f"Downloaded files: {result.downloads_url}")
+
+# 2. Within a session
+with client.session() as session:
+    session.run_task("Download the report")
+
+# After session closes, get aggregated results
+final_result = session.result()
+print(f"Downloaded files: {final_result.downloads_url}")
 ```
 
 </CodeGroup>

@@ -13,29 +13,21 @@ To activate structured outputs, set the `response_model` field by passing either
 ```python Python
 # pip install smooth-py
 from smooth import SmoothClient
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class MyStructuredOutput(BaseModel):
   my_output_data: list[int] = Field(description="A list of random numbers.")
 
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-task = smooth_client.run("Output five random numbers.", response_model=MyStructuredOutput)
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
-# or
-# ..., response_model = {
-#   "type": "object",
-#   "properties": {
-#     "my_output_data": {
-#       "description": "A list of random numbers.",
-#       "items": {
-#         "type": "integer"
-#       },
-#       "type": "array"
-#     }
-#   }
-# }
+# 1. Using the run shortcut
+result = client.run("Output five random numbers.", response_model=MyStructuredOutput)
+print(f"Agent response: {result.output}")
 
-print(f"Agent response: {task.result()}")
+# 2. Using a session for more control
+with client.session() as session:
+    result = session.run_task("Output five random numbers.", response_model=MyStructuredOutput)
+    print(f"Agent response: {result.output}")
 ```
 
 </CodeGroup>
