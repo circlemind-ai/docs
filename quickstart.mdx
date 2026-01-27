@@ -70,7 +70,11 @@ console.log("Agent response:", await task.result())
 
 ## Advanced Flow: Using Sessions
 
-For more complex workflows, such as those requiring multiple tasks in the same browser or manual interactions, use the **Session** interface.
+For more complex workflows, such as those requiring multiple tasks in the same browser context or manual interactions, use the **Session** interface.
+
+<Note>
+  `run_task` preserves the browser state (cookies, URL, page content) but **not** the agent's memory. If you need to carry information from one task to the next, you should pass it explicitly in the prompt.
+</Note>
 
 <CodeGroup>
 
@@ -82,12 +86,13 @@ client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 # Sessions provide a context manager for complex workflows
 with client.session() as session:
     session.goto("https://news.ycombinator.com")
-    session.run_task("Tell me the top story")
+    session.run_task("Find the title of the top story")
     
-    # You can keep using the same browser session!
-    session.run_task("Now find the second story and compare them")
+    # Pass information from the previous task to the next one
+    top_story = session.result().result
+    session.run_task(f"The top story is '{top_story}'. Now find the second story and tell me which one sounds more interesting.")
     
-    print(f"Final Result: {session.result()}")
+    print(f"Final Result: {session.result().result}")
 ```
 
 </CodeGroup>

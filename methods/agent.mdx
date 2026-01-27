@@ -28,11 +28,16 @@ Launch your first task in 4 lines of code. `client.run()` is a convenient shortc
 # pip install smooth-py
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-task = smooth_client.run("Go to google flights and find the cheapest flight from London to Paris today")
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+task = client.run("Find the price of NVDA stock on Yahoo Finance")
 
-print(f"Live URL: {task.live_url()}")
-print(f"Agent response: {task.result()}")
+task_result = task.result()  # Waits for the agent response
+
+if task_result.status == "done":
+  print(f"Agent response: {task_result.result}")
+  print(f"Total cost: ${task_result.credits_used * 0.01}")
+else:
+  print(f"There was an error: {task_result.error}")
 ```
 
 </CodeGroup>
@@ -42,268 +47,126 @@ print(f"Agent response: {task.result()}")
 </Note>
 
 
-## Request
+## Request Parameters
 
-All parameters available when running a task. 
+All parameters available when running a task via `client.run()`.
 
 <ResponseField name="task" type="string" required>
-  The task for the agent to execute.
-  
-  Example: `Go to Google Flights and find the cheapest flight from London to Paris today`
+  The task description for the agent to execute.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  The starting URL for the task. If not provided, the agent will infer it.
 </ResponseField>
 
 <ResponseField name="response_model" type="dict | BaseModel">
-  If provided, enforces a structured output schema.
-  It can be a dictionary describing a JSON schema or a Pydantic Model.
-  Default: `None`.
-  
-  Example:
-  ```json
-  {
-    "type": "object",
-    "properties": {
-      "output": {
-        "type": "integer",
-        "description": "The integer part of the result of the calculation"
-      }
-    }
-  }
-  ```
-</ResponseField>
-
-<ResponseField name="agent" type="string">
-  The agent that will run the task. Currently, only `smooth` is available. Default: `smooth`.
-  
-  Example: `smooth`
-</ResponseField>
-
-<ResponseField name="max_steps" type="int">
-  The upper limit on the number of steps the agent can take during task execution. The range is from 2 to 128. Default: 32.
-  
-  Example: `64`
-</ResponseField>
-
-<ResponseField name="device" type="string">
-  The type of device for the task execution. Choose between `mobile` or `desktop`. Default: `mobile`.
-  
-  Example: `desktop`
-</ResponseField>
-
-<ResponseField name="enable_recording" type="boolean">
-  Toggles the option to record a video of the task execution. Default: True.
-  
-  Example: `True`
-</ResponseField>
-
-### Advanced Parameters
-
-<ResponseField name="url" type="string">
-  The starting URL for the task. If not provided, the agent will infer it from the task.
-  
-  Example: `https://amazon.com`
-</ResponseField>
-
-<ResponseField name="allowed_urls" type="list">
-  List of allowed URL patterns using wildcard syntax. If None, all URLs are allowed.
-  
-  Example: ["google.com/&ast;", "&ast;mydomain.&ast;/&ast;"]
-</ResponseField>
-
-<ResponseField name="metadata" type="dict">
-  A dictionary containing variables or parameters that will be passed to the agent.
-  
-  Example: `{"username": "my_username"}`
-</ResponseField>
-
-<ResponseField name="files" type="list">
-  A list of file ids to be passed to the agent. 
-  
-  Check out our guide on [File uploads](/guides/file-uploads)
+  If provided, enforces a structured output schema. It can be a dictionary describing a JSON schema or a Pydantic Model.
 </ResponseField>
 
 <ResponseField name="profile_id" type="string">
-  The browser profile ID to be utilized. Each profile retains its own state, including login credentials and cookies.
-  
-  Example: `profile_12345`
+  The ID of a [Browser Profile](/methods/profiles) to use. This allows the agent to use previously saved cookies and logins.
 </ResponseField>
 
 <ResponseField name="profile_read_only" type="boolean">
-  If true, the profile specified by `profile_id` will be loaded in read-only mode. Changes made during the task will not be saved back to the profile. Default: False.
+  If true, the profile will be loaded in read-only mode, and any changes (like new cookies) will not be saved. Default: `False`.
 </ResponseField>
 
-<ResponseField name="use_adblock" type="boolean">
-  Enable adblock for the browser session. Default is True.
+<ResponseField name="max_steps" type="int">
+  Max number of steps the agent can take (max 64). Default: 32.
+</ResponseField>
+
+<ResponseField name="device" type="string">
+  The type of device: `mobile` (default) or `desktop`.
+</ResponseField>
+
+<ResponseField name="enable_recording" type="boolean">
+  Enable video recording of the task execution. Default: `True`.
 </ResponseField>
 
 <ResponseField name="stealth_mode" type="boolean">
-  Activates stealth mode for the browser, which helps in avoiding detection. Default: True.
-  
-  Example: `True`
+  Run the browser in stealth mode to avoid detection. Default: `False`.
+</ResponseField>
+
+<ResponseField name="use_adblock" type="boolean">
+  Enable adblock for the browser session. Default: `True`.
 </ResponseField>
 
 <ResponseField name="proxy_server" type="string">
-  The hostname or IP address of the proxy server that will be used for the session.
-  
-  Example: `proxy.example.com`
+  Proxy server address (e.g., `proxy.example.com`).
 </ResponseField>
 
 <ResponseField name="proxy_username" type="string">
-  The username for authenticating with the proxy server, if authentication is required.
-  
-  Example: `user123`
+  Proxy server username.
 </ResponseField>
 
 <ResponseField name="proxy_password" type="string">
-  The password for authenticating with the proxy server, if authentication is required.
-  
-  Example: `password123`
-</ResponseField>
-
-<ResponseField name="certificates" type="list">
-  List of client certificates to use when accessing secure websites. Each certificate is a dictionary with the following fields:
-   - `file`: p12 file object to be uploaded (e.g., open('my_cert.p12', 'rb'));
-   - `password` (optional): The password for the certificate file, if applicable.
-
-   <CodeGroup>
-   ```python Python
-   task = client.run(
-    ...,
-    certificates=[{
-      "file": open("my_cert.p12", "rb"),
-      "password": "my_password"
-    }]
-   )
-   ```
-   </CodeGroup>
-</ResponseField>
-
-<ResponseField name="additional_tools" type="dict">
-  Additional tools to enable for the task. Each tool is a `{tool_name: tool_kwargs}` pair. Use `tool_kwargs = None` for the default configuration of any tool.
-
-  See the [Tools](/methods/tools) page for a complete list of available tools and their configuration options.
-
-  <CodeGroup>
-   ```python Python
-   task = client.run(
-    ...,
-    additional_tools={
-      "screenshot": {"full_page": True},
-      "hover": None
-    }
-   )
-   ```
-   </CodeGroup>
+  Proxy server password.
 </ResponseField>
 
 <ResponseField name="custom_tools" type="list">
-  A list of custom Python functions that the agent can call during task execution. Custom tools run in your local environment and can be used for OTP handling, human-in-the-loop scenarios, database operations, API integrations, and more.
-
-  See the [Custom Tools](/methods/custom-tools) page for detailed documentation and examples.
+  List of [Custom Tools](/methods/custom-tools) to register for this task.
 </ResponseField>
 
-<ResponseField name="experimental_features" type="dict">
-  Experimental features to enable for the task.
+<ResponseField name="additional_tools" type="dict">
+  Dictionary of [Additional Tools](/methods/tools) to enable (e.g., `{"screenshot": {"full_page": True}}`).
 </ResponseField>
 
-## Response
+<ResponseField name="extensions" type="list[str]">
+  List of extension IDs to load into the browser for this task.
+</ResponseField>
 
-Returns a `TaskHandle` with the following attributes.
+<ResponseField name="metadata" type="dict">
+  A dictionary of variables that will be passed to the agent context.
+</ResponseField>
+
+## TaskHandle Methods
+
+Methods available on the `TaskHandle` object returned by `client.run()`.
 
 <ResponseField name="id()" type="method">
   Returns the ID of the task.
 </ResponseField>
 
-<ResponseField name="live_url()" type="method">
-  Returns a live URL where you can see the agent in action.
-  
-  Set `interactive=True` to get an interactive view. 
-  
-  Set `embed=True` to get an embeddable view (ideal for iframes).
+<ResponseField name="live_url(interactive=False, embed=False)" type="method">
+  Returns a live URL where you can sessions the agent in action.
 </ResponseField>
 
-<ResponseField name="result()" type="method">
-  Waits for the task completion and returns a `TaskResponse` upon completion.
+<ResponseField name="result(timeout=None)" type="method">
+  Waits for task completion and returns a `TaskResponse`.
 </ResponseField>
 
 <ResponseField name="recording_url()" type="method">
-  Waits for the task completion and returns a recording URL upon completion if `enable_recording` was enabled. You can use this link to download the video recording of the task. The video will be ready shortly after the task completes.
+  Returns the URL of the video recording after completion.
 </ResponseField>
 
 <ResponseField name="downloads_url()" type="method">
-  Waits for the task completion and returns a URL of the archive containing the files downloaded during the execution. If no file was downloaded raises `ApiError`.
+  Returns the URL of an archive containing any files downloaded.
 </ResponseField>
 
 <ResponseField name="stop()" type="method">
-  Cancel the task execution.
+  Cancels the running task.
 </ResponseField>
 
-## Waiting for task completion
+## TaskResponse Attributes
 
-Use `result()` to wait for task completion.
-
-<CodeGroup>
-
-```python Python highlight={6}
-from smooth import SmoothClient
-
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-task = smooth_client.run("Go to google flights and find the cheapest flight from London to Paris today")
-
-task_result = task.result()  # Waits for the agent response
-
-if task_result.status == "done":
-  print(f"Agent response: {task_result.output}")
-  print(f"Total cost: ${task_result.credits_used * 0.01}")
-else:
-  print(f"There was an error: {task_result.error}")
-```
-
-</CodeGroup>
-
-Returns a `TaskResponse` with the following attributes.
+The object returned by `task.result()`.
 
 <ResponseField name="id" type="string">
   The ID of the task.
 </ResponseField>
 
 <ResponseField name="status" type="string">
-  The status of the task. One of: ["waiting", "running", "done", "failed"]
+  The status of the task. One of: `waiting`, `running`, `done`, `failed`, `cancelled`.
 </ResponseField>
 
-<ResponseField name="output" type="any">
+<ResponseField name="result" type="any">
   The final response from the agent.
 </ResponseField>
 
 <ResponseField name="credits_used" type="int">
-  The number of credits used. 1 credit corresponds to $0.01.
+  Amount of credits used (1 credit = $0.01).
 </ResponseField>
 
-<ResponseField name="device" type="string">
-  The device type used for the task. One of: ["mobile", "desktop"]
+<ResponseField name="error" type="string">
+  Error message if the task failed.
 </ResponseField>
-
-<ResponseField name="created_at" type="number">
-  The timestamp when the task was created.
-</ResponseField>
-
-
-## Cancelling a running task
-
-Use `stop()` to cancel a running task.
-
-<CodeGroup>
-
-```python Python highlight={6}
-from smooth import SmoothClient
-
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-task = smooth_client.run("Go to google flights and find the cheapest flight from London to Paris today")
-
-task.stop()  # Cancel the task execution
-
-task_result = task.result()  # Waits for the agent response
-
-assert task_result.status == "cancelled"
-```
-
-</CodeGroup>

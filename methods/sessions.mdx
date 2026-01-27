@@ -19,7 +19,7 @@ Instead of running isolated tasks, you can open a session and:
 
 ## Using Sessions
 
-The recommended way to use sessions is via a context manager, which ensures the session is properly closed when you are done.
+The recommended way to use sessions is via a context manager, which ensures the session is properly closed when you are done. If you don't use a context manager, you must call `session.close()` manually, otherwise the session will remain active until its internal timeout is reached.
 
 ### Synchronous Usage
 
@@ -36,25 +36,23 @@ with client.session(profile_id="my-session") as session:
     session.goto("https://news.ycombinator.com")
 
     # 2. Run an automated task
-    session.run_task("Find the top story and tell me its title")
+    # Note: run_task preserves browser state (like highlighting or current URL)
+    # but starts with a fresh agent memory.
+    session.run_task("Find the top story and remember its title")
+    
+    # 3. If you want to use information from a previous task, 
+    # you can pass it in the prompt explicitly.
+    last_result = session.result().result
+    session.run_task(f"The previous story was '{last_result}'. Now find the second story and compare them.")
 
-    # 3. Perform a direct extraction
-    data = session.extract(schema={
-        "type": "object",
-        "properties": {
-            "story_title": {"type": "string"}
-        }
-    })
-
-    print(f"Top story: {data['story_title']}")
-    print(f"Session Result: {session.result()}")
+    print(f"Final Session Result: {session.result().result}")
 ```
 
 </CodeGroup>
 
 ### Asynchronous Usage (Recommended)
 
-For production environments, we recommend using the `SmoothAsyncClient`.
+When using the `SmoothAsyncClient`, you don't need to use the client itself as a context manager.
 
 <CodeGroup>
 
@@ -63,12 +61,17 @@ import asyncio
 from smooth import SmoothAsyncClient
 
 async def main():
-    async with SmoothAsyncClient(api_key="cmzr-YOUR_API_KEY") as client:
-        async with await client.session() as session:
-            await session.goto("https://google.com")
-            await session.run_task("Find the weather in London")
-            result = await session.result()
-            print(result)
+    client = SmoothAsyncClient(api_key="cmzr-YOUR_API_KEY")
+    
+    # Use the session as a context manager
+    async with await client.session() as session:
+        await session.goto("https://google.com")
+        await session.run_task("Find the weather in London")
+        result = await session.result()
+        print(result)
+
+    # Always close the client when done if not using a context manager
+    await client.close()
 
 asyncio.run(main())
 ```
@@ -79,12 +82,50 @@ asyncio.run(main())
   `client.run(task)` is a convenient shortcut for `with client.session() as session: session.run_task(task)`.
 </Note>
 
-## Session Methods
+## Session Parameters
 
-Once you have a `SessionHandle`, you can call the following methods:
+These parameters are passed to `client.session()` to configure the browser environment.
+
+<ResponseField name="profile_id" type="string">
+  The unique identifier for the browser profile. Use this to persist cookies and logins.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  The starting URL for the session.
+</ResponseField>
+
+<ResponseField name="device" type="string">
+  The device type used for the session: `mobile` (default) or `desktop`.
+</ResponseField>
+
+<ResponseField name="proxy_server" type="string">
+  Proxy server address (e.g., `proxy.example.com`).
+</ResponseField>
+
+<ResponseField name="enable_recording" type="boolean">
+  Enable video recording of the session. Default: `True`.
+</ResponseField>
+
+<ResponseField name="stealth_mode" type="boolean">
+  Run the browser in stealth mode to avoid detection.
+</ResponseField>
+
+<ResponseField name="custom_tools" type="list">
+  A list of custom tools to register for the duration of the session.
+</ResponseField>
+
+## Session Methods (SessionHandle)
+
+Once you have a `session` object, you can call the following methods.
 
 <ResponseField name="run_task" type="method">
   Executes an autonomous agent task within the session.
+  
+  **Parameters:**
+  - `task` (str): The task description.
+  - `max_steps` (int): Max number of agent steps.
+  - `response_model` (dict): Optional schema for structured output.
+  
   ```python
   session.run_task("Scroll to the bottom and click 'Next'")
   ```
@@ -112,39 +153,11 @@ Once you have a `SessionHandle`, you can call the following methods:
 </ResponseField>
 
 <ResponseField name="result" type="method">
-  Returns the summary/result of the last task executed in the session.
+  Returns the summary result of the last task executed in the session.
 </ResponseField>
 
-<ResponseField name="live_url" type="method">
-  Returns an interactive URL to view and control the browser manually.
-</ResponseField>
-
-## Parameters
-
-All parameters available when opening a browser session via `client.session()`.
-
-<ResponseField name="profile_id" type="string">
-  The unique identifier for the browser profile. Use this to persist cookies and logins.
-</ResponseField>
-
-<ResponseField name="url" type="string">
-  The starting URL for the session.
-</ResponseField>
-
-<ResponseField name="device" type="string">
-  The device type used for the session: `mobile` (default) or `desktop`.
-</ResponseField>
-
-<ResponseField name="proxy_server" type="string">
-  Proxy server address (e.g., `proxy.example.com`).
-</ResponseField>
-
-<ResponseField name="enable_recording" type="boolean">
-  Enable video recording of the session. Default: `True`.
-</ResponseField>
-
-<ResponseField name="stealth_mode" type="boolean">
-  Run the browser in stealth mode to avoid detection.
+<ResponseField name="close" type="method">
+  Closes the session manually. Only necessary if not using a context manager.
 </ResponseField>
 
 
