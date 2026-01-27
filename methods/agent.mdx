@@ -31,13 +31,11 @@ from smooth import SmoothClient
 client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 task = client.run("Find the price of NVDA stock on Yahoo Finance")
 
-task_result = task.result()  # Waits for the agent response
+response = task.result()  # Waits for the task to complete
 
-if task_result.status == "done":
-  print(f"Agent response: {task_result.result}")
-  print(f"Total cost: ${task_result.credits_used * 0.01}")
-else:
-  print(f"There was an error: {task_result.error}")
+if response.status == "done":
+  print(f"Agent output: {response.output}")
+  print(f"Total cost: ${response.credits_used * 0.01}")
 ```
 
 </CodeGroup>
@@ -127,11 +125,11 @@ Methods available on the `TaskHandle` object returned by `client.run()`.
   Returns the ID of the task.
 </ResponseField>
 
-<ResponseField name="live_url(interactive=False, embed=False)" type="method">
-  Returns a live URL where you can sessions the agent in action.
+<ResponseField name="live_url()" type="method">
+  Returns a live URL where you can view the agent in action.
 </ResponseField>
 
-<ResponseField name="result(timeout=None)" type="method">
+<ResponseField name="result()" type="method">
   Waits for task completion and returns a `TaskResponse`.
 </ResponseField>
 
@@ -155,7 +153,7 @@ The object returned by `task.result()`.
   The status of the task. One of: `waiting`, `running`, `done`, `failed`, `cancelled`.
 </ResponseField>
 
-<ResponseField name="result" type="any">
+<ResponseField name="output" type="any">
   The final response from the agent.
 </ResponseField>
 
@@ -163,6 +161,15 @@ The object returned by `task.result()`.
   Amount of credits used (1 credit = $0.01).
 </ResponseField>
 
-<ResponseField name="error" type="string">
-  Error message if the task failed.
+<ResponseField name="live_url" type="string">
+  The live URL for the task.
 </ResponseField>
+
+<ResponseField name="recording_url" type="string">
+  The recording URL (available after task finishes).
+</ResponseField>
+
+<ResponseField name="downloads_url" type="string">
+  The URL for downloaded files (available after task finishes).
+</ResponseField>
+

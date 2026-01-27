@@ -34,25 +34,41 @@ List all your existing browser profiles.
 ```python Python
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-response = smooth_client.list_profiles()
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+profiles = client.list_profiles()
 
-# response is a BrowserProfilesResponse object
-print(f"Profile IDs: {response.profile_ids}")
+# profiles is a list of ProfileResponse objects
+for profile in profiles:
+    print(profile.id)
 ```
 
 </CodeGroup>
 
-## Response Models
+## Client Methods
 
-### ProfileResponse (from `create_profile`)
-<ResponseField name="id" type="string">
-  The unique identifier of the created browser profile.
+The following methods are available on the `SmoothClient` and `SmoothAsyncClient` to manage profiles.
+
+<ResponseField name="create_profile()" type="method">
+  Creates a new browser profile.
 </ResponseField>
 
-### BrowserProfilesResponse (from `list_profiles`)
-<ResponseField name="profile_ids" type="list[str]">
-  A list of all your existing profile IDs.
+<ResponseField name="list_profiles()" type="method">
+  Returns a list of all existing browser profiles.
+</ResponseField>
+
+<ResponseField name="delete_profile()" type="method">
+  Deletes an existing browser profile.
+</ResponseField>
+
+## Response Models
+
+### ProfileResponse
+<ResponseField name="id" type="string">
+  The unique identifier of the browser profile.
+</ResponseField>
+
+<ResponseField name="created_at" type="number">
+  The Unix timestamp when the profile was created.
 </ResponseField>
 
 ## Delete a browser profile

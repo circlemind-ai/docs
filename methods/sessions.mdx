@@ -118,7 +118,7 @@ These parameters are passed to `client.session()` to configure the browser envir
 
 Once you have a `session` object, you can call the following methods.
 
-<ResponseField name="run_task" type="method">
+<ResponseField name="run_task()" type="method">
   Executes an autonomous agent task within the session.
   
   **Parameters:**
@@ -131,28 +131,28 @@ Once you have a `session` object, you can call the following methods.
   ```
 </ResponseField>
 
-<ResponseField name="goto" type="method">
+<ResponseField name="goto()" type="method">
   Navigates the browser to a specific URL.
   ```python
   session.goto("https://example.com")
   ```
 </ResponseField>
 
-<ResponseField name="evaluate_js" type="method">
+<ResponseField name="evaluate_js()" type="method">
   Evaluates JavaScript code in the browser context.
   ```python
   session.evaluate_js("() => document.title")
   ```
 </ResponseField>
 
-<ResponseField name="extract" type="method">
+<ResponseField name="extract()" type="method">
   Performs a structured extraction from the current page state.
   ```python
   session.extract(schema={"properties": {"price": {"type": "number"}}})
   ```
 </ResponseField>
 
-<ResponseField name="result" type="method">
+<ResponseField name="result()" type="method">
   Returns the final summary of the session. 
   
   <Note>
@@ -160,7 +160,7 @@ Once you have a `session` object, you can call the following methods.
   </Note>
 </ResponseField>
 
-<ResponseField name="recording_url" type="method">
+<ResponseField name="recording_url()" type="method">
   Returns the URL of the video recording.
   
   <Note>
@@ -168,7 +168,7 @@ Once you have a `session` object, you can call the following methods.
   </Note>
 </ResponseField>
 
-<ResponseField name="downloads_url" type="method">
+<ResponseField name="downloads_url()" type="method">
   Returns the URL of the archive containing any files downloaded.
   
   <Note>
@@ -176,38 +176,36 @@ Once you have a `session` object, you can call the following methods.
   </Note>
 </ResponseField>
 
-
 <ResponseField name="profile_id()" type="method">
-  Returns ID of the session.
+  Returns the ID of the profile used in the session.
 </ResponseField>
 
 <ResponseField name="live_url()" type="method">
-  Returns a live URL where you can interact with the browser (requires `live_view=True`).
+  Returns a live URL where you can interact with the browser.
 
   Set `interactive=True` to get an interactive view. 
   
   Set `embed=True` to get an embeddable view (ideal for iframes).
 </ResponseField>
 
-
-<ResponseField name="live_id()" type="method">
-  Returns the live ID for the browser session. It can be passed to `.close_session` to close the session and save the browser profile.
+<ResponseField name="close()" type="method">
+  Closes the session manually.
 </ResponseField>
 
 ## Close a browser session
 
-To close a live browser session, simply call `.close_session`.
+While context managers are recommended, you can also close sessions manually.
 
 <CodeGroup>
 
 ```python Python
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
-...  # open session
-
-smooth_client.close_session(sesion_handle.live_id())
+session = client.session()
+session.goto("https://google.com")
+session.close()
 ```
 
 </CodeGroup>
