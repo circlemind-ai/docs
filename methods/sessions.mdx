@@ -67,7 +67,7 @@ async def main():
     async with await client.session() as session:
         await session.goto("https://google.com")
         result = await session.run_task("Find the weather in London")
-        print(result)
+        print(result.output)
 
 asyncio.run(main())
 ```

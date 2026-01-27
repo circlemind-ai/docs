@@ -48,7 +48,7 @@ client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 task = client.run("Go to google flights and find the cheapest flight from London to Paris today")
 
 print(f"Live URL: {task.live_url()}")
-print(f"Agent response: {task.result()}")
+print(f"Agent response: {task.result().output}")
 ```
 
 ```typescript Typescript
@@ -63,7 +63,8 @@ const task = await client.run({
 })
 
 console.log("Live URL:", await task.live_url())
-console.log("Agent response:", await task.result())
+const result = await task.result()
+console.log("Agent response:", result.output)
 ```
 
 </CodeGroup>
@@ -87,15 +88,15 @@ client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 with client.session() as session:
     session.goto("https://news.ycombinator.com")
     
-    # run_task returns the result directly
+    # run_task() returns the result directly
     first_task = session.run_task("Find the title of the top story")
     
     # Pass information from the previous task to the next one
-    top_story = first_task.result
+    top_story = first_task.output
     session.run_task(f"The top story is '{top_story}'. Now find the second story and tell me which one sounds more interesting.")
 
 # Final results and recordings are available after the session closes
-print(f"Final Result: {session.result().result}")
+print(f"Final Result: {session.result().output}")
 ```
 
 </CodeGroup>

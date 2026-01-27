@@ -77,9 +77,8 @@ async def get_data():
     return "Some data"
 
 async def main():
-    async with client:
-        async with await client.session() as session:
-            await session.run_task("Analyze the dashboard", custom_tools=[get_data])
+    async with await client.session() as session:
+        await session.run_task("Analyze the dashboard", custom_tools=[get_data])
 ```
 
 </CodeGroup>
