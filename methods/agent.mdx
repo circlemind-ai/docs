@@ -145,10 +145,6 @@ Methods available on the `TaskHandle` object returned by `client.run()`.
 
 The object returned by `task.result()`.
 
-<ResponseField name="id" type="string">
-  The ID of the task.
-</ResponseField>
-
 <ResponseField name="status" type="string">
   The status of the task. One of: `waiting`, `running`, `done`, `failed`, `cancelled`.
 </ResponseField>
@@ -160,16 +156,3 @@ The object returned by `task.result()`.
 <ResponseField name="credits_used" type="int">
   Amount of credits used (1 credit = $0.01).
 </ResponseField>
-
-<ResponseField name="live_url" type="string">
-  The live URL for the task.
-</ResponseField>
-
-<ResponseField name="recording_url" type="string">
-  The recording URL (available after task finishes).
-</ResponseField>
-
-<ResponseField name="downloads_url" type="string">
-  The URL for downloaded files (available after task finishes).
-</ResponseField>
-
