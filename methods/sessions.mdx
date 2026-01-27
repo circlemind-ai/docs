@@ -38,14 +38,14 @@ with client.session(profile_id="my-session") as session:
     # 2. Run an automated task
     # Note: run_task preserves browser state but starts with a fresh agent memory.
     # It returns the result directly.
-    result = session.run_task("Find the top story and remember its title")
+    result = session.run_task("Find the top story and return its summary")
     
     # 3. Use information from the previous task result
-    session.run_task(f"The previous story was '{result.result}'. Now find the second story and compare them.")
+    session.run_task(f"The previous story was '{result.output}'. Now find the second story and compare them.")
 
-# After the session is closed, you can access the final result and recording
-print(f"Final session result: {session.result().result}")
+# After the session is closed, you can access the recording and download urls
 print(f"Recording URL: {session.recording_url()}")
+print(f"Downloads URL: {session.downloads_url()}")
 ```
 
 </CodeGroup>
@@ -66,12 +66,8 @@ async def main():
     # Use the session as a context manager
     async with await client.session() as session:
         await session.goto("https://google.com")
-        await session.run_task("Find the weather in London")
-        result = await session.result()
+        result = await session.run_task("Find the weather in London")
         print(result)
-
-    # Always close the client when done if not using a context manager
-    await client.close()
 
 asyncio.run(main())
 ```
