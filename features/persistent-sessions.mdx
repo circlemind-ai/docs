@@ -1,29 +1,51 @@
 ---
 title: "Browser Profiles"
-description: "Learn how to run authenticated browser sessions"
+description: "Learn how to persist authentication state across sessions"
 ---
 
 ## Overview
 
-Browser profiles allow you to persist cookies and authentication across runs.
-Once a profile is created, it can be utilized for running agent tasks that require user authentication.
+Browser profiles allow you to persist cookies, local storage, and authentication state. Once a profile is created, you can attach it to any session to maintain your login state.
 
-1. **Create a Profile**
-Open a new browser session. The system will return a profile_id (a unique identifier for your profile) and a live_url (an interactive browser window).
-2. **Authenticate via the Live URL**
-Navigate to the provided live_url to log in to the target platform (e.g., your project management tool, social media account) as you normally would. This action securely stores the session authentication cookies within the profile.
-3. **Execute Tasks with the Profile ID**
-When running an agent task, simply include the profile_id. The agent will use the stored authentication from that profile, allowing it to immediately access the platform as a logged-in user.
+The workflow involves:
+1. **Create a Profile**: Establish a permanent store for browser data.
+2. **Open an Interactive Session**: Log in manually or via the agent to save cookies to the profile.
+3. **Reuse the Profile**: Pass the `profile_id` to future sessions to remain logged in.
 
+## Example Workflow
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+
+# 1. Create a persistent profile
+profile = client.create_profile(profile_id="gmail-user")
+
+# 2. Open a session to log in
+with client.session(profile_id=profile.id) as session:
+    print(f"Go to this URL to log in: {session.live_url()}")
+    # ... perform manual login ...
+    session.run_task("Verify I am logged in")
+
+# 3. Later, run an automated task using the same profile
+with client.session(profile_id="gmail-user") as session:
+    session.run_task("Read my latest email")
+    print(session.result())
+```
+
+</CodeGroup>
 
 ## Guides
 
-Check out our example for scraping behind login walls.
+Check out our guide for a detailed walkthrough on handling authenticated sites.
 
 <Card
   title="Guide: Scrape behind login walls"
   icon="book"
   href="/guides/scrape-behind-login-walls"
 >
-  Learn how to scrape data from websites that require user authentication.
+  Detailed steps to authenticate once and automate forever.
 </Card>

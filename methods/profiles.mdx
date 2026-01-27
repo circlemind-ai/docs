@@ -1,9 +1,31 @@
 ---
 title: 'Manage profiles'
-description: 'List and delete your browser profiles'
+description: 'Create, list, and delete your browser profiles for persistent authentication.'
 ---
 
-## List all browser profiles using the Python SDK
+## Overview
+
+Browser profiles allow you to persist cookies, local storage, and authentication state across multiple [sessions](/methods/sessions) and tasks.
+
+## Create a browser profile
+
+Create a new profile. You can provide a custom `profile_id` or let Smooth generate one for you.
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+
+# Create a profile with a specific ID
+profile = smooth_client.create_profile(profile_id="my-authenticated-user")
+print(f"Created profile: {profile.id}")
+```
+
+</CodeGroup>
+
+## List all browser profiles
 
 List all your existing browser profiles.
 
@@ -20,21 +42,9 @@ print(f"Profile IDs: {response.profile_ids}")
 
 </CodeGroup>
 
-<Note>
-  If Python is not your language of choice, check out our [API Reference](/api-reference/introduction).
-</Note>
-
-## Response
-
-Returns a `BrowserProfilesResponse` with the following attributes.
-
-<ResponseField name="profile_ids" type="list[str]">
-  A list of all the profile IDs.
-</ResponseField>
-
 ## Delete a browser profile
 
-Delete an existing browser profile and its associated data, such as cookies and authentication details.
+Delete an existing browser profile and its associated data.
 
 <CodeGroup>
 

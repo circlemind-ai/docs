@@ -19,7 +19,9 @@ Custom tools can be used for virtually anything, including:
 
 ## Basic Usage
 
-Use the `@client.tool()` decorator to register a Python function as a custom tool:
+Use the `@client.tool()` decorator to register a Python function as a custom tool. You can then pass this tool to `client.run()` or `session.run_task()`.
+
+### Synchronous Client
 
 <CodeGroup>
 
@@ -29,74 +31,115 @@ from smooth import SmoothClient
 client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
 @client.tool(
-    name="ask_human",
-    description="Asks a human operator for input when you need clarification or additional information.",
+    name="get_weather",
+    description="Retrieves the current weather for a given city.",
     inputs={
-        "question": {
+        "city": {
             "type": "string",
-            "description": "The question to ask the human operator",
+            "description": "The city to get the weather for",
         }
     },
     output="string"
 )
-def ask_human(question: str):
-    """
-    Prompts a human operator for input and returns their response.
-    Useful for human-in-the-loop workflows.
-    """
-    print(f"\nQuestion for human: {question}")
-    response = input("Your answer: ")
-    return response
+def get_weather(city: str):
+    # You could call an external API here
+    return f"The weather in {city} is sunny, 25°C"
 
-# Use the custom tool in a task
-task = client.run(
-    task="Ask the human for their favorite book and then find the price on Amazon",
-    custom_tools=[ask_human]
+# Register the tool by passing it to the custom_tools list
+with client.session() as session:
+    session.run_task(
+        "Find the capital of France and then tell me the weather there",
+        custom_tools=[get_weather]
+    )
+```
+
+</CodeGroup>
+
+### Asynchronous Client (Recommended)
+
+When using `SmoothAsyncClient`, your custom tools must be `async`.
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothAsyncClient
+
+client = SmoothAsyncClient(api_key="cmzr-YOUR_API_KEY")
+
+@client.tool(
+    name="get_data",
+    description="Fetches data from an internal API",
+    inputs={},
+    output="string"
 )
+async def get_data():
+    # async logic here
+    return "Some data"
+
+async def main():
+    async with client:
+        async with await client.session() as session:
+            await session.run_task("Analyze the dashboard", custom_tools=[get_data])
 ```
 
 </CodeGroup>
 
 ## Browser JavaScript Execution
 
-Within custom tools, you can execute JavaScript directly in the browser context. Your JavaScript code can access to the DOM, browser APIs, and page state.
+Within custom tools, you can execute JavaScript directly in the browser context. Your JavaScript code has full access to the DOM, browser APIs, and page state.
 
-To use this feature, add a `task: smooth.TaskHandle` parameter to your tool function:
+To use this feature, add a `task: smooth.TaskHandle` parameter to your tool function. This handle allows you to call methods like `evaluate_js()`, `goto()`, and `extract()` directly from within your tool.
 
 <CodeGroup>
 
 ```python Python
 import smooth
+import time
 
 client = smooth.SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
 @client.tool(
-    name="extract_page_data",
-    description="Extracts and analyzes data from the current page using JavaScript",
-    inputs={},
-    output="any"
-)
-def extract_page_data(task: smooth.TaskHandle):
-    # Execute JavaScript in the browser and return the result
-    result = task.exec_js("""
-        () => {
-            // Full access to DOM and browser APIs
-            const data = {
-                title: document.title,
-                url: window.location.href,
-                links: Array.from(document.querySelectorAll('a')).map(a => a.href),
-                hasLoginForm: !!document.querySelector('input[type="password"]'),
-                visibleText: document.body.innerText.substring(0, 50)
-            };
-            return data;
+    name="highlight_and_click",
+    description="Highlights an element using a CSS selector and then clicks it.",
+    inputs={
+        "selector": {
+            "type": "string",
+            "description": "The CSS selector of the element to highlight and click",
         }
-    """)
+    },
+    output="string"
+)
+def highlight_and_click(task: smooth.TaskHandle, selector: str):
+    # 1. Use evaluate_js to manipulate the page
+    success = task.evaluate_js(f"""
+        (selector) => {{
+            const el = document.querySelector(selector);
+            if (el) {{
+                el.style.border = '5px solid red';
+                el.scrollIntoView();
+                return true;
+            }}
+            return false;
+        }}
+    """, selector)
 
-    # Process the result in Python
-    return f"Extracted {len(result['links'])} links on {result['title']}"
+    if not success:
+        return f"Element with selector {selector} not found"
+
+    # 2. Wait a bit so the highlight is visible in the recording
+    time.sleep(1)
+
+    # 3. Use another browser action
+    task.evaluate_js(f"() => document.querySelector('{selector}').click()")
+
+    return f"Successfully highlighted and clicked {selector}"
 ```
 
 </CodeGroup>
+
+<Note>
+  When using the **Async Client**, your tool functions **must** be `async def` and you should `await` all task methods.
+</Note>
 
 <Tip>
 Use JavaScript for browser-level automation and data extraction, and Python for backend processing and integrations. Combine both for powerful workflows.

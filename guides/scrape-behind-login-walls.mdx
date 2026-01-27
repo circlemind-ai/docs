@@ -1,77 +1,62 @@
 ---
 title: "Scrape behind login walls"
-description: "Learn how to scrape data from protected websites"
+description: "Learn how to scrape data from protected websites using Browser Profiles"
 ---
 
 ## Overview
 
-This guide demonstrates how to scrape data from websites that require user authentication by using persistent browser sessions. You'll learn to launch a browser session to create a browser profile, authenticate manually, and then run automated tasks using that authenticated profile.
+This guide demonstrates how to scrape data from websites that require user authentication. You'll learn how to create a **Browser Profile**, log in once, and reuse that profile for automated tasks.
 
 <Steps>
-  <Step title="Launch Browser Session">
-    First, open a browser session to create a new browser profile that will persist your authentication cookies. This session will return a `profile_id` and `live_url` for manual authentication.
+  <Step title="Create a Browser Profile">
+    First, create a persistent profile that will store your authentication cookies.
 
     ```python Python
     from smooth import SmoothClient
 
-    smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-    session = smooth_client.open_session(profile_id="gmail-session")
-
-    print(f"Live URL: {session.live_url()}")
-    print(f"Session ID: {session.profile_id()}")
+    client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+    profile = client.create_profile(profile_id="my-secure-session")
     ```
-
-    The `live_url` opens an interactive browser window where you can manually authenticate.
   </Step>
-  
+
   <Step title="Authenticate Manually">
-    Open the `live_url` in your browser and manually log in to Gmail:
-
-    1. Navigate to the live URL provided by the session
-    2. Go to gmail.com in the browser
-    3. Enter your email address and password
-    4. Complete any two-factor authentication if required
-    5. Verify you're successfully logged in to your Gmail inbox
-
-    Your authentication cookies are now securely stored in the browser profile and will persist for future tasks.
-  </Step>
-
-  <Step title="Close  Browser Session">
-    Use the returned `live_id` to close the interactive session and save the browser profile
+    Open a session using your new profile and use the `live_url` to log in manually.
 
     ```python Python
-    smooth_client.close_session(live_id=session.live_id())
+    with client.session(profile_id="my-secure-session") as session:
+        print(f"Log in here: {session.live_url()}")
+        # Keep the session open until you finish logging in
+        input("Press Enter once you have logged in successfully...")
     ```
 
-    <Note>
-      If the browser session is not manually closed, the profile is saved when the 5 minutes time limit is reached and the browser session closed automatically.
-    </Note>
+    1. Open the `live_url` in your local browser.
+    2. Log in to the target service (e.g., LinkedIn, Gmail).
+    3. Complete any 2FA requirements.
+    4. Once you see your dashboard, close the tab or press Enter in your terminal.
   </Step>
   
-  <Step title="Run Automated Task">
-    Now use the authenticated profile to run an automated task. The agent will access Gmail as a logged-in user and retrieve your last email.
+  <Step title="Run Automated Tasks">
+    Now you can run automated tasks using the authenticated profile. The agent will start as a logged-in user.
 
     ```python Python
-    task = smooth_client.run(
-        task="Go to Gmail and get the subject and sender of the most recent email in my inbox",
-        profile_id="gmail-session"
-    )
-
-    print(f"Live URL: {task.live_url()}")
-    result = task.result()
-    print(f"Last email details: {result}")
+    # Use the same profile_id
+    with client.session(profile_id="my-secure-session") as session:
+        session.run_task("Summarize my most recent notifications")
+        print(session.result())
     ```
-
-    The agent will automatically use the stored authentication from your profile to access Gmail and extract the requested information.
   </Step>
 </Steps>
 
 ## Key Benefits
 
-- **Persistent Authentication**: Profiles maintain login state across multiple tasks
-- **Manual Control**: You handle the authentication process manually for security
-- **Automated Execution**: Once authenticated, agents can run complex tasks automatically
-- **Session Reuse**: The same profile can be used for multiple related tasks
+- **Persistent Authentication**: Profiles maintain login state across multiple sessions.
+- **Security**: You handle the login manually, so the agent never sees your password.
+- **Efficiency**: No need to handle complex automation for login forms or 2FA.
+- **Workflow Continuity**: Move between manual control and autonomous execution seamlessly.
+
+<Note>
+  Browser profiles are saved automatically. You can reuse the same `profile_id` as many times as you need.
+</Note>
 
 ## Best Practices
 

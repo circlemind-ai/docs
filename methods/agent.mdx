@@ -20,7 +20,7 @@ Get your free API key and start running tasks in minutes.
 
 ## Launch a task using the Python SDK
 
-Launch your first task in 4 lines of code.
+Launch your first task in 4 lines of code. `client.run()` is a convenient shortcut for creating a temporary session and executing a single task.
 
 <CodeGroup>
 
@@ -38,7 +38,7 @@ print(f"Agent response: {task.result()}")
 </CodeGroup>
 
 <Note>
-  If Python is not your language of choice, check out our [API Reference](/api-reference/introduction).
+  For more complex workflows requiring multiple steps or manual interaction, use [Sessions](/methods/sessions).
 </Note>
 
 

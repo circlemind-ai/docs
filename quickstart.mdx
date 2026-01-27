@@ -36,16 +36,16 @@ npm installl @circlemind-ai/smooth-ts
   To directly interface with the APIs, refer to the [API documentation](https://docs.smooth.sh/api-reference/introduction)
 </Note>
 
-## Run a task
-Submit a task in seconds.
+## Run your first task
+Submit a task in seconds. `client.run()` is the simplest way to get started.
 
 <CodeGroup>
 
 ```python Python
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-task = smooth_client.run("Go to google flights and find the cheapest flight from London to Paris today")
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+task = client.run("Go to google flights and find the cheapest flight from London to Paris today")
 
 print(f"Live URL: {task.live_url()}")
 print(f"Agent response: {task.result()}")
@@ -66,22 +66,28 @@ console.log("Live URL:", await task.live_url())
 console.log("Agent response:", await task.result())
 ```
 
-```javascript Javascript
-fetch('https://api.smooth.sh/api/v1/task/smooth', {
-  method: 'POST',
-  headers: {
-    'apikey': 'YOUR_API_KEY',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ 'max_steps': 32, 'task': 'your_task_description' })
-})
-```
+</CodeGroup>
 
-```curl cURL
-curl -X POST https://api.smooth.sh/api/v1/task/smooth \ 
-          -H "apikey: cmzr-YOUR_API_KEY" \
-          -H "Content-Type: application/json" \
-          -d '{"max_steps": 32, "task": "your_task_description"}'
+## Advanced Flow: Using Sessions
+
+For more complex workflows, such as those requiring multiple tasks in the same browser or manual interactions, use the **Session** interface.
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
+
+# Sessions provide a context manager for complex workflows
+with client.session() as session:
+    session.goto("https://news.ycombinator.com")
+    session.run_task("Tell me the top story")
+    
+    # You can keep using the same browser session!
+    session.run_task("Now find the second story and compare them")
+    
+    print(f"Final Result: {session.result()}")
 ```
 
 </CodeGroup>
