@@ -1,0 +1,60 @@
+---
+title: 'Print Page'
+description: 'Save the current page as a PDF'
+---
+
+The Print Page tool allows the agent to save the current page as a PDF. The generated PDF can be accessed via `.downloads_url()` after the task completes.
+
+## Usage
+
+<CodeGroup>
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+task = client.run(
+    task="Go to the invoice page and save it as a PDF",
+    url="https://example.com/invoice",
+    additional_tools={
+        "print_page": None
+    }
+)
+
+result = task.result()
+print(f"Download PDF: {task.downloads_url()}")
+```
+</CodeGroup>
+
+## Parameters
+
+This tool has no configurable parameters. Pass `None` to enable it with default behavior.
+
+## Examples
+
+**Save an invoice as PDF:**
+
+<CodeGroup>
+```python Python
+task = client.run(
+    task="Navigate to my billing page and print the latest invoice",
+    additional_tools={
+        "print_page": None
+    }
+)
+```
+</CodeGroup>
+
+**Save a receipt:**
+
+<CodeGroup>
+```python Python
+task = client.run(
+    task="Go to the order confirmation page and save it as a PDF for my records",
+    url="https://shop.example.com/order/12345",
+    additional_tools={
+        "print_page": None
+    }
+)
+```
+</CodeGroup>

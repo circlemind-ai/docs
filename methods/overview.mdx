@@ -1,0 +1,72 @@
+---
+title: 'Overview'
+description: 'Understanding Simple Tasks vs Session Workflows'
+---
+
+Smooth provides two ways to automate browser tasks, each suited for different use cases:
+
+- **Simple Task** — Run a task with a single method call. No session management required.
+- **Session Workflow** — Multi-step execution where you can orchestrate smaller tasks, navigate to URLs, and extract data within a persistent browser session.
+
+## Simple Task
+
+The simplest way to run a browser automation. Give Smooth a task, and the agent handles everything autonomously.
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+task = client.run("Find the cheapest flight from NYC to LA")
+print(task.result())
+```
+
+</CodeGroup>
+
+**Characteristics:**
+- One-shot execution
+- Agent handles navigation and actions autonomously
+- Best for standalone tasks and quick automations
+
+<Card title="Simple Task Reference" icon="bolt" href="/methods/simple-task">
+  Full documentation for client.run()
+</Card>
+
+---
+
+## Session Workflow
+
+For complex workflows, create a browser session and orchestrate multiple steps. This gives you fine-grained control and higher reliability by breaking tasks into smaller, composable actions.
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+with client.session() as session:
+    session.run_task("Search for flights from NYC to LA leaving tomorrow")
+    results = session.extract(FlightSchema)
+    session.run_task("Select the cheapest option")
+```
+
+</CodeGroup>
+
+**Characteristics:**
+- Break big tasks into smaller, reliable tasks
+- Mix deterministic actions (goto) with agent tasks (run_task)
+- Extract structured data at any point in the workflow
+- Best for complex workflows requiring higher reliability
+- Great for multi-turn integrations in agents
+
+<Card title="Session Workflow Reference" icon="browser" href="/methods/session">
+  Full documentation for browser sessions
+</Card>
+
+---
+
+<Tip>
+  Under the hood, `client.run()` is a convenient shorthand that creates a session, runs a single task, and returns the result.
+</Tip>

@@ -1,0 +1,55 @@
+---
+title: 'Hover'
+description: 'Hover over elements on the page'
+---
+
+The Hover tool allows the agent to hover over elements on the page. This is useful for revealing hidden content like dropdown menus, tooltips, or other hover-triggered UI elements.
+
+## Usage
+
+<CodeGroup>
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+task = client.run(
+    task="Hover over the navigation menu to reveal the dropdown options",
+    additional_tools={
+        "hover": None
+    }
+)
+```
+</CodeGroup>
+
+## Parameters
+
+This tool has no configurable parameters. Pass `None` to enable it with default behavior.
+
+## Examples
+
+**Revealing dropdown menus:**
+
+<CodeGroup>
+```python Python
+task = client.run(
+    task="Hover over the 'Products' menu and click on 'Enterprise'",
+    additional_tools={
+        "hover": None
+    }
+)
+```
+</CodeGroup>
+
+**Viewing tooltips:**
+
+<CodeGroup>
+```python Python
+task = client.run(
+    task="Hover over the info icon next to the price to see the tooltip",
+    additional_tools={
+        "hover": None
+    }
+)
+```
+</CodeGroup>

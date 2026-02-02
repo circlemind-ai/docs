@@ -1,0 +1,36 @@
+---
+title: 'Overview'
+description: 'Built-in tools to extend your agent'
+---
+
+Additional tools are built-in capabilities that can be enabled for any task. Enable them via the `additional_tools` parameter when running a task.
+
+## Usage
+
+<CodeGroup>
+```python Python
+task = client.run(
+    task="Take a screenshot of the page",
+    additional_tools={
+        "screenshot": {"full_page": True},
+        "hover": None
+    }
+)
+```
+</CodeGroup>
+
+Pass a configuration dictionary for tools with parameters, or `None` to use default settings.
+
+## Available Tools
+
+<Card title="Screenshot" icon="camera" href="/methods/tools-screenshot">
+  Capture screenshots of the browser viewport or full page.
+</Card>
+
+<Card title="Hover" icon="arrow-pointer" href="/methods/tools-hover">
+  Hover over elements to reveal hidden content like dropdown menus.
+</Card>
+
+<Card title="Print Page" icon="file-pdf" href="/methods/tools-print-page">
+  Save the current page as a PDF.
+</Card>

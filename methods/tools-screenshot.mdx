@@ -1,0 +1,61 @@
+---
+title: 'Screenshot'
+description: 'Capture screenshots of the browser'
+---
+
+The Screenshot tool allows the agent to take screenshots of the browser viewport. The captured screenshots can be accessed via `.downloads_url()` after the task completes.
+
+## Usage
+
+<CodeGroup>
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+task = client.run(
+    task="Go to example.com and take a screenshot",
+    additional_tools={
+        "screenshot": {"full_page": True}
+    }
+)
+
+result = task.result()
+print(f"Download screenshots: {task.downloads_url()}")
+```
+</CodeGroup>
+
+## Parameters
+
+<ResponseField name="full_page" type="boolean">
+  Whether to capture the entire scrollable page rather than just the visible viewport. Default: `False`.
+</ResponseField>
+
+## Examples
+
+**Viewport screenshot (default):**
+
+<CodeGroup>
+```python Python
+task = client.run(
+    task="Take a screenshot of the visible area",
+    additional_tools={
+        "screenshot": None  # Uses default settings
+    }
+)
+```
+</CodeGroup>
+
+**Full page screenshot:**
+
+<CodeGroup>
+```python Python
+task = client.run(
+    task="Go to the url and take a full page screenshot",
+    url="https://smooth.sh",
+    additional_tools={
+        "screenshot": {"full_page": True}
+    }
+)
+```
+</CodeGroup>

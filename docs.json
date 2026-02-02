@@ -18,27 +18,46 @@
             "pages": [
               "index",
               "quickstart",
+              "cli",
               "pricing",
               "performance"
             ]
           },
           {
-            "group": "Agent",
+            "group": "Automation",
             "pages": [
-              "methods/agent"
+              "methods/overview",
+              "methods/simple-task",
+              {
+                "group": "Session Workflow",
+                "pages": [
+                  "methods/session",
+                  "methods/session-run-task",
+                  "methods/session-goto",
+                  "methods/session-extract",
+                  "methods/session-evaluate-js"
+                ]
+              }
             ]
           },
           {
-            "group": "Sessions & Profiles",
+            "group": "Browser Profiles",
             "pages": [
-              "methods/sessions",
               "methods/profiles"
             ]
           },
           {
             "group": "Tools",
             "pages": [
-              "methods/tools",
+              {
+                "group": "Additional Tools",
+                "pages": [
+                  "methods/tools-overview",
+                  "methods/tools-screenshot",
+                  "methods/tools-hover",
+                  "methods/tools-print-page"
+                ]
+              },
               "methods/custom-tools"
             ]
           },
@@ -49,6 +68,7 @@
               "features/file-download",
               "features/persistent-sessions",
               "features/proxies",
+              "features/use-my-ip",
               "features/live-share",
               "features/session-recording",
               "features/structured-output",

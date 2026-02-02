@@ -5,72 +5,65 @@ description: "Learn how to scrape data from protected websites"
 
 ## Overview
 
-This guide demonstrates how to scrape data from websites that require user authentication by using persistent browser sessions. You'll learn to launch a browser session to create a browser profile, authenticate manually, and then run automated tasks using that authenticated profile.
+This guide demonstrates how to scrape data from websites that require user authentication by using browser sessions. You'll learn to launch a session, authenticate manually via a live URL, and then run automated tasks within the same authenticated session.
 
 <Steps>
-  <Step title="Launch Browser Session">
-    First, open a browser session to create a new browser profile that will persist your authentication cookies. This session will return a `profile_id` and `live_url` for manual authentication.
+  <Step title="Launch Session and Authenticate">
+    Create a session with a profile ID. The profile will persist your authentication cookies for future sessions.
 
     ```python Python
     from smooth import SmoothClient
 
-    smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-    session = smooth_client.open_session(profile_id="gmail-session")
+    client = SmoothClient()
 
-    print(f"Live URL: {session.live_url()}")
-    print(f"Session ID: {session.profile_id()}")
+    with client.session(profile_id="gmail-session", url="https://mail.google.com") as session:
+        # Get the live URL for manual authentication
+        print(f"Please log in at: {session.live_url()}")
+
+        # Wait for user to authenticate
+        input("Press Enter after you've logged in...")
+
+        # Now run tasks in the authenticated session
+        result = session.run_task(
+            task="Get the subject and sender of the most recent email"
+        )
+
+        print(f"Last email: {result.output}")
     ```
 
-    The `live_url` opens an interactive browser window where you can manually authenticate.
-  </Step>
-  
-  <Step title="Authenticate Manually">
-    Open the `live_url` in your browser and manually log in to Gmail:
-
-    1. Navigate to the live URL provided by the session
-    2. Go to gmail.com in the browser
-    3. Enter your email address and password
-    4. Complete any two-factor authentication if required
-    5. Verify you're successfully logged in to your Gmail inbox
-
-    Your authentication cookies are now securely stored in the browser profile and will persist for future tasks.
+    Open the `live_url` in your browser and log in to Gmail. Once authenticated, press Enter to continue with the automated task.
   </Step>
 
-  <Step title="Close  Browser Session">
-    Use the returned `live_id` to close the interactive session and save the browser profile
+  <Step title="Reuse the Profile">
+    In future runs, use the same profile ID to skip manual authentication. Your login state is already saved.
 
     ```python Python
-    smooth_client.close_session(live_id=session.live_id())
+    with client.session(profile_id="gmail-session", url="https://mail.google.com") as session:
+        result = session.run_task(
+            task="Get the subject and sender of my 5 most recent emails",
+            response_model={
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "subject": {"type": "string", "description": "Email subject"},
+                        "sender": {"type": "string", "description": "Sender name or email"}
+                    }
+                }
+            }
+        )
+
+        for email in result.output:
+            print(f"From: {email['sender']} - {email['subject']}")
     ```
-
-    <Note>
-      If the browser session is not manually closed, the profile is saved when the 5 minutes time limit is reached and the browser session closed automatically.
-    </Note>
-  </Step>
-  
-  <Step title="Run Automated Task">
-    Now use the authenticated profile to run an automated task. The agent will access Gmail as a logged-in user and retrieve your last email.
-
-    ```python Python
-    task = smooth_client.run(
-        task="Go to Gmail and get the subject and sender of the most recent email in my inbox",
-        profile_id="gmail-session"
-    )
-
-    print(f"Live URL: {task.live_url()}")
-    result = task.result()
-    print(f"Last email details: {result}")
-    ```
-
-    The agent will automatically use the stored authentication from your profile to access Gmail and extract the requested information.
   </Step>
 </Steps>
 
 ## Key Benefits
 
-- **Persistent Authentication**: Profiles maintain login state across multiple tasks
+- **Persistent Authentication**: Profiles maintain login state across multiple sessions
 - **Manual Control**: You handle the authentication process manually for security
-- **Automated Execution**: Once authenticated, agents can run complex tasks automatically
+- **Automated Execution**: Once authenticated, run complex tasks automatically
 - **Session Reuse**: The same profile can be used for multiple related tasks
 
 ## Best Practices

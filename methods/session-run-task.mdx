@@ -1,0 +1,204 @@
+---
+title: 'Run Task'
+description: 'Run an agent task within a browser session'
+---
+
+Run an agent task within the current browser session. The agent will perform the task autonomously, starting from the current page state.
+
+## Usage
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+with client.session() as session:
+    result = session.run_task(
+        task="Fill out the contact form with test data",
+        url="https://example.com/contact"
+    )
+    print(f"Output: {result.output}")
+    print(f"Credits used: {result.credits_used}")
+```
+
+</CodeGroup>
+
+## Request
+
+<ResponseField name="task" type="string" required>
+  The task for the agent to execute.
+
+  Example: `Fill out the contact form and submit it`
+</ResponseField>
+
+<ResponseField name="max_steps" type="int">
+  The upper limit on the number of steps the agent can take during task execution. The range is from 2 to 128. Default: `32`.
+
+  Example: `64`
+</ResponseField>
+
+<ResponseField name="response_model" type="dict">
+  If provided, enforces a structured output schema. It should be a dictionary describing a JSON schema.
+  Default: `None`.
+
+  Example:
+  ```json
+  {
+    "type": "object",
+    "properties": {
+      "confirmation_number": {
+        "type": "string",
+        "description": "The confirmation number after form submission"
+      }
+    }
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  Navigate to this URL before executing the task. If not provided, the task starts from the current page.
+
+  Example: `https://example.com/contact`
+</ResponseField>
+
+<ResponseField name="metadata" type="dict">
+  A dictionary containing variables or parameters that will be passed to the agent.
+
+  Example: `{"username": "test_user", "email": "test@example.com"}`
+</ResponseField>
+
+## Response
+
+Returns an object with the following attributes.
+
+<ResponseField name="output" type="any">
+  The task output returned by the agent. If `response_model` was provided, this will conform to the specified schema.
+</ResponseField>
+
+<ResponseField name="credits_used" type="float">
+  The number of credits used for this task. 1 credit corresponds to $0.01.
+</ResponseField>
+
+<ResponseField name="duration" type="float">
+  The duration in seconds taken to perform the task.
+</ResponseField>
+
+## Examples
+
+**Basic task:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    result = session.run_task(
+        task="Find the top story and tell me its title",
+        url="https://news.ycombinator.com"
+    )
+    print(result.output)
+```
+
+</CodeGroup>
+
+**With structured output:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    result = session.run_task(
+        task="Search for one-way flights from NYC to LA on March 15, then return the 3 cheapest options",
+        url="https://www.google.com/travel/flights",
+        response_model={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "airline": {"type": "string"},
+                    "price": {"type": "number"},
+                    "departure_time": {"type": "string"},
+                    "duration": {"type": "string"}
+                }
+            }
+        }
+    )
+    for flight in result.output:
+        print(f"{flight['airline']}: ${flight['price']} - {flight['departure_time']} ({flight['duration']})")
+```
+
+</CodeGroup>
+
+**With metadata:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    result = session.run_task(
+        task="Fill out the shipping form with the provided address",
+        url="https://shop.example.com/checkout",
+        metadata={
+            "name": "John Smith",
+            "address": "123 Main Street",
+            "city": "New York",
+            "zip": "10001"
+        }
+    )
+```
+
+</CodeGroup>
+
+**Chaining multiple tasks:**
+
+<CodeGroup>
+
+```python Python
+status_schema = {
+    "type": "object",
+    "properties": {
+        "success": {"type": "boolean", "description": "Whether the task was completed successfully"},
+        "message": {"type": "string", "description": "Details about what was done or why it failed"}
+    }
+}
+
+with client.session(url="https://shop.example.com") as session:
+    # Task 1: Search for a product
+    result = session.run_task(
+        task="Search for 'wireless headphones'",
+        response_model=status_schema
+    )
+    if not result.output["success"]:
+        raise Exception(f"Search failed: {result.output['message']}")
+
+    # Task 2: Apply filters
+    result = session.run_task(
+        task="Filter by price under $100 and rating 4+ stars",
+        response_model=status_schema
+    )
+    if not result.output["success"]:
+        raise Exception(f"Filter failed: {result.output['message']}")
+
+    # Extract the results
+    products = session.extract(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "price": {"type": "number"}
+                }
+            }
+        },
+        prompt="Extract the first 3 products from the search results"
+    )
+    print(products.output)
+```
+
+</CodeGroup>
+
+<Tip>
+  **Pro Tip:** Use `response_model` to have the agent report whether each task succeeded before moving to the next one. This prevents your workflow from continuing blindly when something went wrong.
+</Tip>

@@ -1,0 +1,204 @@
+---
+title: 'Extract'
+description: 'Extract structured data from the current page'
+---
+
+Extract structured data from the current page by providing a schema. The extraction uses the current page state, making it ideal for capturing data mid-workflow.
+
+## Usage
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+with client.session() as session:
+    session.goto("https://news.ycombinator.com")
+
+    result = session.extract(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "title": {"type": "string", "description": "The title of the story"},
+                    "url": {"type": "string", "description": "Link to the story"},
+                    "points": {"type": "integer", "description": "Number of upvotes"}
+                }
+            }
+        },
+        prompt="Extract the top 5 stories from the front page"
+    )
+
+    for story in result.output:
+        print(f"{story['title']} - {story['points']} points")
+```
+
+</CodeGroup>
+
+## Request
+
+<ResponseField name="schema" type="dict" required>
+  A JSON schema describing the structure of the data to extract. Include `description` fields to help guide the extraction.
+
+  Example:
+  ```json
+  {
+    "type": "object",
+    "properties": {
+      "title": {"type": "string", "description": "The product title"},
+      "price": {"type": "number", "description": "Price in USD"},
+      "in_stock": {"type": "boolean", "description": "Whether the item is available"}
+    }
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="prompt" type="string">
+  Optional prompt to guide the extraction. Use this to filter results, specify quantity, or handle ambiguous cases.
+
+  Example: `Extract only the products that are currently in stock and under $50`
+</ResponseField>
+
+## Response
+
+Returns an object with the following attributes.
+
+<ResponseField name="output" type="any">
+  The extracted data conforming to the provided schema.
+</ResponseField>
+
+<ResponseField name="credits_used" type="float">
+  The number of credits used for this action. 1 credit corresponds to $0.01.
+</ResponseField>
+
+<ResponseField name="duration" type="float">
+  The duration in seconds taken to perform the extraction.
+</ResponseField>
+
+## Examples
+
+**Extract a single object:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.goto("https://example.com/product/12345")
+
+    result = session.extract(
+        schema={
+            "type": "object",
+            "properties": {
+                "name": {"type": "string", "description": "Product name"},
+                "price": {"type": "number", "description": "Price in USD"},
+                "rating": {"type": "number", "description": "Average rating out of 5"},
+                "reviews_count": {"type": "integer", "description": "Number of reviews"}
+            }
+        },
+        prompt="Extract the main product details from this page"
+    )
+
+    product = result.output
+    print(f"{product['name']}: ${product['price']} ({product['rating']} stars)")
+```
+
+</CodeGroup>
+
+**Extract a list of items:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.goto("https://example.com/search?q=laptops")
+
+    result = session.extract(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "Product name"},
+                    "price": {"type": "number", "description": "Price in USD"},
+                    "specs": {"type": "string", "description": "Key specifications"}
+                }
+            }
+        },
+        prompt="Extract the first 10 laptops from the search results"
+    )
+
+    for laptop in result.output:
+        print(f"{laptop['name']}: ${laptop['price']}")
+```
+
+</CodeGroup>
+
+**Filtering with prompt:**
+
+Use the prompt to filter, sort, or apply conditions that go beyond what the schema can express.
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.run_task(
+        task="Search for one-way flights from NYC to LA on March 15",
+        url="https://www.google.com/travel/flights"
+    )
+
+    result = session.extract(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "airline": {"type": "string", "description": "Airline name"},
+                    "departure": {"type": "string", "description": "Departure time"},
+                    "arrival": {"type": "string", "description": "Arrival time"},
+                    "price": {"type": "number", "description": "Price in USD"}
+                }
+            }
+        },
+        prompt="Extract only non-stop flights under $300, sorted by price from lowest to highest"
+    )
+
+    for flight in result.output:
+        print(f"{flight['airline']}: ${flight['price']} ({flight['departure']} - {flight['arrival']})")
+```
+
+</CodeGroup>
+
+**Extract and use data to guide next action:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.goto("https://shop.example.com/category/electronics")
+
+    result = session.extract(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "Product name"},
+                    "price": {"type": "number", "description": "Price in USD"},
+                    "in_stock": {"type": "boolean", "description": "Whether the item is available"}
+                }
+            }
+        },
+        prompt="Extract all products that are in stock"
+    )
+
+    # Find the cheapest in-stock item
+    products = result.output
+    if products:
+        cheapest = min(products, key=lambda p: p['price'])
+        session.run_task(f"Add '{cheapest['name']}' to cart")
+```
+
+</CodeGroup>

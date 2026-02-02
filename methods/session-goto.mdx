@@ -1,0 +1,75 @@
+---
+title: 'Goto'
+description: 'Navigate to a URL deterministically'
+---
+
+Navigate to a specific URL deterministically. Use this when you know exactly where you need to go, rather than asking the agent to navigate.
+
+## Usage
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+with client.session() as session:
+    result = session.goto("https://example.com/products")
+    print(f"Navigation took {result.duration} seconds")
+
+    session.run_task("Click on the first product")
+```
+
+</CodeGroup>
+
+## Request
+
+<ResponseField name="url" type="string" required>
+  The URL to navigate to.
+
+  Example: `https://example.com/login`
+</ResponseField>
+
+## Response
+
+Returns an object with the following attributes.
+
+<ResponseField name="credits_used" type="float">
+  Always `0`. Navigation is free.
+</ResponseField>
+
+<ResponseField name="duration" type="float">
+  The duration in seconds taken to perform the navigation.
+</ResponseField>
+
+## Examples
+
+**Navigate and extract data:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.goto("https://news.ycombinator.com")
+
+    stories = session.extract(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "title": {"type": "string"},
+                    "url": {"type": "string"},
+                    "points": {"type": "integer"}
+                }
+            }
+        },
+        prompt="Extract the top 5 stories"
+    )
+
+    for story in stories.output:
+        print(f"{story['title']} ({story['points']} points)")
+```
+
+</CodeGroup>

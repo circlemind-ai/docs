@@ -1,0 +1,121 @@
+---
+title: 'CLI for AI Agents'
+description: 'Give your AI agent a browser that actually works'
+---
+
+{/* TODO: Replace with actual demo video */}
+<iframe
+  className="w-full aspect-video rounded-xl"
+  src="https://youtube.com/embed/TXROf4O1fkw"
+  title="Smooth CLI Demo"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+## The Problem
+
+AI agents like Claude Code are powerful, but they're mostly stuck in the terminal. Meanwhile, most valuable work happens in the browser.
+
+Current browser tools for agents (like `--chrome`, Playwright MCP, agent-browser) all make the same mistake: **they expose low-level actions like click, type, and scroll.** This forces your agent to think about button positions instead of your actual goals.
+
+This creates three problems:
+
+| Problem | Why it matters |
+|---------|----------------|
+| **Slow & expensive** | Using a massive model to click buttons is wasteful. Every action costs tokens and time. |
+| **Context pollution** | Every click and keystroke fills up the context window with UI noise instead of your task. |
+| **Wrong expertise** | General-purpose models aren't trained to handle iframes, shadow DOMs, and the messy reality of websites. |
+
+## The Solution
+
+Smooth CLI is a browser built for AI agents. Instead of exposing hundreds of low-level tools, it gives agents a simple natural language interface.
+
+**Your agent says what it wants. Smooth figures out how to do it.**
+
+<CardGroup cols={2}>
+  <Card title="20x faster" icon="bolt">
+    A specialized model handles the clicking so your agent can focus on thinking.
+  </Card>
+  <Card title="5x cheaper" icon="piggy-bank">
+    Stop using 1T+ params models and burning tokens on UI navigation.
+  </Card>
+  <Card title="Use your IP" icon="house-signal">
+    Route traffic through your machine to avoid captchas and access geo-restricted content.
+  </Card>
+  <Card title="Secure by design" icon="shield">
+    Runs in an isolated environment with no permissions by default.
+  </Card>
+  <Card title="Unlimited browsers" icon="browsers">
+    Launch as many parallel browsers as needed, on-demand.
+  </Card>
+  <Card title="Fully managed" icon="cloud">
+    No setup, no configuration. Browsers run in the cloud, ready instantly.
+  </Card>
+</CardGroup>
+
+## How It Works
+
+Instead of this:
+```
+click(x=342, y=128)
+type("search query")
+click(x=401, y=130)
+scroll(down=500)
+click(x=220, y=340)
+... (50 more steps)
+```
+
+Your agent just says:
+```
+"Search for flights from NYC to LA and find the cheapest option"
+```
+
+The agent thinks about your goals. Smooth handles the browser.
+
+## Installation
+
+<Steps>
+  <Step title="Install the CLI">
+    ```bash
+    pip install smooth-py
+    ```
+  </Step>
+  <Step title="Configure your API key">
+    Get your API key from [app.smooth.sh](https://app.smooth.sh), then run:
+    ```bash
+    smooth config --api-key YOUR_API_KEY
+    ```
+  </Step>
+  <Step title="Add to your agent">
+    ```bash
+    npx skills add https://github.com/circlemind-ai/smooth-sdk
+    ```
+  </Step>
+  <Step title="Give your agent a task">
+    Ask your agent to do something on the web. It will use Smooth automatically.
+
+    ```
+    Find a one-way flight from London to NY leaving tomorrow
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+**Pro Tip:** You can also give your agent complex goals. Our skill will teach your agent how to break them into subtasks and distribute them across multiple concurrent browser sessions automatically.
+</Tip>
+
+## Works With
+
+- Claude Code
+- Clawdbot / Moltbot / OpenClaw
+- Codex
+- Cursor
+- Antigravity
+- Cline
+- Factory AI
+- Github Copilot
+- Kiro
+- OpenCode
+- Windsurf
+- Any other agent that can run CLI commands

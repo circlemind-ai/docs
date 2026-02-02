@@ -1,8 +1,11 @@
 ---
-title: 'Run task'
-description: 'Launch a browser agent'
+title: 'Simple Task'
+description: 'Run a one-shot browser automation task'
 ---
 
+<Note>
+  For complex multi-step workflows or when you need more control, see [Session Workflows](/methods/session).
+</Note>
 
 ## Setting up
 
@@ -20,7 +23,7 @@ Get your free API key and start running tasks in minutes.
 
 ## Launch a task using the Python SDK
 
-Launch your first task in 4 lines of code.
+Launch your first task in 4 lines of code. Under the hood, `client.run()` creates a browser session, runs the task, and returns the result.
 
 <CodeGroup>
 
@@ -143,8 +146,10 @@ All parameters available when running a task.
 
 <ResponseField name="proxy_server" type="string">
   The hostname or IP address of the proxy server that will be used for the session.
-  
-  Example: `proxy.example.com`
+
+  Set to `"self"` to route traffic through your own IP address. See [Use My IP](/features/use-my-ip) for details.
+
+  Example: `proxy.example.com` or `self`
 </ResponseField>
 
 <ResponseField name="proxy_username" type="string">
@@ -180,7 +185,7 @@ All parameters available when running a task.
 <ResponseField name="additional_tools" type="dict">
   Additional tools to enable for the task. Each tool is a `{tool_name: tool_kwargs}` pair. Use `tool_kwargs = None` for the default configuration of any tool.
 
-  See the [Tools](/methods/tools) page for a complete list of available tools and their configuration options.
+  See the [Tools](/methods/tools-overview) page for a complete list of available tools and their configuration options.
 
   <CodeGroup>
    ```python Python

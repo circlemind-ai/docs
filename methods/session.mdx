@@ -1,0 +1,308 @@
+---
+title: 'Create Session'
+description: 'Create browser sessions for multi-step workflows'
+---
+
+Browser sessions allow you to run multiple sequential tasks in a single browser instance. This enables you to break complex workflows into smaller, more reliable steps.
+
+## Creating a Session
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+with client.session() as session:
+    session.run_task("Search for flights from NYC to LA")
+    data = session.extract(schema)
+    session.run_task("Select the cheapest option")
+```
+
+</CodeGroup>
+
+<Note>
+  When using the `with` statement, the session is automatically closed when the block exits. Otherwise, you must call `session.close()` manually.
+</Note>
+
+## Request
+
+All parameters available when creating a session.
+
+<ResponseField name="url" type="string">
+  The starting URL for the session. If not provided, the browser will start on a blank page.
+
+  Example: `https://amazon.com`
+</ResponseField>
+
+<ResponseField name="device" type="string">
+  The type of device for the session. Choose between `mobile` or `desktop`. Default: `mobile`.
+
+  Example: `desktop`
+</ResponseField>
+
+<ResponseField name="enable_recording" type="boolean">
+  Toggles the option to record a video of the session. Default: `True`.
+</ResponseField>
+
+<ResponseField name="agent" type="string">
+  The agent that will run tasks in this session. Currently, only `smooth` is available. Default: `smooth`.
+</ResponseField>
+
+### Advanced Parameters
+
+<ResponseField name="allowed_urls" type="list">
+  List of allowed URL patterns using wildcard syntax. If None, all URLs are allowed.
+
+  Example: `["google.com/*", "*mydomain.*//*"]`
+</ResponseField>
+
+<ResponseField name="files" type="list">
+  A list of file ids to be passed to the session.
+
+  Check out our guide on [File uploads](/guides/file-uploads).
+</ResponseField>
+
+<ResponseField name="profile_id" type="string">
+  The browser profile ID to be utilized. Each profile retains its own state, including login credentials and cookies.
+
+  Example: `profile_12345`
+</ResponseField>
+
+<ResponseField name="profile_read_only" type="boolean">
+  If true, the profile specified by `profile_id` will be loaded in read-only mode. Changes made during the session will not be saved back to the profile. Default: `False`.
+</ResponseField>
+
+<ResponseField name="use_adblock" type="boolean">
+  Enable adblock for the browser session. Default: `True`.
+</ResponseField>
+
+<ResponseField name="stealth_mode" type="boolean">
+  Activates stealth mode for the browser, which helps in avoiding detection. Default: `False`.
+</ResponseField>
+
+<ResponseField name="proxy_server" type="string">
+  The hostname or IP address of the proxy server that will be used for the session.
+
+  Set to `"self"` to route traffic through your own IP address. See [Use My IP](/features/use-my-ip) for details.
+
+  Example: `proxy.example.com` or `self`
+</ResponseField>
+
+<ResponseField name="proxy_username" type="string">
+  The username for authenticating with the proxy server, if authentication is required.
+
+  Example: `user123`
+</ResponseField>
+
+<ResponseField name="proxy_password" type="string">
+  The password for authenticating with the proxy server, if authentication is required.
+
+  Example: `password123`
+</ResponseField>
+
+<ResponseField name="certificates" type="list">
+  List of client certificates to use when accessing secure websites. Each certificate is a dictionary with the following fields:
+   - `file`: p12 file object to be uploaded (e.g., open('my_cert.p12', 'rb'));
+   - `password` (optional): The password for the certificate file, if applicable.
+
+   <CodeGroup>
+   ```python Python
+   with client.session(
+      certificates=[{
+        "file": open("my_cert.p12", "rb"),
+        "password": "my_password"
+      }]
+   ) as session:
+      ...
+   ```
+   </CodeGroup>
+</ResponseField>
+
+<ResponseField name="additional_tools" type="dict">
+  Additional tools to enable for tasks in this session. Each tool is a `{tool_name: tool_kwargs}` pair. Use `tool_kwargs = None` for the default configuration of any tool.
+
+  See the [Tools](/methods/tools-overview) page for a complete list of available tools and their configuration options.
+
+  <CodeGroup>
+   ```python Python
+   with client.session(
+      additional_tools={
+        "screenshot": {"full_page": True},
+        "hover": None
+      }
+   ) as session:
+      ...
+   ```
+   </CodeGroup>
+</ResponseField>
+
+<ResponseField name="custom_tools" type="list">
+  A list of custom Python functions that the agent can call during task execution. Custom tools run in your local environment and can be used for OTP handling, human-in-the-loop scenarios, database operations, API integrations, and more.
+
+  See the [Custom Tools](/methods/custom-tools) page for detailed documentation and examples.
+</ResponseField>
+
+<ResponseField name="extensions" type="list">
+  A list of browser extension paths to load into the session.
+
+  See the [Custom Extensions](/features/custom-extensions) page for more details.
+</ResponseField>
+
+<ResponseField name="show_cursor" type="boolean">
+  Show the cursor in the browser during the session. Useful for debugging or recordings. Default: `False`.
+</ResponseField>
+
+<ResponseField name="experimental_features" type="dict">
+  Experimental features to enable for the session.
+</ResponseField>
+
+## Response
+
+Returns a `SessionHandle` with the following methods.
+
+### Session Methods
+
+<ResponseField name="run_task()" type="method">
+  Run an agent task within the session. See [Run Task](/methods/session-run-task) for full documentation.
+</ResponseField>
+
+<ResponseField name="goto()" type="method">
+  Navigate to a specific URL deterministically. See [Goto](/methods/session-goto) for full documentation.
+</ResponseField>
+
+<ResponseField name="extract()" type="method">
+  Extract structured data from the current page. See [Extract](/methods/session-extract) for full documentation.
+</ResponseField>
+
+<ResponseField name="evaluate_js()" type="method">
+  Execute JavaScript in the browser context. See [Evaluate JS](/methods/session-evaluate-js) for full documentation.
+</ResponseField>
+
+<ResponseField name="close()" type="method">
+  Close the session and save any profile changes. Automatically called when using the `with` statement.
+</ResponseField>
+
+### Status Methods
+
+<ResponseField name="id()" type="method">
+  Returns the ID of the session.
+</ResponseField>
+
+<ResponseField name="live_url()" type="method">
+  Returns a live URL where you can see the browser in action.
+
+  Set `interactive=True` to get an interactive view.
+
+  Set `embed=True` to get an embeddable view (ideal for iframes).
+</ResponseField>
+
+<ResponseField name="recording_url()" type="method">
+  Returns a recording URL if `enable_recording` was enabled. You can use this link to download the video recording of the session.
+</ResponseField>
+
+<ResponseField name="downloads_url()" type="method">
+  Returns a URL of the archive containing the files downloaded during the session. If no file was downloaded raises `ApiError`.
+</ResponseField>
+
+<ResponseField name="result()" type="method">
+  Returns a `SessionResponse` with session information.
+</ResponseField>
+
+## Session Response
+
+The `result()` method returns an object with the following attributes.
+
+<ResponseField name="id" type="string">
+  The ID of the session.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  The status of the session.
+</ResponseField>
+
+<ResponseField name="credits_used" type="int">
+  The number of credits used. 1 credit corresponds to $0.01.
+</ResponseField>
+
+<ResponseField name="created_at" type="number">
+  The timestamp when the session was created.
+</ResponseField>
+
+## Writing Multi-Step Workflow
+
+Here’s an example of a multi-step browser automation workflow using a session:
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+with client.session(url="https://flights.example.com") as session:
+    # Step 1: Let the agent search for flights
+    session.run_task("Search for one-way flights from NYC to LA on March 15")
+
+    # Step 2: Extract the results
+    flights = session.extract({
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "airline": {"type": "string"},
+                "price": {"type": "number"}
+            }
+        }
+    })
+
+    # Step 3: Use the data to guide the next action
+    cheapest = min(flights, key=lambda f: f["price"])
+    session.run_task(f"Select the {cheapest['airline']} flight for ${cheapest['price']}")
+
+    # Step 4: Get session info
+    print(f"Credits used: {session.result().credits_used}")
+```
+
+</CodeGroup>
+
+## Manual Session Management
+
+If you're not using the `with` statement, you must close the session manually.
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+session = client.session()
+
+try:
+    session.run_task("Do something")
+    session.run_task("Do something else")
+finally:
+    session.close()  # Always close the session
+```
+
+</CodeGroup>
+
+## Core Session Methods
+
+<Card title="Run Task" icon="play" href="/methods/session-run-task">
+  Run an agent task within the session. The agent will perform the task autonomously starting from the current page state.
+</Card>
+
+<Card title="Goto" icon="arrow-right" href="/methods/session-goto">
+  Navigate to a specific URL deterministically. Use this when you know exactly where you need to go.
+</Card>
+
+<Card title="Extract" icon="database" href="/methods/session-extract">
+  Extract structured data from the current page. Define a schema and get back typed data.
+</Card>
+
+<Card title="Evaluate JS" icon="code" href="/methods/session-evaluate-js">
+  Execute JavaScript in the browser context. Useful for advanced interactions or reading page state.
+</Card>

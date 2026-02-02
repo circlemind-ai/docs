@@ -1,0 +1,83 @@
+---
+title: 'Use My IP'
+description: 'Run browser automations using your own IP address'
+---
+
+By setting `proxy_server` to `"self"`, Smooth creates a secure tunnel and routes all browser traffic through your machine's IP address. This is useful for:
+
+- **Avoiding bot detection** — Many websites trust residential IPs more than datacenter IPs
+- **Geo-localized automations** — Access location-specific content based on your actual location
+- **Location-aware queries** — Run searches like "restaurants near me" that rely on IP geolocation
+- **Accessing region-restricted content** — Browse content only available in your region
+
+## Usage
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+# Simple task using your IP
+task = client.run(
+    task="Search for 'coffee shops near me' and get the top 5 results",
+    proxy_server="self"
+)
+print(task.result().output)
+```
+
+</CodeGroup>
+
+## With Sessions
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+with client.session(proxy_server="self") as session:
+    session.run_task(
+        task="Search for nearby Italian restaurants",
+        url="https://www.google.com/maps"
+    )
+
+    results = session.extract(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "Restaurant name"},
+                    "rating": {"type": "number", "description": "Star rating"},
+                    "address": {"type": "string", "description": "Street address"}
+                }
+            }
+        },
+        prompt="Extract the top 5 restaurants from the results"
+    )
+
+    for restaurant in results.output:
+        print(f"{restaurant['name']} - {restaurant['rating']} stars")
+```
+
+</CodeGroup>
+
+## How It Works
+
+When you set `proxy_server="self"`:
+
+1. Smooth establishes a secure tunnel between the remote browser and your machine
+2. All browser traffic is routed through your local network
+3. Websites see your IP address instead of Smooth's datacenter IP
+4. The tunnel is automatically closed when the task or session ends
+
+<Tip>
+  **Pro Tip:** Using your own IP is the most effective way to avoid captchas. Websites see the same IP they would see if you were browsing manually.
+</Tip>
+
+<Note>
+  This feature is most useful when running automations from a local machine with a residential IP. If your code is running from a datacenter, the tunnel will still use a datacenter IP.
+</Note>

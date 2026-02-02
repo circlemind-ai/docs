@@ -1,0 +1,182 @@
+---
+title: 'Evaluate JS'
+description: 'Execute JavaScript in the browser context'
+---
+
+Execute JavaScript code in the browser context. This is useful for advanced interactions, reading page state, or performing actions that require direct DOM manipulation.
+
+## Usage
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+with client.session() as session:
+    session.goto("https://example.com")
+
+    # Get the page title
+    result = session.evaluate_js("document.title")
+    print(f"Page title: {result.output}")
+```
+
+</CodeGroup>
+
+## Request
+
+<ResponseField name="code" type="string" required>
+  The JavaScript code to execute in the browser. The code should be an expression or a function that returns a value.
+
+  Example: `document.title`
+</ResponseField>
+
+<ResponseField name="args" type="dict">
+  Optional dictionary of arguments to pass to the JavaScript function. When using args, your code must be a function that receives `args` as its parameter.
+
+  Example: `{"selector": ".product-price", "index": 0}`
+</ResponseField>
+
+## Response
+
+Returns an object with the following attributes.
+
+<ResponseField name="output" type="any">
+  The result of the JavaScript evaluation. Complex objects are serialized to JSON.
+</ResponseField>
+
+<ResponseField name="credits_used" type="float">
+  The number of credits used for this action. 1 credit corresponds to $0.01.
+</ResponseField>
+
+<ResponseField name="duration" type="float">
+  The duration in seconds taken to execute the JavaScript.
+</ResponseField>
+
+## Examples
+
+**Read page information:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.goto("https://example.com")
+
+    # Get current URL
+    result = session.evaluate_js("window.location.href")
+    print(f"Current URL: {result.output}")
+
+    # Get page title
+    result = session.evaluate_js("document.title")
+    print(f"Title: {result.output}")
+
+    # Check if an element exists
+    result = session.evaluate_js("!!document.querySelector('.login-button')")
+    print(f"Has login button: {result.output}")
+```
+
+</CodeGroup>
+
+**Extract data from the DOM:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.goto("https://example.com/products")
+
+    result = session.evaluate_js("""
+        Array.from(document.querySelectorAll('.product-card')).map(card => ({
+            name: card.querySelector('.name').textContent,
+            price: parseFloat(card.querySelector('.price').textContent.replace('$', ''))
+        }))
+    """)
+
+    for product in result.output:
+        print(f"{product['name']}: ${product['price']}")
+```
+
+</CodeGroup>
+
+**With arguments:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.goto("https://example.com")
+
+    result = session.evaluate_js(
+        "(args) => { return document.querySelectorAll(args.selector).length; }",
+        args={"selector": ".product-item"}
+    )
+    print(f"Found {result.output} products")
+```
+
+</CodeGroup>
+
+**Scroll the page:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.goto("https://example.com/infinite-scroll")
+
+    # Scroll to bottom to load more content
+    session.evaluate_js("window.scrollTo(0, document.body.scrollHeight)")
+
+    # Wait a moment for content to load, then extract
+    session.run_task("Wait for new content to load")
+    data = session.extract({"type": "array", "items": {"type": "object", "properties": {"title": {"type": "string"}}}})
+```
+
+</CodeGroup>
+
+**Interact with page elements:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.goto("https://example.com/form")
+
+    # Set a value directly
+    session.evaluate_js(
+        "(args) => { document.querySelector(args.selector).value = args.value; }",
+        args={"selector": "#email", "value": "test@example.com"}
+    )
+
+    # Click a button
+    session.evaluate_js("document.querySelector('#submit-btn').click()")
+```
+
+</CodeGroup>
+
+**Check page state before proceeding:**
+
+<CodeGroup>
+
+```python Python
+with client.session() as session:
+    session.goto("https://example.com")
+    session.run_task("Log in with my credentials")
+
+    # Verify login succeeded
+    result = session.evaluate_js("""
+        {
+            isLoggedIn: !!document.querySelector('.user-avatar'),
+            username: document.querySelector('.username')?.textContent || null
+        }
+    """)
+
+    if result.output['isLoggedIn']:
+        print(f"Logged in as {result.output['username']}")
+        session.run_task("Go to my account settings")
+    else:
+        print("Login failed")
+```
+
+</CodeGroup>

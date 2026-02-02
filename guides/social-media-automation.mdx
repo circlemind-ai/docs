@@ -5,58 +5,50 @@ description: "Automate actions on social media using Smooth"
 
 ## Overview
 
-This guide demonstrates how to use Smooth to automate sending a LinkedIn connection. You'll learn to manually authenticate to LinkedIn and then run automated tasks to connect with specific professionals.
+This guide demonstrates how to use Smooth to automate sending a LinkedIn connection. You'll learn to authenticate to LinkedIn via a live URL and then run automated tasks to connect with specific professionals.
 
 <Steps>
-  <Step title="Launch LinkedIn Session">
-    Create a new browser profile for LinkedIn that will persist your authentication cookies. This approach ensures secure access while maintaining your login state.
+  <Step title="Launch Session and Authenticate">
+    Create a session with a profile ID for LinkedIn. The profile will persist your authentication cookies.
 
     ```python Python
     from smooth import SmoothClient
 
-    smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-    session = smooth_client.open_session(profile_id="linkedin-automation")
+    client = SmoothClient()
 
-    print(f"Live URL: {session.live_url()}")
-    print(f"Session ID: {session.profile_id()}")
+    with client.session(profile_id="linkedin-automation", url="https://www.linkedin.com") as session:
+        # Get the live URL for manual authentication
+        print(f"Please log in at: {session.live_url()}")
+
+        # Wait for user to authenticate
+        input("Press Enter after you've logged in to LinkedIn...")
+
+        # Now run tasks in the authenticated session
+        result = session.run_task(
+            task="""
+            Search for "Antonio Vespoli Circlemind" on LinkedIn.
+            Find his profile and send a connection request with the message:
+            "Hi Antonio, I love Smooth. Would love to connect!"
+            """
+        )
+
+        print(f"Agent response: {result.output}")
     ```
 
-    The `live_url` provides an interactive browser window for manual authentication.
+    Open the `live_url` in your browser and log in to LinkedIn. Once authenticated, press Enter to continue.
   </Step>
-  
-  <Step title="Authenticate to LinkedIn">
-    Open the `live_url` in your browser and manually log in to LinkedIn:
 
-    1. Navigate to the live URL provided by the session
-    2. Go to linkedin.com in the browser
-    3. Enter your LinkedIn email and password
-    4. Complete any security verification if prompted
-    5. Verify you're successfully logged into your LinkedIn home feed
-
-    Your authentication cookies are now stored in the profile for automated tasks.
-  </Step>
-  
-  <Step title="Automate Connection Request">
-    Use the authenticated profile to automatically find and connect with Antonio Vespoli from Circlemind.
+  <Step title="Reuse the Profile">
+    In future runs, use the same profile ID to skip manual authentication.
 
     ```python Python
-    connection_task = """
-    Search for "Antonio Vespoli Circlemind" on LinkedIn. Find his profile and send a connection request with the message: "Hi Antonio, I love Smooth. Would love to connect!"
-    """
+    with client.session(profile_id="linkedin-automation", url="https://www.linkedin.com/feed") as session:
+        result = session.run_task(
+            task="Like the first 3 posts"
+        )
 
-    task = smooth_client.run(
-        task=connection_task,
-        profile_id="linkedin-automation",
-        enable_recording=True
-    )
-
-    print(f"Live URL: {task.live_url()}")
-    result = task.result()
-    print(f"Agent Response: {result.output}")
-    print(f"Task video: {result.recording_url}")
+        print(f"Agent response: {result.output}")
     ```
-
-    The agent will search LinkedIn, locate Antonio's profile, and send a personalized connection request.
   </Step>
 </Steps>
 
