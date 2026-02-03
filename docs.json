@@ -18,13 +18,21 @@
             "pages": [
               "index",
               "quickstart",
-              "cli",
               "pricing",
               "performance"
             ]
           },
           {
-            "group": "Automation",
+            "group": "CLI Browser",
+            "pages": [
+              "cli/overview",
+              "cli/claude-code",
+              "cli/openclaw",
+              "cli/other-agents"
+            ]
+          },
+          {
+            "group": "Automation SDK",
             "pages": [
               "methods/overview",
               "methods/simple-task",

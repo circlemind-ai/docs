@@ -1,9 +1,8 @@
 ---
-title: 'CLI for AI Agents'
+title: 'Overview'
 description: 'Give your AI agent a browser that actually works'
 ---
 
-{/* TODO: Replace with actual demo video */}
 <iframe
   className="w-full aspect-video rounded-xl"
   src="https://youtube.com/embed/TXROf4O1fkw"
@@ -73,49 +72,16 @@ Your agent just says:
 
 The agent thinks about your goals. Smooth handles the browser.
 
-## Installation
+## Get Started
 
-<Steps>
-  <Step title="Install the CLI">
-    ```bash
-    pip install smooth-py
-    ```
-  </Step>
-  <Step title="Configure your API key">
-    Get your API key from [app.smooth.sh](https://app.smooth.sh), then run:
-    ```bash
-    smooth config --api-key YOUR_API_KEY
-    ```
-  </Step>
-  <Step title="Add to your agent">
-    ```bash
-    npx skills add https://github.com/circlemind-ai/smooth-sdk
-    ```
-  </Step>
-  <Step title="Give your agent a task">
-    Ask your agent to do something on the web. It will use Smooth automatically.
-
-    ```
-    Find a one-way flight from London to NY leaving tomorrow
-    ```
-  </Step>
-</Steps>
-
-<Tip>
-**Pro Tip:** You can also give your agent complex goals. Our skill will teach your agent how to break them into subtasks and distribute them across multiple concurrent browser sessions automatically.
-</Tip>
-
-## Works With
-
-- Claude Code
-- Clawdbot / Moltbot / OpenClaw
-- Codex
-- Cursor
-- Antigravity
-- Cline
-- Factory AI
-- Github Copilot
-- Kiro
-- OpenCode
-- Windsurf
-- Any other agent that can run CLI commands
+<CardGroup cols={3}>
+  <Card title="Claude Code" icon="terminal" href="/cli/claude-code">
+    Setup for Claude Code
+  </Card>
+  <Card title="OpenClaw" icon="robot" href="/cli/openclaw">
+    Setup for OpenClaw
+  </Card>
+  <Card title="Other Agents" icon="gear" href="/cli/other-agents">
+    Generic setup
+  </Card>
+</CardGroup>

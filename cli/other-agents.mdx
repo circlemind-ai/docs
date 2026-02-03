@@ -1,0 +1,51 @@
+---
+title: 'Other Agents'
+description: 'Setup Smooth CLI for any agent'
+---
+
+Smooth CLI works with any agent that can run CLI commands.
+
+## Supported Agents
+
+- Codex
+- Cursor
+- Antigravity
+- Cline
+- Factory AI
+- Github Copilot
+- Kiro
+- OpenCode
+- Windsurf
+- Any other agent that can run CLI commands
+
+## Installation
+
+<Steps>
+  <Step title="Install the CLI">
+    ```bash
+    pip install smooth-py
+    ```
+  </Step>
+  <Step title="Configure your API key">
+    Get your API key from [app.smooth.sh](https://app.smooth.sh), then run:
+    ```bash
+    smooth config --api-key YOUR_API_KEY
+    ```
+  </Step>
+  <Step title="Add to your agent">
+    ```bash
+    npx skills add https://github.com/circlemind-ai/smooth-sdk
+    ```
+  </Step>
+  <Step title="Give your agent a task">
+    Ask your agent to do something on the web. It will use Smooth automatically.
+
+    ```
+    Find a one-way flight from London to NY leaving tomorrow
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+**Pro Tip:** You can also give your agent complex goals. Our skill will teach it how to break them into subtasks and distribute them across multiple concurrent browser sessions automatically.
+</Tip>

@@ -1,0 +1,36 @@
+---
+title: 'OpenClaw'
+description: 'Setup Smooth CLI for OpenClaw'
+---
+
+## Installation
+
+<Steps>
+  <Step title="Install the CLI">
+    ```bash
+    pip install smooth-py
+    ```
+  </Step>
+  <Step title="Configure your API key">
+    Get your API key from [app.smooth.sh](https://app.smooth.sh), then run:
+    ```bash
+    smooth config --api-key YOUR_API_KEY
+    ```
+  </Step>
+  <Step title="Add to OpenClaw">
+    ```bash
+    npx clawhub@latest install smooth-browser
+    ```
+  </Step>
+  <Step title="Give your agent a task">
+    Ask your agent to do something on the web. It will use Smooth automatically.
+
+    ```
+    Find a one-way flight from London to NY leaving tomorrow
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+**Pro Tip:** You can also give your agent complex goals. Our skill will teach it how to break them into subtasks and distribute them across multiple concurrent browser sessions automatically.
+</Tip>
