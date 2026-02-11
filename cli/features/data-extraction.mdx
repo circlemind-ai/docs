@@ -1,0 +1,59 @@
+---
+title: 'Extract Data'
+description: 'Pull structured information from any webpage'
+---
+
+Your agent can extract structured data from any webpage and return it in a format you can work with. No parsing HTML, no writing selectors - just describe what you want.
+
+## What Your Agent Can Do
+
+- **Scrape product listings** - Get prices, names, and details from e-commerce sites
+- **Extract contact info** - Pull emails, phone numbers, and addresses from directories
+- **Gather research data** - Collect information from multiple sources into structured tables
+- **Parse search results** - Turn search engine results into actionable data
+
+## Example: Extract Search Results
+
+Ask your agent:
+
+> "Search Google for 'best restaurants in Austin' and extract the top 10 results with name, rating, and address"
+
+Your agent returns structured data:
+
+```json
+[
+  {"name": "Franklin Barbecue", "rating": 4.8, "address": "900 E 11th St"},
+  {"name": "Uchi", "rating": 4.7, "address": "801 S Lamar Blvd"},
+  ...
+]
+```
+
+## Example: Scrape a Product Page
+
+> "Go to this Amazon product page and extract the title, price, rating, and number of reviews"
+
+```json
+{
+  "title": "Sony WH-1000XM5 Wireless Headphones",
+  "price": 328.00,
+  "rating": 4.6,
+  "reviews": 12847
+}
+```
+
+## Example: Gather Competitive Intelligence
+
+> "Go to our three main competitors' pricing pages and extract all their plan names and prices"
+
+Your agent visits multiple sites and returns consolidated data you can compare.
+
+## How Extraction Works
+
+1. Your agent navigates to the page (or you provide a URL)
+2. You describe what data you want in plain English
+3. The agent analyzes the page and extracts matching information
+4. Data is returned in a structured format
+
+<Tip>
+  Be specific about what fields you want. "Extract the products" is okay, but "Extract product name, price, and availability" gets better results.
+</Tip>

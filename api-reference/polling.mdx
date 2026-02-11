@@ -1,0 +1,351 @@
+---
+title: 'Polling Mechanism'
+description: 'How to poll for task results and events'
+---
+
+The Smooth API uses polling to deliver task results and events. This page explains how the polling mechanism works and best practices for implementing it.
+
+## Why Polling?
+
+The API uses polling rather than webhooks or WebSockets for several reasons:
+- **Simplicity** - No need to set up webhook endpoints or maintain WebSocket connections
+- **Reliability** - No lost events due to connection issues
+- **Firewall-friendly** - Works behind firewalls that block incoming connections
+- **Stateless** - Each request is independent; easy to implement in any language
+
+## Basic Polling
+
+For simple tasks, poll the task endpoint until the status changes to `done`, `failed`, or `cancelled`:
+
+```bash
+# Initial request
+curl -X GET "https://api.smooth.sh/api/v1/task/task_abc123" \
+     -H "apikey: YOUR_API_KEY"
+```
+
+**Response (running):**
+```json
+{
+  "r": {
+    "id": "task_abc123",
+    "status": "running",
+    "output": null,
+    "live_url": "https://live.smooth.sh/v/..."
+  }
+}
+```
+
+**Response (completed):**
+```json
+{
+  "r": {
+    "id": "task_abc123",
+    "status": "done",
+    "output": "The top 5 stories from Hacker News are...",
+    "credits_used": 15,
+    "recording_url": "https://..."
+  }
+}
+```
+
+### HTTP Status Codes
+
+| Status Code | Meaning |
+|-------------|---------|
+| `200` | Task has completed (`done`, `failed`, or `cancelled`) |
+| `202` | Task is still running (`waiting` or `running`) |
+| `404` | Task not found |
+
+## Event-Based Polling
+
+For sessions and custom tools, use the `event_t` parameter to receive events incrementally. This is more efficient than fetching the full response each time.
+
+### The event_t Parameter
+
+The `event_t` (event timestamp) parameter filters events to only return those that occurred **after** the specified timestamp:
+
+```bash
+# First poll - get all events
+curl -X GET "https://api.smooth.sh/api/v1/task/task_abc123?event_t=0" \
+     -H "apikey: YOUR_API_KEY"
+```
+
+```json
+{
+  "r": {
+    "id": "task_abc123",
+    "status": "running",
+    "events": [
+      {
+        "id": "evt_001",
+        "name": "browser_action",
+        "payload": {"code": 200, "output": null},
+        "timestamp": 1699999990000
+      },
+      {
+        "id": "evt_002",
+        "name": "tool_call",
+        "payload": {"name": "my_tool", "input": {"x": 1}},
+        "timestamp": 1699999999000
+      }
+    ]
+  }
+}
+```
+
+```bash
+# Subsequent polls - only new events
+curl -X GET "https://api.smooth.sh/api/v1/task/task_abc123?event_t=1699999999000" \
+     -H "apikey: YOUR_API_KEY"
+```
+
+```json
+{
+  "r": {
+    "id": "task_abc123",
+    "status": "running",
+    "events": [
+      {
+        "id": "evt_003",
+        "name": "browser_action",
+        "payload": {"code": 200, "output": {"title": "Example"}},
+        "timestamp": 1700000005000
+      }
+    ]
+  }
+}
+```
+
+### Event Structure
+
+Each event contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique event identifier (use for matching responses) |
+| `name` | string | Event type: `browser_action`, `session_action`, or `tool_call` |
+| `payload` | object | Event-specific data |
+| `timestamp` | integer | Unix timestamp in milliseconds |
+
+## Polling Loop Implementation
+
+Here's a robust polling implementation:
+
+```javascript
+async function pollTask(taskId, options = {}) {
+  const {
+    pollInterval = 1000,
+    timeout = 300000,  // 5 minutes
+    onEvent = null
+  } = options;
+
+  const startTime = Date.now();
+  let lastEventT = 0;
+
+  while (true) {
+    // Check timeout
+    if (Date.now() - startTime > timeout) {
+      throw new Error('Polling timeout exceeded');
+    }
+
+    // Poll for updates
+    const response = await fetch(
+      `https://api.smooth.sh/api/v1/task/${taskId}?event_t=${lastEventT}`,
+      { headers: { 'apikey': API_KEY } }
+    );
+
+    const { r: task } = await response.json();
+
+    // Process events
+    if (task.events && task.events.length > 0) {
+      for (const event of task.events) {
+        if (onEvent) {
+          await onEvent(event);
+        }
+      }
+      // Update timestamp for next poll
+      lastEventT = task.events[task.events.length - 1].timestamp;
+    }
+
+    // Check if task is complete
+    if (!['running', 'waiting'].includes(task.status)) {
+      return task;
+    }
+
+    // Wait before next poll
+    await new Promise(r => setTimeout(r, pollInterval));
+  }
+}
+
+// Usage
+const result = await pollTask('task_abc123', {
+  pollInterval: 1000,
+  timeout: 300000,
+  onEvent: async (event) => {
+    console.log('Event:', event.name, event.id);
+
+    // Handle tool calls
+    if (event.name === 'tool_call') {
+      const output = await executeMyTool(event.payload);
+      await sendToolResponse(taskId, event.id, output);
+    }
+  }
+});
+```
+
+## Best Practices
+
+### 1. Use Appropriate Poll Intervals
+
+| Scenario | Recommended Interval |
+|----------|---------------------|
+| Simple tasks | 1-2 seconds |
+| Sessions with actions | 500ms - 1 second |
+| Custom tools (time-sensitive) | 500ms |
+| Background monitoring | 5-10 seconds |
+
+### 2. Implement Exponential Backoff
+
+For long-running tasks, increase the interval over time:
+
+```javascript
+async function pollWithBackoff(taskId) {
+  let interval = 1000;
+  const maxInterval = 10000;
+
+  while (true) {
+    const task = await getTask(taskId);
+
+    if (task.status !== 'running' && task.status !== 'waiting') {
+      return task;
+    }
+
+    await new Promise(r => setTimeout(r, interval));
+
+    // Increase interval up to max
+    interval = Math.min(interval * 1.2, maxInterval);
+  }
+}
+```
+
+### 3. Handle Network Errors
+
+```javascript
+async function resilientPoll(taskId) {
+  let retries = 0;
+  const maxRetries = 5;
+
+  while (true) {
+    try {
+      const task = await getTask(taskId);
+      retries = 0;  // Reset on success
+
+      if (task.status !== 'running' && task.status !== 'waiting') {
+        return task;
+      }
+    } catch (error) {
+      retries++;
+      if (retries >= maxRetries) {
+        throw new Error(`Polling failed after ${maxRetries} retries: ${error.message}`);
+      }
+      // Exponential backoff on errors
+      await new Promise(r => setTimeout(r, Math.pow(2, retries) * 1000));
+      continue;
+    }
+
+    await new Promise(r => setTimeout(r, 1000));
+  }
+}
+```
+
+### 4. Track Processed Events
+
+Avoid processing the same event twice:
+
+```javascript
+const processedEvents = new Set();
+
+function handleEvents(events) {
+  for (const event of events) {
+    if (processedEvents.has(event.id)) {
+      continue;  // Already processed
+    }
+    processedEvents.add(event.id);
+
+    // Process event...
+  }
+}
+```
+
+### 5. Clean Up on Errors
+
+If your polling loop fails, consider cancelling the task to avoid resource leaks:
+
+```javascript
+async function runWithCleanup(taskId) {
+  try {
+    return await pollTask(taskId);
+  } catch (error) {
+    // Cancel task on error
+    try {
+      await fetch(`https://api.smooth.sh/api/v1/task/${taskId}`, {
+        method: 'DELETE',
+        headers: { 'apikey': API_KEY }
+      });
+    } catch (cancelError) {
+      // Ignore cancel errors
+    }
+    throw error;
+  }
+}
+```
+
+## Python SDK
+
+The Python SDK handles all polling automatically:
+
+```python
+from smooth import SmoothClient
+
+client = SmoothClient(api_key="YOUR_API_KEY")
+
+# Automatic polling with result()
+task = client.run(task="Go to google.com")
+result = task.result()  # Blocks until complete, handles polling internally
+
+# With timeout
+result = task.result(timeout=60)  # Raises TimeoutError after 60 seconds
+
+# Session polling is also automatic
+with client.session() as session:
+    # Each action polls internally for the response
+    session.goto("https://example.com")
+    data = session.extract(schema={"type": "object"}, prompt="Extract data")
+    print(data.output)
+```
+
+## Debugging
+
+### Checking Event Flow
+
+Add logging to understand the event flow:
+
+```javascript
+const { r: task } = await getTask(taskId, eventT);
+
+console.log(`Status: ${task.status}`);
+console.log(`Events since ${eventT}:`);
+for (const event of task.events || []) {
+  console.log(`  [${event.timestamp}] ${event.name} (${event.id})`);
+  console.log(`    Payload:`, JSON.stringify(event.payload));
+}
+```
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Missing events | Using wrong `event_t` | Always use the last event's timestamp |
+| Duplicate processing | Not tracking processed events | Keep a Set of processed event IDs |
+| Timeout errors | Poll interval too long | Reduce interval for time-sensitive operations |
+| Rate limiting | Polling too fast | Increase poll interval or use backoff |

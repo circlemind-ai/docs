@@ -7,8 +7,8 @@
   ],
   "info": {
     "title": "Smooth",
-    "version": "0.1.1",
-    "description": "# Introduction\n\nThe Smooth API allows for programmatic browser automation and task execution. You can run complex tasks, manage interactive browser sessions, and more.\n\nThis documentation provides a guide to using the API directly, as well as through our Python SDK.\n\n# Authentication\n\nTo use the API, you need an API key. The API key must be sent in the `apikey` header with every request.\n\nExample: `apikey: YOUR_API_KEY`\n\nIf you are using the Python SDK, you can provide the API key in two ways:\n\n1.  **Directly in the client constructor**:\n\n    ```python\n    from smooth import SmoothClient\n    client = SmoothClient(api_key=\"YOUR_API_KEY\")\n    ```\n\n2.  **As an environment variable**:\n    Set the `CIRCLEMIND_API_KEY` environment variable, and the client will automatically use it.\n\n    ```bash\n    export CIRCLEMIND_API_KEY=\"YOUR_API_KEY\"\n    ```\n\n# Python SDK\n\nThe Smooth Python SDK provides a convenient way to interact with the Smooth API.\n\n## Installation\n\nYou can install the Smooth Python SDK using pip:\n\n```bash\npip install smooth-py\n```\n\n## Features\n\n*   **Synchronous and Asynchronous Clients**: Choose between `SmoothClient` for traditional sequential programming and `SmoothAsyncClient` for high-performance asynchronous applications.\n*   **Task Management**: Easily run tasks, check their status, and retrieve results.\n*   **Interactive Browser Sessions**: Get access to and manage interactive browser sessions.\n\n## Usage\n\n### Synchronous Client\n\nThe `SmoothClient` is ideal for scripts and applications that don't require asynchronous operations.\n\n#### Running a Task and Waiting for the Result\n\n```python\nfrom smooth import SmoothClient\nfrom smooth.errors import TimeoutError, ApiError\n\nwith SmoothClient() as client:\n    try:\n        task_handle = client.run(\n            task=\"Go to https://www.google.com and search for 'Smooth SDK'\"\n        )\n        print(f\"Task started with ID: {task_handle.id}\")\n        print(f\"Live view: {task_handle.live_url}\")\n\n        completed_task = task_handle.result() # This blocks until the task is done\n        \n        if completed_task.status == 'done':\n            print(\"Task Output:\", completed_task.output)\n        else:\n            print(\"Task Failed:\", completed_task.output)\n            \n    except TimeoutError:\n        print(\"The task timed out.\")\n    except ApiError as e:\n        print(f\"An API error occurred: {e}\")\n```\n\n### Asynchronous Client\n\nThe `SmoothAsyncClient` is designed for use in asynchronous applications, such as those built with `asyncio`.\n\n#### Running a Task and Waiting for the Result\n\n```python\nimport asyncio\nfrom smooth import SmoothAsyncClient\nfrom smooth.errors import TimeoutError, ApiError\n\nasync def main():\n    async with SmoothAsyncClient() as client:\n        try:\n            task_handle = await client.run(\n                task=\"Go to Github and search for \\\"smooth-sdk\\\"\"\n            )\n            print(f\"Task started with ID: {task_handle.id}\")\n            print(f\"Live view: {task_handle.live_url}\")\n\n            completed_task = await task_handle.result()\n            \n            if completed_task.status == 'done':\n                print(\"Task Output:\", completed_task.output)\n            else:\n                print(\"Task Failed:\", completed_task.output)\n                \n        except TimeoutError:\n            print(\"The task timed out.\")\n        except ApiError as e:\n            print(f\"An API error occurred: {e}\")\n\nif __name__ == \"__main__\":\n    asyncio.run(main())\n```"
+    "version": "0.4.1",
+    "description": "# Introduction\n\nThe Smooth API allows for programmatic browser automation and task execution. You can run simple one-shot tasks, or create interactive browser sessions for multi-step workflows.\n\nThis documentation provides a guide to using the API directly, as well as through our Python SDK.\n\n# Authentication\n\nTo use the API, you need an API key. The API key must be sent in the `apikey` header with every request.\n\nExample: `apikey: YOUR_API_KEY`\n\nIf you are using the Python SDK, you can provide the API key in two ways:\n\n1.  **Directly in the client constructor**:\n\n    ```python\n    from smooth import SmoothClient\n    client = SmoothClient(api_key=\"YOUR_API_KEY\")\n    ```\n\n2.  **As an environment variable**:\n    Set the `CIRCLEMIND_API_KEY` environment variable, and the client will automatically use it.\n\n    ```bash\n    export CIRCLEMIND_API_KEY=\"YOUR_API_KEY\"\n    ```\n\n# Python SDK\n\nThe Smooth Python SDK provides a convenient way to interact with the Smooth API.\n\n## Installation\n\nYou can install the Smooth Python SDK using pip:\n\n```bash\npip install smooth-py\n```\n\n## Features\n\n*   **Synchronous and Asynchronous Clients**: Choose between `SmoothClient` for traditional sequential programming and `SmoothAsyncClient` for high-performance asynchronous applications.\n*   **Simple Tasks**: Run one-shot browser automation tasks with `client.run()`.\n*   **Session Workflows**: Create browser sessions for multi-step workflows with `client.session()`.\n*   **Custom Tools**: Register Python functions that the agent can call during execution.\n\n## Usage\n\n### Simple Task\n\nRun a one-shot task and wait for the result:\n\n```python\nfrom smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n\ntask_handle = client.run(\n    task=\"Go to https://www.google.com and search for 'Smooth SDK'\"\n)\nprint(f\"Task started with ID: {task_handle.id()}\")\nprint(f\"Live view: {task_handle.live_url()}\")\n\nresult = task_handle.result()  # Blocks until task is done\n\nif result.status == 'done':\n    print(\"Task Output:\", result.output)\nelse:\n    print(\"Task Failed:\", result.output)\n```\n\n### Session Workflow\n\nFor multi-step workflows, create a session and run multiple actions:\n\n```python\nfrom smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n\nwith client.session(url=\"https://example.com\") as session:\n    # Run a task within the session\n    result = session.run_task(\"Search for flights from NYC to LA\")\n    print(f\"Task output: {result.output}\")\n    \n    # Extract structured data\n    flights = session.extract(\n        schema={\"type\": \"array\", \"items\": {\"type\": \"object\", \"properties\": {\"price\": {\"type\": \"number\"}}}},\n        prompt=\"Extract the first 3 flight prices\"\n    )\n    print(f\"Flights: {flights.output}\")\n    \n    # Navigate to a URL\n    session.goto(\"https://example.com/checkout\")\n    \n    # Execute JavaScript\n    title = session.evaluate_js(\"document.title\")\n    print(f\"Page title: {title.output}\")\n```\n\n### Asynchronous Client\n\nFor async applications:\n\n```python\nimport asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def main():\n    async with SmoothAsyncClient(api_key=\"YOUR_API_KEY\") as client:\n        task_handle = await client.run(\n            task=\"Go to Github and search for 'smooth-sdk'\"\n        )\n        print(f\"Task started with ID: {task_handle.id()}\")\n        \n        result = await task_handle.result()\n        print(\"Task Output:\", result.output)\n\nasyncio.run(main())\n```"
   },
   "security": [
     {
@@ -17,27 +17,35 @@
   ],
   "tags": [
     {
-      "name": "Agent",
-      "description": "Operations related to tasks"
+      "name": "Task",
+      "description": "Operations for running and managing browser automation tasks"
     },
     {
-      "name": "Session",
-      "description": "Operations related to the browser sessions"
+      "name": "Event",
+      "description": "Operations for sending events to running tasks (session actions, custom tool responses)"
+    },
+    {
+      "name": "Profile",
+      "description": "Operations for managing browser profiles (persistent cookies and authentication)"
+    },
+    {
+      "name": "File",
+      "description": "Operations for uploading and managing files"
     },
     {
       "name": "Extension",
-      "description": "Operations related to browser extensions"
+      "description": "Operations for managing browser extensions"
     }
   ],
   "paths": {
     "/task": {
       "post": {
-        "summary": "Run Task",
-        "description": "Submits a task to be executed by the Smooth agent.",
+        "summary": "Submit Task",
+        "description": "Submits a task to be executed by the Smooth agent. If `task` is `null`, opens a browser session that waits for actions via the Event endpoint.",
         "tags": [
-          "Agent"
+          "Task"
         ],
-        "operationId": "run_task_task_post",
+        "operationId": "submit_task",
         "requestBody": {
           "required": true,
           "content": {
@@ -45,21 +53,35 @@
               "schema": {
                 "$ref": "#/components/schemas/TaskRequest"
               },
-              "example": {
-                "task": "Go to hacker news and get the top 5 stories.",
-                "device": "desktop",
-                "max_steps": 32
+              "examples": {
+                "simple_task": {
+                  "summary": "Simple task",
+                  "value": {
+                    "task": "Go to hacker news and get the top 5 stories.",
+                    "device": "desktop",
+                    "max_steps": 32
+                  }
+                },
+                "session_mode": {
+                  "summary": "Open session (task=null)",
+                  "description": "Opens a browser session that waits for actions via the Event endpoint",
+                  "value": {
+                    "task": null,
+                    "url": "https://example.com",
+                    "device": "desktop"
+                  }
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Task successfully submitted. The initial response may have a status of 'waiting'.",
+            "description": "Task successfully submitted. The initial response will have a status of 'waiting'.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TaskResponse"
+                  "$ref": "#/components/schemas/ApiResponse_TaskResponse"
                 }
               }
             }
@@ -74,7 +96,7 @@
             "description": "Validation Error"
           },
           "429": {
-            "description": "API credits exhausted."
+            "description": "API credits exhausted or concurrent session limit reached."
           }
         },
         "x-codeSamples": [
@@ -86,17 +108,67 @@
           {
             "lang": "python",
             "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n\ntask_handle = client.run(\n    task=\"Go to hacker news and get the top 5 stories.\",\n    device=\"desktop\",\n    max_steps=32\n)\n\nprint(f\"Task ID: {task_handle.id}\")\n# Wait for the result\nresult = task_handle.result()\nprint(result)"
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n\ntask_handle = client.run(\n    task=\"Go to hacker news and get the top 5 stories.\",\n    device=\"desktop\",\n    max_steps=32\n)\n\nprint(f\"Task ID: {task_handle.id()}\")\nprint(f\"Live URL: {task_handle.live_url()}\")\n\n# Wait for the result\nresult = task_handle.result()\nprint(f\"Output: {result.output}\")"
           },
           {
             "lang": "python",
             "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def run_task():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    task_handle = await client.run(\n        task=\"Go to hacker news and get the top 5 stories.\",\n        device=\"desktop\",\n        max_steps=32\n    )\n    print(f\"Task ID: {task_handle.id}\")\n    # Wait for the result\n    result = await task_handle.result()\n    print(result)\n    await client.close()\n\nasyncio.run(run_task())"
+            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def run_task():\n    async with SmoothAsyncClient(api_key=\"YOUR_API_KEY\") as client:\n        task_handle = await client.run(\n            task=\"Go to hacker news and get the top 5 stories.\",\n            device=\"desktop\",\n            max_steps=32\n        )\n        print(f\"Task ID: {task_handle.id()}\")\n        \n        result = await task_handle.result()\n        print(f\"Output: {result.output}\")\n\nasyncio.run(run_task())"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/task';\n\nconst payload = {\n  task: 'Go to hacker news and get the top 5 stories.',\n  device: 'desktop',\n  max_steps: 32,\n  enable_recording: true\n};\n\nasync function runTask() {\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'Content-Type': 'application/json',\n        'apikey': apiKey\n      },\n      body: JSON.stringify(payload)\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Task submitted:', data);\n    // You can now use data.r.id to poll the get task endpoint\n  } catch (error) {\n    console.error('Error running task:', error);\n  }\n}\n\nrunTask();"
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/task';\n\nconst payload = {\n  task: 'Go to hacker news and get the top 5 stories.',\n  device: 'desktop',\n  max_steps: 32,\n  enable_recording: true\n};\n\nasync function runTask() {\n  const response = await fetch(url, {\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json',\n      'apikey': apiKey\n    },\n    body: JSON.stringify(payload)\n  });\n\n  const data = await response.json();\n  console.log('Task ID:', data.r.id);\n  // Poll GET /task/{id} for results\n}\n\nrunTask();"
+          }
+        ]
+      },
+      "get": {
+        "summary": "List Tasks",
+        "description": "List all tasks for the authenticated user.",
+        "tags": [
+          "Task"
+        ],
+        "operationId": "list_tasks",
+        "parameters": [
+          {
+            "name": "t",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Timestamp to paginate from (returns tasks created before this timestamp)"
+            }
+          },
+          {
+            "name": "l",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 128,
+              "default": 32,
+              "description": "Limit number of results"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse_TaskList"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "cURL",
+            "source": "curl -X GET \"https://api.smooth.sh/api/v1/task?l=10\" \\\n     -H \"apikey: YOUR_API_KEY\""
           }
         ]
       }
@@ -104,11 +176,11 @@
     "/task/{task_id}": {
       "get": {
         "summary": "Get Task",
-        "description": "Returns the status and result of a task by its ID.",
+        "description": "Returns the status and result of a task by its ID. Use `event_t` parameter for polling to receive only new events since the given timestamp.",
         "tags": [
-          "Agent"
+          "Task"
         ],
-        "operationId": "get_task_task__task_id__get",
+        "operationId": "get_task",
         "parameters": [
           {
             "name": "task_id",
@@ -120,39 +192,49 @@
             }
           },
           {
+            "name": "event_t",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "description": "Timestamp of last event received. Only events after this timestamp will be returned."
+            }
+          },
+          {
             "name": "downloads",
             "in": "query",
             "required": false,
             "schema": {
               "type": "boolean",
-              "title": "Downloads",
-              "description": "Whether to download the task result files after the task is completed. If true, the response will include the download link for the files."
+              "default": false,
+              "description": "Whether to include the download URL for files downloaded during the task."
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful Response: The task has completed (status is 'done' or 'failed').",
+            "description": "Task has completed (status is 'done', 'failed', or 'cancelled').",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TaskResponse"
+                  "$ref": "#/components/schemas/ApiResponse_TaskResponse"
                 }
               }
             }
           },
           "202": {
-            "description": "Accepted: The task is still running (status is 'waiting' or 'running').",
+            "description": "Task is still running (status is 'waiting' or 'running').",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TaskResponse"
+                  "$ref": "#/components/schemas/ApiResponse_TaskResponse"
                 }
               }
             }
           },
-          "422": {
-            "description": "Validation Error"
+          "404": {
+            "description": "Task not found"
           }
         },
         "x-codeSamples": [
@@ -162,19 +244,19 @@
             "source": "curl -X GET \"https://api.smooth.sh/api/v1/task/YOUR_TASK_ID\" \\\n     -H \"apikey: YOUR_API_KEY\""
           },
           {
-            "lang": "python",
-            "label": "Python (sync)",
-            "source": "# Note: The SDK's task_handle.result() method handles this polling for you.\n# This is how you would do it manually:\nfrom smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\ntask_status = client._get_task(\"YOUR_TASK_ID\") # Internal method\nprint(task_status)"
+            "lang": "curl",
+            "label": "cURL (polling with event_t)",
+            "source": "# Poll for new events since timestamp 1699999999999\ncurl -X GET \"https://api.smooth.sh/api/v1/task/YOUR_TASK_ID?event_t=1699999999999\" \\\n     -H \"apikey: YOUR_API_KEY\""
           },
           {
             "lang": "python",
-            "label": "Python (async)",
-            "source": "# Note: The SDK's task_handle.result() method handles this polling for you.\n# This is how you would do it manually:\nimport asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def check_task():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    task_status = await client._get_task(\"YOUR_TASK_ID\") # Internal method\n    print(task_status)\n    await client.close()\n\nasyncio.run(check_task())"
+            "label": "Python",
+            "source": "# The SDK handles polling automatically via task_handle.result()\nfrom smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\ntask_handle = client.run(task=\"Go to google.com\")\n\n# This polls internally until the task completes\nresult = task_handle.result()\nprint(f\"Status: {result.status}\")\nprint(f\"Output: {result.output}\")"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst taskId = 'YOUR_TASK_ID';\nconst url = `https://api.smooth.sh/api/v1/task/${taskId}`;\n\nasync function getTaskStatus() {\n  try {\n    const response = await fetch(url, {\n      method: 'GET',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Task status:', data);\n\n    // You can poll this endpoint until status is 'done' or 'failed'\n    if (data.r.status === 'running' || data.r.status === 'waiting') {\n      console.log('Task is still in progress...');\n    }\n\n  } catch (error) {\n    console.error('Error fetching task status:', error);\n  }\n}\n\ngetTaskStatus();"
+            "source": "const apiKey = 'YOUR_API_KEY';\nconst taskId = 'YOUR_TASK_ID';\n\nasync function pollTask() {\n  let eventT = 0;\n  \n  while (true) {\n    const response = await fetch(\n      `https://api.smooth.sh/api/v1/task/${taskId}?event_t=${eventT}`,\n      { headers: { 'apikey': apiKey } }\n    );\n    \n    const data = await response.json();\n    const task = data.r;\n    \n    if (task.status === 'done' || task.status === 'failed') {\n      console.log('Final output:', task.output);\n      break;\n    }\n    \n    // Update eventT for next poll\n    if (task.events && task.events.length > 0) {\n      eventT = task.events[task.events.length - 1].timestamp;\n    }\n    \n    await new Promise(r => setTimeout(r, 1000));\n  }\n}\n\npollTask();"
           }
         ]
       },
@@ -182,9 +264,9 @@
         "summary": "Cancel Task",
         "description": "Cancel a running task by its ID.",
         "tags": [
-          "Agent"
+          "Task"
         ],
-        "operationId": "cancel_task_task__task_id__delete",
+        "operationId": "cancel_task",
         "parameters": [
           {
             "name": "task_id",
@@ -198,7 +280,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Task successfully cancelled."
+            "description": "Task successfully cancelled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse_Bool"
+                }
+              }
+            }
           },
           "404": {
             "description": "Task not found or already completed."
@@ -209,142 +298,231 @@
             "lang": "curl",
             "label": "cURL",
             "source": "curl -X DELETE \"https://api.smooth.sh/api/v1/task/YOUR_TASK_ID\" \\\n     -H \"apikey: YOUR_API_KEY\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "# For sessions, use session.close()\nwith client.session() as session:\n    session.run_task(\"Do something\")\n    session.close()  # Closes the session"
           }
         ]
       }
     },
-    "/browser/session": {
+    "/task/{task_id}/event": {
       "post": {
-        "summary": "Open Session",
-        "description": "Open an interactive browser instance for 5 minutes. You can either create a new profile or load an existing one by providing its `profile_id`.",
+        "summary": "Send Event",
+        "description": "Send an event to a running task. This is used for:\n\n- **Session actions**: `run_task`, `goto`, `extract`, `evaluate_js`, `close`\n- **Custom tool responses**: Responding to tool calls from the agent\n\nThe SDK handles this automatically when using `session.run_task()`, `session.goto()`, etc.",
         "tags": [
-          "Session"
+          "Event"
         ],
-        "operationId": "open_browser_session_browser_session_post",
+        "operationId": "send_task_event",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BrowserSessionRequest"
+                "$ref": "#/components/schemas/TaskEvent"
+              },
+              "examples": {
+                "run_task": {
+                  "summary": "Run task in session",
+                  "value": {
+                    "name": "session_action",
+                    "payload": {
+                      "name": "run_task",
+                      "input": {
+                        "task": "Search for flights from NYC to LA",
+                        "max_steps": 32
+                      }
+                    },
+                    "id": "evt_abc123"
+                  }
+                },
+                "goto": {
+                  "summary": "Navigate to URL",
+                  "value": {
+                    "name": "browser_action",
+                    "payload": {
+                      "name": "goto",
+                      "input": {
+                        "url": "https://example.com"
+                      }
+                    },
+                    "id": "evt_def456"
+                  }
+                },
+                "extract": {
+                  "summary": "Extract data",
+                  "value": {
+                    "name": "browser_action",
+                    "payload": {
+                      "name": "extract",
+                      "input": {
+                        "schema": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "title": {"type": "string"},
+                              "price": {"type": "number"}
+                            }
+                          }
+                        },
+                        "prompt": "Extract the first 5 products"
+                      }
+                    },
+                    "id": "evt_ghi789"
+                  }
+                },
+                "evaluate_js": {
+                  "summary": "Execute JavaScript",
+                  "value": {
+                    "name": "browser_action",
+                    "payload": {
+                      "name": "evaluate_js",
+                      "input": {
+                        "js": "document.title"
+                      }
+                    },
+                    "id": "evt_jkl012"
+                  }
+                },
+                "close": {
+                  "summary": "Close session",
+                  "value": {
+                    "name": "session_action",
+                    "payload": {
+                      "name": "close"
+                    },
+                    "id": "evt_mno345"
+                  }
+                },
+                "tool_response": {
+                  "summary": "Custom tool response",
+                  "description": "Response to a tool call from the agent",
+                  "value": {
+                    "name": "tool_call",
+                    "payload": {
+                      "code": 200,
+                      "output": {"result": "Tool execution successful"}
+                    },
+                    "id": "evt_pqr678"
+                  }
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "Event successfully sent.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BrowserSessionResponse"
+                  "$ref": "#/components/schemas/ApiResponse_TaskEventResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Session closed or invalid event."
+          },
+          "404": {
+            "description": "Task not found."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "cURL (run_task)",
+            "source": "curl -X POST \"https://api.smooth.sh/api/v1/task/YOUR_TASK_ID/event\" \\\n     -H \"Content-Type: application/json\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -d '{\n       \"name\": \"session_action\",\n       \"payload\": {\n         \"name\": \"run_task\",\n         \"input\": {\n           \"task\": \"Search for flights from NYC to LA\",\n           \"max_steps\": 32\n         }\n       },\n       \"id\": \"evt_abc123\"\n     }'"
+          },
+          {
+            "lang": "curl",
+            "label": "cURL (extract)",
+            "source": "curl -X POST \"https://api.smooth.sh/api/v1/task/YOUR_TASK_ID/event\" \\\n     -H \"Content-Type: application/json\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -d '{\n       \"name\": \"browser_action\",\n       \"payload\": {\n         \"name\": \"extract\",\n         \"input\": {\n           \"schema\": {\"type\": \"object\", \"properties\": {\"title\": {\"type\": \"string\"}}},\n           \"prompt\": \"Extract the page title\"\n         }\n       },\n       \"id\": \"evt_def456\"\n     }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "# The SDK handles events automatically\nfrom smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n\nwith client.session(url=\"https://example.com\") as session:\n    # These methods send events internally\n    result = session.run_task(\"Click the login button\")\n    data = session.extract(\n        schema={\"type\": \"object\", \"properties\": {\"title\": {\"type\": \"string\"}}},\n        prompt=\"Extract the page title\"\n    )\n    session.goto(\"https://example.com/dashboard\")\n    js_result = session.evaluate_js(\"document.title\")"
+          }
+        ]
+      }
+    },
+    "/profile": {
+      "post": {
+        "summary": "Create Profile",
+        "description": "Creates a new browser profile. Profiles persist cookies and authentication across tasks.",
+        "tags": [
+          "Profile"
+        ],
+        "operationId": "create_profile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse_ProfileResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Unavailable on Free Plan or insufficient credits."
+            "description": "Access to premium features is not available on the free plan."
           },
-          "422": {
-            "description": "Validation Error"
-          },
-          "429": {
-            "description": "Maximum number of concurrent browser sessions reached."
-          },
-          "503": {
-            "description": "Service unavailable. Please try again later."
+          "409": {
+            "description": "Profile with this ID already exists."
           }
         },
         "x-codeSamples": [
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X POST \"https://api.smooth.sh/api/v1/browser/session\" \\\n     -H \"Content-Type: application/json\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -d '{\n       \"session_id\": \"my-persistent-session\"\n     }'"
+            "source": "curl -X POST \"https://api.smooth.sh/api/v1/profile\" \\\n     -H \"Content-Type: application/json\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -d '{\"id\": \"my-profile\"}'"
           },
           {
             "lang": "python",
-            "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n# If session_id is omitted, a random one is created\nbrowser_session = client.open_session(session_id=\"my-session\")\nprint(browser_session.live_url)"
-          },
-          {
-            "lang": "python",
-            "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def open_session():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    # If session_id is omitted, a random one is created\n    browser_session = await client.open_session(session_id=\"my-session\")\n    print(browser_session.live_url)\n    await client.close()\n\nasyncio.run(open_session())"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/browser/session';\n\n// To create a new session with a random ID, omit the payload or send an empty object\nconst payload = {\n  session_id: 'my-persistent-session' // or null to create a new one\n};\n\nasync function openSession() {\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'Content-Type': 'application/json',\n        'apikey': apiKey\n      },\n      body: JSON.stringify(payload)\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Session opened:', data);\n    console.log('Live URL:', data.r.live_url);\n  } catch (error) {\n    console.error('Error opening session:', error);\n  }\n}\n\nopenSession();"
+            "label": "Python",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nprofile = client.create_profile(profile_id=\"my-profile\")\nprint(f\"Profile ID: {profile.id}\")"
           }
         ]
-      }
-    },
-    "/browser/session/{live_id}": {
-      "delete": {
-        "summary": "Close Session",
-        "description": "Close an interactive browser session by its `live_id`.",
-        "tags": [
-          "Session"
-        ],
-        "operationId": "close_browser_session_browser_session__live_id__delete",
-        "parameters": [
-          {
-            "name": "live_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Live Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Session successfully closed."
-          },
-          "404": {
-            "description": "Session not found."
-          }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "curl",
-            "label": "cURL",
-            "source": "curl -X DELETE \"https://api.smooth.sh/api/v1/browser/session/my-session\" \\\n     -H \"apikey: YOUR_API_KEY\""
-          },
-          {
-            "lang": "python",
-            "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nclient.close_session(\"my-session\")\nprint(\"Session 'my-session' closed.\")"
-          },
-          {
-            "lang": "python",
-            "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def close_session():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    await client.close_session(\"my-session\")\n    print(\"Session 'my-session' closed.\")\n    await client.close()\n\nasyncio.run(close_session())"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst sessionId = 'my-session'; // The ID of the session to close\nconst url = `https://api.smooth.sh/api/v1/browser/session/${sessionId}`;\n\nasync function closeSession() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`Session '${sessionId}' closed successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error closing session:', error);\n  }\n}\n\ncloseSession();"
-          }
-        ]
-      }
-    },
-    "/browser/profile": {
+      },
       "get": {
         "summary": "List Profiles",
         "description": "List all browser profiles for the user.",
         "tags": [
           "Profile"
         ],
-        "operationId": "list_browser_profiles_browser_profile_get",
+        "operationId": "list_profiles",
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "List of profiles",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BrowserProfilesResponse"
+                  "$ref": "#/components/schemas/ApiResponse_ProfileList"
                 }
               }
             }
@@ -354,73 +532,59 @@
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X GET \"https://api.smooth.sh/api/v1/browser/profile\" \\\n     -H \"apikey: YOUR_API_KEY\""
+            "source": "curl -X GET \"https://api.smooth.sh/api/v1/profile\" \\\n     -H \"apikey: YOUR_API_KEY\""
           },
           {
             "lang": "python",
-            "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nprofiles = client.list_profiles()\nprint(profiles.profile_ids)"
-          },
-          {
-            "lang": "python",
-            "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def list_profiles():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    profiles = await client.list_profiles()\n    print(profiles.profile_ids)\n    await client.close()\n\nasyncio.run(list_profiles())"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/browser/profile';\n\nasync function listProfiles() {\n  try {\n    const response = await fetch(url, {\n      method: 'GET',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Available profiles:', data.r.profile_ids);\n  } catch (error) {\n    console.error('Error listing profiles:', error);\n  }\n}\n\nlistProfiles();"
+            "label": "Python",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nprofiles = client.list_profiles()\nfor profile in profiles:\n    print(f\"Profile ID: {profile.id}\")"
           }
         ]
       }
     },
-    "/browser/profile/{profile_id}": {
+    "/profile/{profile_id}": {
       "delete": {
         "summary": "Delete Profile",
-        "description": "Delete a specific browser profile for a user.",
+        "description": "Delete a browser profile by its ID.",
         "tags": [
           "Profile"
         ],
-        "operationId": "delete_browser_profile_browser_profile__profile_id__delete",
+        "operationId": "delete_profile",
         "parameters": [
           {
             "name": "profile_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "title": "Profile Id"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Profile successfully deleted"
+            "description": "Profile successfully deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse_Bool"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Profile not found"
+            "description": "Profile not found."
           }
         },
         "x-codeSamples": [
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X DELETE \"https://api.smooth.sh/api/v1/browser/profile/my-profile\" \\\n     -H \"apikey: YOUR_API_KEY\""
+            "source": "curl -X DELETE \"https://api.smooth.sh/api/v1/profile/my-profile\" \\\n     -H \"apikey: YOUR_API_KEY\""
           },
           {
             "lang": "python",
-            "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nclient.delete_profile(\"my-profile\")\nprint(\"Profile 'my-profile' deleted.\")"
-          },
-          {
-            "lang": "python",
-            "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def delete_profile():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    await client.delete_profile(\"my-profile\")\n    print(\"Profile 'my-profile' deleted.\")\n    await client.close()\n\nasyncio.run(delete_profile())"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst profileId = 'my-profile'; // The ID of the profile to delete\nconst url = `https://api.smooth.sh/api/v1/browser/profile/${profileId}`;\n\nasync function deleteProfile() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`Profile '${profileId}' deleted successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error deleting profile:', error);\n  }\n}\n\ndeleteProfile();"
+            "label": "Python",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nclient.delete_profile(\"my-profile\")"
           }
         ]
       }
@@ -428,11 +592,11 @@
     "/file": {
       "post": {
         "summary": "Upload File",
-        "description": "Upload a file to be used by tasks.",
+        "description": "Upload a file to be used by tasks. Files can be passed to tasks via the `files` parameter.",
         "tags": [
-          "Files"
+          "File"
         ],
-        "operationId": "upload_file_file_post",
+        "operationId": "upload_file",
         "requestBody": {
           "required": true,
           "content": {
@@ -442,15 +606,12 @@
                 "properties": {
                   "file": {
                     "type": "string",
-                    "format": "binary"
+                    "format": "binary",
+                    "description": "The file to upload."
                   },
-                  "name": {
+                  "file_purpose": {
                     "type": "string",
-                    "description": "Optional custom name for the file. If not provided, the original file name will be used."
-                  },
-                  "purpose": {
-                    "type": "string",
-                    "description": "Optional short description of the file to describe its purpose (i.e., 'the bank statement pdf')."
+                    "description": "Optional description of the file's purpose (max 64 characters)."
                   }
                 },
                 "required": [
@@ -466,38 +627,25 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadFileResponse"
+                  "$ref": "#/components/schemas/ApiResponse_UploadFileResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid Request"
-          },
-          "422": {
-            "description": "Validation Error"
+            "description": "Invalid file or filename."
           }
         },
         "x-codeSamples": [
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X POST \"https://api.smooth.sh/api/v1/file\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -F \"file=@/path/to/your/file.txt\""
+            "source": "curl -X POST \"https://api.smooth.sh/api/v1/file\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -F \"file=@/path/to/your/file.pdf\" \\\n     -F \"file_purpose=invoice document\""
           },
           {
             "lang": "python",
-            "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nwith open(\"/path/to/your/file.txt\", \"rb\") as f:\n    upload_response = client.upload_file(f)\nprint(f\"File uploaded with ID: {upload_response.id}\")"
-          },
-          {
-            "lang": "python",
-            "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def upload_file():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    with open(\"/path/to/your/file.txt\", \"rb\") as f:\n        upload_response = await client.upload_file(f)\n    print(f\"File uploaded with ID: {upload_response.id}\")\n\nasyncio.run(upload_file())"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/file';\n\nasync function uploadFile(file) {\n  const formData = new FormData();\n  formData.append('file', file);\n\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'apikey': apiKey\n      },\n      body: formData\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('File uploaded with ID:', data.r.id);\n  } catch (error) {\n    console.error('Error uploading file:', error);\n  }\n}\n\n// Usage example (in a browser environment):\n// const fileInput = document.querySelector('input[type=\"file\"]');\n// fileInput.addEventListener('change', (event) => {\n//   const file = event.target.files[0];\n//   uploadFile(file);\n// });"
+            "label": "Python",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n\nwith open(\"/path/to/your/file.pdf\", \"rb\") as f:\n    response = client.upload_file(f, purpose=\"invoice document\")\n    print(f\"File ID: {response.id}\")\n\n# Use the file in a task\ntask = client.run(\n    task=\"Process this invoice\",\n    files=[response.id]\n)"
           }
         ]
       }
@@ -507,9 +655,9 @@
         "summary": "Delete File",
         "description": "Delete an uploaded file by its ID.",
         "tags": [
-          "Files"
+          "File"
         ],
-        "operationId": "delete_file_file__file_id__delete",
+        "operationId": "delete_file",
         "parameters": [
           {
             "name": "file_id",
@@ -522,7 +670,14 @@
         ],
         "responses": {
           "200": {
-            "description": "File successfully deleted."
+            "description": "File successfully deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse_Bool"
+                }
+              }
+            }
           },
           "404": {
             "description": "File not found."
@@ -536,30 +691,20 @@
           },
           {
             "lang": "python",
-            "label": "Python (sync)",
+            "label": "Python",
             "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nclient.delete_file(file_id=\"YOUR_FILE_ID\")"
-          },
-          {
-            "lang": "python",
-            "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def delete_file():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    await client.delete_file(file_id=\"YOUR_FILE_ID\")\n    await client.close()\n\nasyncio.run(delete_file())"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst fileId = 'YOUR_FILE_ID'; // The ID of the file to delete\nconst url = `https://api.smooth.sh/api/v1/file/${fileId}`;\n\nasync function deleteFile() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`File '${fileId}' deleted successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error deleting file:', error);\n  }\n}\n\ndeleteFile();"
           }
         ]
       }
     },
-    "/browser/extension": {
+    "/extension": {
       "post": {
         "summary": "Upload Extension",
         "description": "Upload a browser extension (.zip file) to be used in tasks.",
         "tags": [
           "Extension"
         ],
-        "operationId": "upload_extension_browser_extension_post",
+        "operationId": "upload_extension",
         "requestBody": {
           "required": true,
           "content": {
@@ -570,7 +715,7 @@
                   "file": {
                     "type": "string",
                     "format": "binary",
-                    "description": "The zipped extension file to upload (.zip format)."
+                    "description": "The zipped extension file (.zip format)."
                   }
                 },
                 "required": [
@@ -586,38 +731,25 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UploadExtensionResponse"
+                  "$ref": "#/components/schemas/ApiResponse_UploadExtensionResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid Request"
-          },
-          "422": {
-            "description": "Validation Error"
+            "description": "Invalid file format. Only ZIP files are allowed."
           }
         },
         "x-codeSamples": [
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X POST \"https://api.smooth.sh/api/v1/browser/extension\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -F \"file=@/path/to/your/extension.zip\""
+            "source": "curl -X POST \"https://api.smooth.sh/api/v1/extension\" \\\n     -H \"apikey: YOUR_API_KEY\" \\\n     -F \"file=@/path/to/extension.zip\""
           },
           {
             "lang": "python",
-            "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nwith open(\"/path/to/your/extension.zip\", \"rb\") as f:\n    upload_response = client.upload_extension(f)\nprint(f\"Extension uploaded with ID: {upload_response.id}\")"
-          },
-          {
-            "lang": "python",
-            "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def upload_extension():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    with open(\"/path/to/your/extension.zip\", \"rb\") as f:\n        upload_response = await client.upload_extension(f)\n    print(f\"Extension uploaded with ID: {upload_response.id}\")\n    await client.close()\n\nasyncio.run(upload_extension())"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/browser/extension';\n\nasync function uploadExtension(file) {\n  const formData = new FormData();\n  formData.append('file', file);\n\n  try {\n    const response = await fetch(url, {\n      method: 'POST',\n      headers: {\n        'apikey': apiKey\n      },\n      body: formData\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Extension uploaded with ID:', data.r.id);\n  } catch (error) {\n    console.error('Error uploading extension:', error);\n  }\n}\n\n// Usage example (in a browser environment):\n// const fileInput = document.querySelector('input[type=\"file\"]');\n// fileInput.addEventListener('change', (event) => {\n//   const file = event.target.files[0];\n//   uploadExtension(file);\n// });"
+            "label": "Python",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n\nwith open(\"/path/to/extension.zip\", \"rb\") as f:\n    response = client.upload_extension(f)\n    print(f\"Extension ID: {response.id}\")\n\n# Use the extension in a task\ntask = client.run(\n    task=\"Do something\",\n    extensions=[response.id]\n)"
           }
         ]
       },
@@ -627,14 +759,14 @@
         "tags": [
           "Extension"
         ],
-        "operationId": "list_extensions_browser_extension_get",
+        "operationId": "list_extensions",
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "List of extensions",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListExtensionsResponse"
+                  "$ref": "#/components/schemas/ApiResponse_ExtensionList"
                 }
               }
             }
@@ -644,22 +776,12 @@
           {
             "lang": "curl",
             "label": "cURL",
-            "source": "curl -X GET \"https://api.smooth.sh/api/v1/browser/extension\" \\\n     -H \"apikey: YOUR_API_KEY\""
+            "source": "curl -X GET \"https://api.smooth.sh/api/v1/extension\" \\\n     -H \"apikey: YOUR_API_KEY\""
           },
           {
             "lang": "python",
-            "label": "Python (sync)",
-            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nextensions = client.list_extensions()\nfor ext in extensions.extensions:\n    print(f\"ID: {ext.id}, Name: {ext.name}\")"
-          },
-          {
-            "lang": "python",
-            "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def list_extensions():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    extensions = await client.list_extensions()\n    for ext in extensions.extensions:\n        print(f\"ID: {ext.id}, Name: {ext.name}\")\n    await client.close()\n\nasyncio.run(list_extensions())"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst url = 'https://api.smooth.sh/api/v1/browser/extension';\n\nasync function listExtensions() {\n  try {\n    const response = await fetch(url, {\n      method: 'GET',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (!response.ok) {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n    const data = await response.json();\n    console.log('Available extensions:', data.r.extensions);\n  } catch (error) {\n    console.error('Error listing extensions:', error);\n  }\n}\n\nlistExtensions();"
+            "label": "Python",
+            "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nextensions = client.list_extensions()\nfor ext in extensions:\n    print(f\"ID: {ext.id}, Name: {ext.file_name}\")"
           }
         ]
       }
@@ -671,7 +793,7 @@
         "tags": [
           "Extension"
         ],
-        "operationId": "delete_extension_browser_extension__extension_id__delete",
+        "operationId": "delete_extension",
         "parameters": [
           {
             "name": "extension_id",
@@ -684,7 +806,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Extension successfully deleted."
+            "description": "Extension successfully deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse_Bool"
+                }
+              }
+            }
           },
           "404": {
             "description": "Extension not found."
@@ -698,18 +827,51 @@
           },
           {
             "lang": "python",
-            "label": "Python (sync)",
+            "label": "Python",
             "source": "from smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\nclient.delete_extension(extension_id=\"YOUR_EXTENSION_ID\")"
+          }
+        ]
+      }
+    },
+    "/browser/session": {
+      "post": {
+        "summary": "Open Browser Session (Deprecated)",
+        "description": "**Deprecated**: Use `POST /task` with `task=null` instead, and send actions via `POST /task/{task_id}/event`.\n\nOpens an interactive browser instance for 5 minutes.",
+        "tags": [
+          "Profile"
+        ],
+        "operationId": "open_browser_session",
+        "deprecated": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BrowserSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session opened.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse_BrowserSessionResponse"
+                }
+              }
+            }
           },
+          "403": {
+            "description": "Access to premium features is not available on the free plan."
+          }
+        },
+        "x-codeSamples": [
           {
             "lang": "python",
-            "label": "Python (async)",
-            "source": "import asyncio\nfrom smooth import SmoothAsyncClient\n\nasync def delete_extension():\n    client = SmoothAsyncClient(api_key=\"YOUR_API_KEY\")\n    await client.delete_extension(extension_id=\"YOUR_EXTENSION_ID\")\n    await client.close()\n\nasyncio.run(delete_extension())"
-          },
-          {
-            "lang": "javascript",
-            "label": "JavaScript",
-            "source": "const apiKey = 'YOUR_API_KEY';\nconst extensionId = 'YOUR_EXTENSION_ID'; // The ID of the extension to delete\nconst url = `https://api.smooth.sh/api/v1/browser/extension/${extensionId}`;\n\nasync function deleteExtension() {\n  try {\n    const response = await fetch(url, {\n      method: 'DELETE',\n      headers: {\n        'apikey': apiKey\n      }\n    });\n\n    if (response.ok) {\n        console.log(`Extension '${extensionId}' deleted successfully.`);\n    } else {\n      throw new Error(`HTTP error! status: ${response.status}`);\n    }\n\n  } catch (error) {\n    console.error('Error deleting extension:', error);\n  }\n}\n\ndeleteExtension();"
+            "label": "Python (Recommended)",
+            "source": "# Use the new session() method instead\nfrom smooth import SmoothClient\n\nclient = SmoothClient(api_key=\"YOUR_API_KEY\")\n\nwith client.session(url=\"https://example.com\") as session:\n    session.run_task(\"Click the login button\")\n    session.close()"
           }
         ]
       }
@@ -717,535 +879,688 @@
   },
   "components": {
     "schemas": {
-      "BrowserSessionRequest": {
+      "ApiResponse_TaskResponse": {
+        "type": "object",
         "properties": {
-          "profile_id": {
+          "r": {
+            "$ref": "#/components/schemas/TaskResponse"
+          }
+        },
+        "required": ["r"]
+      },
+      "ApiResponse_TaskList": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskResponse"
+            }
+          }
+        },
+        "required": ["r"]
+      },
+      "ApiResponse_TaskEventResponse": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "$ref": "#/components/schemas/TaskEventResponse"
+          }
+        },
+        "required": ["r"]
+      },
+      "ApiResponse_ProfileResponse": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "$ref": "#/components/schemas/ProfileResponse"
+          }
+        },
+        "required": ["r"]
+      },
+      "ApiResponse_ProfileList": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProfileResponse"
+            }
+          }
+        },
+        "required": ["r"]
+      },
+      "ApiResponse_UploadFileResponse": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "$ref": "#/components/schemas/UploadFileResponse"
+          }
+        },
+        "required": ["r"]
+      },
+      "ApiResponse_UploadExtensionResponse": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "$ref": "#/components/schemas/UploadExtensionResponse"
+          }
+        },
+        "required": ["r"]
+      },
+      "ApiResponse_ExtensionList": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Extension"
+            }
+          }
+        },
+        "required": ["r"]
+      },
+      "ApiResponse_BrowserSessionResponse": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "$ref": "#/components/schemas/BrowserSessionResponse"
+          }
+        },
+        "required": ["r"]
+      },
+      "ApiResponse_Bool": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "type": "boolean"
+          }
+        },
+        "required": ["r"]
+      },
+      "TaskRequest": {
+        "type": "object",
+        "properties": {
+          "task": {
             "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+              {"type": "string"},
+              {"type": "null"}
             ],
-            "description": "The profile ID to open in the browser. If None, a new profile will be created with a random name.",
-            "title": "Profile ID"
+            "description": "The task to run. If `null`, opens a browser session that waits for actions via the Event endpoint.",
+            "title": "Task"
           },
-          "live_view": {
-            "type": "boolean",
-            "description": "Whether to open a live browser instance using the specified profile.",
-            "title": "Live View"
-          },
-          "device": {
-            "type": "string",
+          "response_model": {
             "anyOf": [
-              {
-                "enum": [
-                  "desktop",
-                  "mobile"
-                ]
-              },
-              {
-                "type": "null"
-              }
+              {"type": "object"},
+              {"type": "null"}
             ],
-            "description": "The device type for the browser session. Note that `mobile` does not support navigation via the search bar, so a starting URL must be provided.",
-            "title": "Device"
+            "description": "JSON schema describing the desired output structure. If provided, the agent will return structured data matching this schema.",
+            "title": "Response Model"
           },
           "url": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "uri"
-              },
-              {
-                "type": "null"
-              }
+              {"type": "string", "format": "uri"},
+              {"type": "null"}
             ],
-            "description": "The starting URL to open in the browser session. If None, a blank page will be opened.",
-            "title": "Url"
+            "description": "The starting URL for the task. If not provided, the agent will infer it from the task.",
+            "title": "URL"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "anyOf": [
+                    {"type": "string"},
+                    {"type": "number"},
+                    {"type": "boolean"}
+                  ]
+                }
+              },
+              {"type": "null"}
+            ],
+            "description": "Variables or parameters passed to the agent. Max 16 keys, max 2048 chars per value.",
+            "title": "Metadata"
+          },
+          "files": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              {"type": "null"}
+            ],
+            "description": "List of file IDs (from Upload File endpoint) to pass to the agent.",
+            "title": "Files"
+          },
+          "agent": {
+            "type": "string",
+            "enum": ["smooth", "smooth-lite"],
+            "description": "The agent to use for the task.",
+            "default": "smooth",
+            "title": "Agent"
+          },
+          "max_steps": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 128,
+            "description": "Maximum number of steps the agent can take.",
+            "default": 32,
+            "title": "Max Steps"
+          },
+          "device": {
+            "type": "string",
+            "enum": ["desktop", "mobile", "desktop-lg"],
+            "description": "Device type for the task.",
+            "default": "desktop",
+            "title": "Device"
+          },
+          "allowed_urls": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              {"type": "null"}
+            ],
+            "description": "List of allowed URL patterns using wildcard syntax (e.g., `https://*example.com/*`). If not provided, all URLs are allowed.",
+            "title": "Allowed URLs"
+          },
+          "enable_recording": {
+            "type": "boolean",
+            "description": "Enable video recording of the task execution.",
+            "default": true,
+            "title": "Enable Recording"
+          },
+          "profile_id": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ],
+            "description": "Browser profile ID to use. Each profile maintains its own cookies and login credentials.",
+            "title": "Profile ID"
+          },
+          "profile_read_only": {
+            "type": "boolean",
+            "description": "If true, changes made during the task will not be saved to the profile.",
+            "default": false,
+            "title": "Profile Read Only"
+          },
+          "stealth_mode": {
+            "type": "boolean",
+            "description": "Run the browser in stealth mode to avoid detection.",
+            "default": false,
+            "title": "Stealth Mode"
           },
           "proxy_server": {
             "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+              {"type": "string"},
+              {"type": "null"}
             ],
-            "description": "Proxy server address to route browser traffic through.",
+            "description": "Proxy server URL (e.g., `http://proxy.example.com:8080` or `socks5://proxy.example.com:1080`). Use `self` to route through your own IP.",
             "title": "Proxy Server"
           },
           "proxy_username": {
             "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+              {"type": "string"},
+              {"type": "null"}
             ],
-            "description": "Username for proxy server authentication, if required.",
+            "description": "Proxy server username for authentication.",
             "title": "Proxy Username"
           },
           "proxy_password": {
             "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+              {"type": "string"},
+              {"type": "null"}
             ],
-            "description": "Password for proxy server authentication, if required.",
+            "description": "Proxy server password for authentication.",
             "title": "Proxy Password"
-          }
-        },
-        "type": "object",
-        "title": "BrowserSessionRequest",
-        "description": "Request model for creating a browser session."
-      },
-      "BrowserSessionResponse": {
-        "properties": {
-          "profile_id": {
-            "type": "string",
-            "title": "Profile ID",
-            "description": "The ID of the browser profile associated with the opened browser session."
-          },
-          "live_id": {
-            "type": "string",
-            "title": "Live ID",
-            "description": "The unique identifier for the live browser session."
-          },
-          "live_url": {
-            "type": "string",
-            "title": "Live Url",
-            "description": "The live URL to interact with the browser session."
-          }
-        },
-        "type": "object",
-        "required": [
-          "profile_id"
-        ],
-        "title": "BrowserSessionResponse",
-        "description": "Browser session response model."
-      },
-      "BrowserProfilesResponse": {
-        "properties": {
-          "profile_ids": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Profile IDs",
-            "description": "The IDs of the browser profiles."
-          }
-        },
-        "type": "object",
-        "required": [
-          "profile_ids"
-        ],
-        "title": "BrowserProfilesResponse",
-        "description": "Response model for listing browser profiles."
-      },
-      "TaskRequest": {
-        "properties": {
-          "task": {
-            "type": "string",
-            "title": "Task",
-            "description": "The task to run."
-          },
-          "response_model": {
-            "type": "object",
-            "title": "Response Model",
-            "description": "If provided, the JSON schema describing the desired output structure.",
-            "default": null
-          },
-          "url": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uri"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Url",
-            "description": "The starting URL for the task. If not provided, the agent will start from a blank page.",
-            "default": null
-          },
-          "metadata": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "title": "Metadata",
-            "description": "A dictionary containing variables or parameters that will be passed to the agent.",
-            "default": null
-          },
-          "agent": {
-            "type": "string",
-            "enum": [
-              "smooth"
-            ],
-            "title": "Agent",
-            "description": "The agent to use for the task.",
-            "default": "smooth"
-          },
-          "max_steps": {
-            "type": "integer",
-            "maximum": 128,
-            "minimum": 2,
-            "title": "Max Steps",
-            "description": "Maximum number of steps the agent can take (min 2, max 128).",
-            "default": 32
-          },
-          "device": {
-            "type": "string",
-            "enum": [
-              "desktop",
-              "mobile"
-            ],
-            "title": "Device",
-            "description": "Device type for the task. Default is mobile.",
-            "default": "desktop"
-          },
-          "allowed_urls": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uri"
-            },
-            "title": "Allowed Urls",
-            "description": "List of URL patterns using wildcard syntax (e.g., https://\\*example.com/\\*) the agent is allowed to visit. If not provided, the agent can visit any URL.",
-            "default": null
-          },
-          "enable_recording": {
-            "type": "boolean",
-            "title": "Enable Recording",
-            "description": "Enable video recording of the task execution. Default is False",
-            "default": true
-          },
-          "profile_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Profile ID",
-            "description": "Browser profile ID to use. Each profile maintains its own state, such as login credentials."
-          },
-          "profile_read_only": {
-            "type": "boolean",
-            "title": "Profile Read Only",
-            "description": "If true, the profile specified by `profile_id` will be loaded in read-only mode. Changes made during the task will not be saved back to the profile.",
-            "default": false
-          },
-          "stealth_mode": {
-            "type": "boolean",
-            "title": "Stealth Mode",
-            "description": "Run the browser in stealth mode.",
-            "default": true
-          },
-          "proxy_server": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Proxy Server",
-            "description": "Proxy server address to route browser traffic through."
-          },
-          "proxy_username": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Proxy Username",
-            "description": "Proxy server username."
-          },
-          "proxy_password": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Proxy Password",
-            "description": "Proxy server password."
           },
           "certificates": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "file": {
-                  "type": "string",
-                  "description": "Base64 encoded p12 client certificate file."
-                },
-                "password": {
-                  "type": "string",
-                  "description": "The password for the certificate file, if applicable."
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Certificate"
                 }
               },
-              "required": [
-                "file"
-              ]
-            },
-            "title": "Certificates",
-            "description": "List of client certificates to use when accessing secure websites.",
-            "default": null
+              {"type": "null"}
+            ],
+            "description": "List of client certificates for accessing secure websites.",
+            "title": "Certificates"
           },
           "use_adblock": {
-            "type": "boolean",
-            "title": "Use Adblock",
-            "description": "Enable ad-blocking in the browser to improve performance and reduce distractions.",
-            "default": true
+            "anyOf": [
+              {"type": "boolean"},
+              {"type": "null"}
+            ],
+            "description": "Enable ad-blocking in the browser.",
+            "default": true,
+            "title": "Use Adblock"
+          },
+          "additional_tools": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "anyOf": [
+                    {"type": "object"},
+                    {"type": "null"}
+                  ]
+                }
+              },
+              {"type": "null"}
+            ],
+            "description": "Additional built-in tools to enable. Supported: `screenshot`, `hover`, `print_page`. Use `null` for default config.",
+            "title": "Additional Tools"
+          },
+          "custom_tools": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ToolSignature"
+                }
+              },
+              {"type": "null"}
+            ],
+            "description": "Custom tool definitions that the agent can call during execution.",
+            "title": "Custom Tools"
           },
           "experimental_features": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "any"
-            },
-            "title": "Experimental Features",
-            "description": "A dictionary of experimental features to enable or disable."
+            "anyOf": [
+              {"type": "object"},
+              {"type": "null"}
+            ],
+            "description": "Experimental features to enable.",
+            "title": "Experimental Features"
           },
           "extensions": {
             "anyOf": [
               {
                 "type": "array",
-                "items": {
-                  "type": "string"
-                }
+                "items": {"type": "string"}
               },
-              {
-                "type": "null"
-              }
+              {"type": "null"}
             ],
-            "title": "Extensions",
-            "description": "List of extension IDs to load into the browser for this task.",
-            "default": null
+            "description": "List of extension IDs (from Upload Extension endpoint) to load in the browser.",
+            "title": "Extensions"
+          },
+          "show_cursor": {
+            "type": "boolean",
+            "description": "Show mouse cursor in the browser.",
+            "default": false,
+            "title": "Show Cursor"
           }
         },
-        "type": "object",
-        "required": [
-          "task"
-        ],
         "title": "TaskRequest",
-        "description": "Run task request model."
+        "description": "Request model for submitting a task."
       },
       "TaskResponse": {
+        "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "title": "Id",
-            "description": "The ID of the task."
+            "description": "The unique ID of the task.",
+            "title": "ID"
           },
           "status": {
             "type": "string",
-            "enum": [
-              "waiting",
-              "running",
-              "done",
-              "failed",
-              "cancelled"
-            ],
-            "title": "Status",
-            "description": "The status of the task."
+            "enum": ["waiting", "running", "done", "failed", "cancelled"],
+            "description": "The current status of the task.",
+            "title": "Status"
           },
           "output": {
-            "anyOf": [
-              {},
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Output",
-            "description": "The output of the task."
+            "anyOf": [{}, {"type": "null"}],
+            "description": "The output of the task. If `response_model` was provided, this matches the specified schema.",
+            "title": "Output"
           },
           "credits_used": {
             "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
+              {"type": "integer"},
+              {"type": "null"}
             ],
-            "title": "Credits Used",
-            "description": "The amount of credits used to perform the task."
-          },
-          "credits_balance": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Credits Balance",
-            "description": "The amount of credits remaining on the account."
+            "description": "Number of credits used. 1 credit = $0.01.",
+            "title": "Credits Used"
           },
           "device": {
             "anyOf": [
               {
                 "type": "string",
-                "enum": [
-                  "desktop",
-                  "mobile"
-                ]
+                "enum": ["desktop", "mobile", "desktop-lg"]
               },
-              {
-                "type": "null"
-              }
+              {"type": "null"}
             ],
-            "title": "Device",
-            "description": "The device type used for the task."
+            "description": "The device type used for the task.",
+            "title": "Device"
           },
           "live_url": {
             "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+              {"type": "string"},
+              {"type": "null"}
             ],
-            "title": "Live Url",
-            "description": "The URL to view and interact with the task execution."
+            "description": "URL to view the task execution in real-time.",
+            "title": "Live URL"
           },
           "recording_url": {
             "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+              {"type": "string"},
+              {"type": "null"}
             ],
-            "title": "Recording Url",
-            "description": "The URL to view the task recording."
+            "description": "URL to download the video recording (available after task completes).",
+            "title": "Recording URL"
           },
           "downloads_url": {
             "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+              {"type": "string"},
+              {"type": "null"}
             ],
-            "title": "Downloads Url",
-            "description": "The URL to download files generated during the task."
+            "description": "URL to download files created during the task.",
+            "title": "Downloads URL"
           },
           "created_at": {
             "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
+              {"type": "integer"},
+              {"type": "null"}
             ],
-            "title": "Created At",
-            "description": "The timestamp when the task was created."
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "status"
-        ],
-        "title": "TaskResponse",
-        "description": "Task response model."
-      },
-      "UploadFileResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "The ID assigned to the uploaded file."
-          }
-        },
-        "type": "object",
-        "required": [
-          "id"
-        ],
-        "title": "UploadFileResponse",
-        "description": "Response model for uploading a file."
-      },
-      "Extension": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id",
-            "description": "The unique identifier for the extension."
+            "description": "Unix timestamp when the task was created.",
+            "title": "Created At"
           },
+          "events": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TaskEvent"
+                }
+              },
+              {"type": "null"}
+            ],
+            "description": "List of new events fired since last poll (when using `event_t` parameter).",
+            "title": "Events"
+          }
+        },
+        "required": ["id", "status"],
+        "title": "TaskResponse",
+        "description": "Response model for task operations."
+      },
+      "TaskEvent": {
+        "type": "object",
+        "properties": {
           "name": {
             "type": "string",
-            "title": "Name",
-            "description": "The name of the extension."
+            "description": "Event type: `browser_action`, `session_action`, or `tool_call`.",
+            "title": "Name"
           },
-          "created_at": {
-            "type": "integer",
-            "title": "Created At",
-            "description": "The timestamp when the extension was uploaded."
+          "payload": {
+            "type": "object",
+            "description": "Event payload. For actions: `{name, input}`. For tool responses: `{code, output}`.",
+            "title": "Payload"
+          },
+          "id": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ],
+            "description": "Unique event ID. Used to match responses to requests.",
+            "title": "ID"
+          },
+          "timestamp": {
+            "anyOf": [
+              {"type": "integer"},
+              {"type": "null"}
+            ],
+            "description": "Unix timestamp of the event.",
+            "title": "Timestamp"
           }
         },
-        "type": "object",
-        "required": [
-          "id",
-          "name",
-          "created_at"
-        ],
-        "title": "Extension",
-        "description": "Extension model."
+        "required": ["name", "payload"],
+        "title": "TaskEvent",
+        "description": "Event model for sending actions to running tasks."
       },
-      "UploadExtensionResponse": {
+      "TaskEventResponse": {
+        "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "description": "The ID assigned to the uploaded extension."
+            "description": "The ID of the created event.",
+            "title": "ID"
           }
         },
-        "type": "object",
-        "required": [
-          "id"
-        ],
-        "title": "UploadExtensionResponse",
-        "description": "Response model for uploading an extension."
+        "required": ["id"],
+        "title": "TaskEventResponse",
+        "description": "Response model for send event operation."
       },
-      "ListExtensionsResponse": {
+      "ToolSignature": {
+        "type": "object",
         "properties": {
-          "extensions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Extension"
-            },
-            "title": "Extensions",
-            "description": "List of uploaded extensions."
+          "name": {
+            "type": "string",
+            "description": "The name of the tool.",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of what the tool does and when to use it.",
+            "title": "Description"
+          },
+          "inputs": {
+            "type": "object",
+            "description": "JSON schema describing the tool's input parameters.",
+            "title": "Inputs"
+          },
+          "output": {
+            "type": "string",
+            "description": "Description of the tool's output type.",
+            "title": "Output"
           }
         },
+        "required": ["name", "description", "inputs", "output"],
+        "title": "ToolSignature",
+        "description": "Custom tool definition."
+      },
+      "Certificate": {
         "type": "object",
-        "required": [
-          "extensions"
-        ],
-        "title": "ListExtensionsResponse",
-        "description": "Response model for listing extensions."
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Base64-encoded p12 certificate file.",
+            "title": "File"
+          },
+          "password": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ],
+            "description": "Password for the certificate file.",
+            "title": "Password"
+          }
+        },
+        "required": ["file"],
+        "title": "Certificate",
+        "description": "Client certificate for secure websites."
+      },
+      "ProfileRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ],
+            "description": "Optional custom ID for the profile. If not provided, a random ID will be generated.",
+            "title": "ID"
+          }
+        },
+        "title": "ProfileRequest",
+        "description": "Request model for creating a browser profile."
+      },
+      "ProfileResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the browser profile.",
+            "title": "ID"
+          }
+        },
+        "required": ["id"],
+        "title": "ProfileResponse",
+        "description": "Response model for profile operations."
+      },
+      "UploadFileResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID assigned to the uploaded file.",
+            "title": "ID"
+          }
+        },
+        "required": ["id"],
+        "title": "UploadFileResponse",
+        "description": "Response model for file upload."
+      },
+      "UploadExtensionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID assigned to the uploaded extension.",
+            "title": "ID"
+          }
+        },
+        "required": ["id"],
+        "title": "UploadExtensionResponse",
+        "description": "Response model for extension upload."
+      },
+      "Extension": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier for the extension.",
+            "title": "ID"
+          },
+          "file_name": {
+            "type": "string",
+            "description": "The original filename of the extension.",
+            "title": "File Name"
+          },
+          "creation_time": {
+            "type": "integer",
+            "description": "Unix timestamp when the extension was uploaded.",
+            "title": "Creation Time"
+          }
+        },
+        "required": ["id", "file_name", "creation_time"],
+        "title": "Extension",
+        "description": "Browser extension model."
+      },
+      "BrowserSessionRequest": {
+        "type": "object",
+        "properties": {
+          "profile_id": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ],
+            "description": "The profile ID to use. If not provided, a new profile will be created.",
+            "title": "Profile ID"
+          },
+          "live_view": {
+            "type": "boolean",
+            "description": "Request a live URL to interact with the browser.",
+            "default": true,
+            "title": "Live View"
+          },
+          "device": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": ["desktop", "mobile"]
+              },
+              {"type": "null"}
+            ],
+            "description": "Device type for the browser session.",
+            "default": "desktop",
+            "title": "Device"
+          },
+          "url": {
+            "anyOf": [
+              {"type": "string", "format": "uri"},
+              {"type": "null"}
+            ],
+            "description": "Starting URL to open.",
+            "title": "URL"
+          },
+          "proxy_server": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ],
+            "description": "Proxy server address.",
+            "title": "Proxy Server"
+          },
+          "proxy_username": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ],
+            "description": "Proxy server username.",
+            "title": "Proxy Username"
+          },
+          "proxy_password": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ],
+            "description": "Proxy server password.",
+            "title": "Proxy Password"
+          },
+          "extensions": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              {"type": "null"}
+            ],
+            "description": "List of extension IDs to load.",
+            "title": "Extensions"
+          }
+        },
+        "title": "BrowserSessionRequest",
+        "description": "Request model for opening a browser session (deprecated)."
+      },
+      "BrowserSessionResponse": {
+        "type": "object",
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "description": "The ID of the browser profile.",
+            "title": "Profile ID"
+          },
+          "live_id": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ],
+            "description": "The ID of the live browser session.",
+            "title": "Live ID"
+          },
+          "live_url": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "null"}
+            ],
+            "description": "URL to interact with the browser session.",
+            "title": "Live URL"
+          }
+        },
+        "required": ["profile_id"],
+        "title": "BrowserSessionResponse",
+        "description": "Response model for browser session (deprecated)."
       }
     },
     "securitySchemes": {

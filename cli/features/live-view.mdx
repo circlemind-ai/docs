@@ -1,0 +1,53 @@
+---
+title: 'Watch Your Agent Work'
+description: 'See exactly what your agent sees in real-time'
+---
+
+Every session comes with a live view URL where you can watch your agent browse in real-time. You can also take over and interact with the browser yourself.
+
+## What You Can Do
+
+- **Watch progress** - See your agent navigate, click, and type in real-time
+- **Debug issues** - See exactly where things go wrong when a task fails
+- **Take over** - Manually handle a step the agent can't (like a CAPTCHA)
+- **Verify actions** - Confirm the agent is doing what you expect before it continues
+
+## How It Works
+
+When a session starts, you get a live URL:
+
+```
+Session started successfully!
+Session ID: abc123
+Live URL: https://live.smooth.sh/v/...
+```
+
+Open that URL in your browser to watch and interact.
+
+## Example: Supervise a Sensitive Task
+
+> "Using my bank profile, go to my account and check my balance. I'll watch via live view."
+
+You monitor the live view as the agent navigates your banking site, ready to intervene if needed.
+
+## Example: Handle a CAPTCHA
+
+The agent encounters a CAPTCHA it can't solve:
+
+1. You see it in the live view
+2. You solve the CAPTCHA manually
+3. The agent continues where it left off
+
+## Example: Verify Before Submitting
+
+> "Fill out the insurance claim form with these details. Stop before submitting so I can review."
+
+You check the live view to verify the form is correct, then tell the agent to submit.
+
+<Tip>
+  The live view is interactive. You can click, type, and scroll - the agent will see your changes and can continue from there.
+</Tip>
+
+<Note>
+  Live views are session-specific and expire when the session closes. Share them only with people you trust.
+</Note>

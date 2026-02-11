@@ -1,0 +1,51 @@
+---
+title: 'QA & Testing'
+description: 'Have your agent test your web application'
+---
+
+Your agent can explore your web app, try different user flows, and report issues - like having a QA tester on demand.
+
+## What Your Agent Can Do
+
+- **Exploratory testing** - Click around and find broken things
+- **User flow testing** - Walk through signup, checkout, or other critical paths
+- **Visual inspection** - Check for UI issues, broken images, or layout problems
+- **Cross-browser behavior** - Verify functionality works as expected
+
+## Example: Test a User Flow
+
+> "Go to localhost:3000, create a new account, add an item to cart, and complete checkout. Tell me if anything breaks or looks wrong."
+
+Your agent walks through the entire flow and reports any issues encountered.
+
+## Example: Find Broken Links
+
+> "Go to our marketing site and check all the links on the homepage. Report any that are broken or lead to 404 pages."
+
+Your agent systematically clicks through links and documents failures.
+
+## Example: Test After Deployment
+
+> "Go to staging.ourapp.com and test the new password reset flow. Try with a valid email, invalid email, and empty form. Report results."
+
+Your agent tests edge cases and normal cases, documenting what happens.
+
+## Example: Check Mobile Layout
+
+> "Go to our landing page on a mobile device and check if all elements are visible and the navigation works properly."
+
+Your agent uses mobile emulation to test responsive design.
+
+## Example: Accessibility Spot Check
+
+> "Go to our signup page and try to complete the form using only the keyboard. Report any issues with focus states or navigation."
+
+Your agent tests keyboard accessibility and reports problems.
+
+<Tip>
+  Use localhost access to test against your local dev server before deploying. The agent can catch issues before they reach production.
+</Tip>
+
+<Note>
+  Your agent provides natural language reports about what it found, not automated test results. It's exploratory testing, not assertion-based testing.
+</Note>

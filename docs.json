@@ -23,15 +23,6 @@
             ]
           },
           {
-            "group": "CLI Browser",
-            "pages": [
-              "cli/overview",
-              "cli/claude-code",
-              "cli/openclaw",
-              "cli/other-agents"
-            ]
-          },
-          {
             "group": "Automation SDK",
             "pages": [
               "methods/overview",
@@ -102,12 +93,53 @@
         ]
       },
       {
+        "tab": "CLI Browser",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "cli/overview",
+              "cli/claude-code",
+              "cli/openclaw",
+              "cli/other-agents"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "cli/features/localhost",
+              "cli/features/data-extraction",
+              "cli/features/authentication",
+              "cli/features/files",
+              "cli/features/live-view"
+            ]
+          },
+          {
+            "group": "Use Cases",
+            "pages": [
+              "cli/use-cases/research",
+              "cli/use-cases/form-filling",
+              "cli/use-cases/testing",
+              "cli/use-cases/monitoring"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Getting Started",
             "pages": [
               "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "api-reference/sessions",
+              "api-reference/custom-tools",
+              "api-reference/polling"
             ]
           },
           {

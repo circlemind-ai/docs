@@ -1,0 +1,47 @@
+---
+title: 'Access Localhost'
+description: 'Let your agent browse your local development environment'
+---
+
+Your agent can access localhost and your local network through a secure tunnel. This is perfect for testing local apps, accessing internal tools, or working with development servers.
+
+## What Your Agent Can Do
+
+- **Test your local app** - Have the agent click through your dev server and report bugs
+- **Access internal dashboards** - Browse admin panels and internal tools on your network
+- **Fill local forms** - Submit data to your local APIs through the browser
+- **Screenshot local pages** - Get visual feedback from your running application
+
+## How It Works
+
+When you start a session, the browser traffic is routed through your machine by default. Your agent sees exactly what you'd see if you opened the browser yourself.
+
+```
+Your Machine                    Cloud Browser
+     |                               |
+     |  <-- secure tunnel -->        |
+     |                               |
+localhost:3000            agent browses localhost:3000
+```
+
+<Note>
+  The tunnel is automatic. Just give your agent a localhost URL and it works.
+</Note>
+
+## Example: Test a Local App
+
+Ask your agent:
+
+> "Go to localhost:3000, click through the signup flow, and tell me if there are any broken links or UI issues"
+
+Your agent will browse your local dev server, interact with it like a real user, and report back.
+
+## Example: Access Internal Tools
+
+> "Go to 192.168.1.100:8080/admin, check the system status dashboard, and summarize any warnings"
+
+Your agent can access anything on your local network that your machine can reach.
+
+## Disabling the Tunnel
+
+If you don't need local access and want the browser to use its own IP, tell your agent to use the `--no-proxy` flag when starting the session.

@@ -1,15 +1,19 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Overview'
+description: 'Complete guide to the Smooth REST API'
 ---
 
-<Note>
-  If you're using Python, we recommend using our [Python SDK](/quickstart).
-</Note>
+<Warning>
+  **We recommend using one of our SDKs instead of calling the API directly.** The SDKs handle authentication, polling, and error handling automatically, making integration much simpler.
 
-## Setting up
+  If we don't support your language yet, reach out at **support@circlemind.co** and we'll be happy to support your implementation.
+</Warning>
 
-Get your free API key and start running tasks in minutes.
+The Smooth API enables programmatic browser automation through REST endpoints. You can run AI-powered tasks, create interactive browser sessions, and extend agent capabilities with custom tools.
+
+## Quick Start
+
+Get your API key and start running tasks in minutes.
 
 <Card
   title="Get your free API key"
@@ -22,11 +26,252 @@ Get your free API key and start running tasks in minutes.
 
 ## Authentication
 
-All API endpoints are authenticated using your API key.
+All API endpoints require authentication via the `apikey` header:
 
-```curl cURL highlight={2}
-curl -X POST https://api.smooth.sh/api/v1/task \ 
-          -H "apikey: cmzr-YOUR_API_KEY" \
-          -H "Content-Type: application/json" \
-          -d '{"task": "<your_task_description>"}'
+```bash
+curl -X POST "https://api.smooth.sh/api/v1/task" \
+     -H "apikey: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"task": "Go to hacker news and get the top story"}'
 ```
+
+## Two Ways to Use the API
+
+### 1. Simple Tasks
+
+Run one-shot tasks that execute and return results:
+
+```bash
+# Submit a task
+curl -X POST "https://api.smooth.sh/api/v1/task" \
+     -H "apikey: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"task": "Go to hacker news and get the top 5 stories"}'
+
+# Response: {"r": {"id": "task_abc123", "status": "running", ...}}
+
+# Poll for results
+curl -X GET "https://api.smooth.sh/api/v1/task/task_abc123" \
+     -H "apikey: YOUR_API_KEY"
+
+# Response: {"r": {"id": "task_abc123", "status": "done", "output": "..."}}
+```
+
+### 2. Session Workflows
+
+For multi-step workflows, create a session and send actions:
+
+```bash
+# Create a session (task=null)
+curl -X POST "https://api.smooth.sh/api/v1/task" \
+     -H "apikey: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"task": null, "url": "https://example.com"}'
+
+# Response: {"r": {"id": "task_abc123", "status": "running", "live_url": "..."}}
+
+# Send actions via the Event endpoint
+curl -X POST "https://api.smooth.sh/api/v1/task/task_abc123/event" \
+     -H "apikey: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "name": "session_action",
+       "payload": {"name": "run_task", "input": {"task": "Click the login button"}},
+       "id": "evt_001"
+     }'
+
+# Poll for the result
+curl -X GET "https://api.smooth.sh/api/v1/task/task_abc123?event_t=0" \
+     -H "apikey: YOUR_API_KEY"
+```
+
+<CardGroup cols={2}>
+  <Card title="Session Workflow" icon="window" href="/api-reference/sessions">
+    Learn how to create sessions, send actions, and poll for results
+  </Card>
+  <Card title="Polling Mechanism" icon="rotate" href="/api-reference/polling">
+    Understand how to efficiently poll for task results and events
+  </Card>
+</CardGroup>
+
+## Core Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/task` | POST | Submit a task or create a session (`task=null`) |
+| `/task` | GET | List all tasks |
+| `/task/{id}` | GET | Get task status and results |
+| `/task/{id}` | DELETE | Cancel a running task |
+| `/task/{id}/event` | POST | Send an event to a running task/session |
+
+## Session Actions
+
+When using sessions, send actions via `POST /task/{id}/event`:
+
+| Action | Event Type | Description |
+|--------|-----------|-------------|
+| Navigate | `browser_action` | Go to a URL |
+| Extract | `browser_action` | Extract structured data from the page |
+| JavaScript | `browser_action` | Execute JavaScript in the browser |
+| Run Task | `session_action` | Run an AI-powered task within the session |
+| Close | `session_action` | Close the session |
+
+<Card title="Session Actions Reference" icon="code" href="/api-reference/sessions#action-reference">
+  See complete examples of all session actions
+</Card>
+
+## Custom Tools
+
+Extend agent capabilities by registering custom tools:
+
+```bash
+curl -X POST "https://api.smooth.sh/api/v1/task" \
+     -H "apikey: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "task": "Look up the weather and send it to Slack",
+       "custom_tools": [
+         {
+           "name": "get_weather",
+           "description": "Get weather for a city",
+           "inputs": {"type": "object", "properties": {"city": {"type": "string"}}},
+           "output": "Weather data"
+         },
+         {
+           "name": "send_slack",
+           "description": "Send a Slack message",
+           "inputs": {"type": "object", "properties": {"message": {"type": "string"}}},
+           "output": "Success boolean"
+         }
+       ]
+     }'
+```
+
+When the agent calls a tool, you receive a `tool_call` event. Execute the tool locally and respond via the Event endpoint.
+
+<Card title="Custom Tools Guide" icon="wrench" href="/api-reference/custom-tools">
+  Complete guide to implementing custom tools with the API
+</Card>
+
+## Additional Features
+
+### Browser Profiles
+
+Persist cookies and authentication across tasks:
+
+```bash
+# Create a profile
+curl -X POST "https://api.smooth.sh/api/v1/profile" \
+     -H "apikey: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"id": "my-profile"}'
+
+# Use the profile in a task
+curl -X POST "https://api.smooth.sh/api/v1/task" \
+     -H "apikey: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"task": "Check my account balance", "profile_id": "my-profile"}'
+```
+
+### Structured Output
+
+Get structured data matching a JSON schema:
+
+```bash
+curl -X POST "https://api.smooth.sh/api/v1/task" \
+     -H "apikey: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "task": "Get the top 3 stories from Hacker News",
+       "response_model": {
+         "type": "array",
+         "items": {
+           "type": "object",
+           "properties": {
+             "title": {"type": "string"},
+             "url": {"type": "string"},
+             "points": {"type": "number"}
+           }
+         }
+       }
+     }'
+```
+
+### File Uploads
+
+Pass files to tasks:
+
+```bash
+# Upload a file
+curl -X POST "https://api.smooth.sh/api/v1/file" \
+     -H "apikey: YOUR_API_KEY" \
+     -F "file=@invoice.pdf"
+
+# Response: {"r": {"id": "file_xyz789"}}
+
+# Use in a task
+curl -X POST "https://api.smooth.sh/api/v1/task" \
+     -H "apikey: YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"task": "Extract the total from this invoice", "files": ["file_xyz789"]}'
+```
+
+## Response Format
+
+All responses are wrapped in an `r` field:
+
+```json
+{
+  "r": {
+    "id": "task_abc123",
+    "status": "done",
+    "output": "...",
+    "credits_used": 15
+  }
+}
+```
+
+### Task Status Values
+
+| Status | Description |
+|--------|-------------|
+| `waiting` | Task is queued |
+| `running` | Task is executing |
+| `done` | Task completed successfully |
+| `failed` | Task failed |
+| `cancelled` | Task was cancelled |
+
+## Error Handling
+
+| HTTP Code | Meaning |
+|-----------|---------|
+| 400 | Invalid request parameters |
+| 403 | Premium feature not available on your plan |
+| 404 | Resource not found |
+| 422 | Validation error |
+| 429 | Rate limit exceeded or credits exhausted |
+
+Error responses include a detail message:
+
+```json
+{
+  "detail": "API credits exhausted. Please upgrade your plan."
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Session Workflow" icon="window" href="/api-reference/sessions">
+    Create interactive sessions for multi-step workflows
+  </Card>
+  <Card title="Custom Tools" icon="wrench" href="/api-reference/custom-tools">
+    Extend agent capabilities with your own tools
+  </Card>
+  <Card title="Polling Guide" icon="rotate" href="/api-reference/polling">
+    Best practices for polling task results
+  </Card>
+  <Card title="Python SDK" icon="python" href="/quickstart">
+    Use the SDK for automatic polling and easier integration
+  </Card>
+</CardGroup>

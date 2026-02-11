@@ -1,0 +1,51 @@
+---
+title: 'Stay Logged In'
+description: 'Let your agent access your accounts without re-authenticating'
+---
+
+Browser profiles save your login state so your agent can access authenticated content. Log in once manually, then your agent can work with that account indefinitely.
+
+## What Your Agent Can Do
+
+- **Check your email** - Read and summarize messages from Gmail, Outlook, etc.
+- **Manage social media** - Post updates, check notifications, respond to messages
+- **Access work tools** - Use Jira, Notion, Salesforce, or any SaaS you're logged into
+- **Monitor dashboards** - Check analytics, reports, and admin panels
+
+## How It Works
+
+1. Create a profile and log in manually through the live view
+2. Your authentication (cookies, sessions) is saved to that profile
+3. Future sessions with the same profile are already logged in
+
+Your credentials stay on your machine and in the secure profile storage. The agent never sees your password.
+
+## Example: Check LinkedIn Messages
+
+First session - log in manually:
+
+> "Start a session with my linkedin profile and go to linkedin.com. I'll log in."
+
+You log in through the live view URL. Cookies are saved.
+
+Next time - already authenticated:
+
+> "Using my linkedin profile, check my messages and summarize any from recruiters this week"
+
+Your agent is already logged in and can access your messages immediately.
+
+## Example: Post to Social Media
+
+> "Using my twitter profile, draft a tweet about our new product launch and show me a preview before posting"
+
+Your agent uses your saved Twitter session to compose the tweet.
+
+## Example: Check Work Dashboard
+
+> "Using my salesforce profile, go to my deals dashboard and tell me which deals are closing this week"
+
+Your agent accesses Salesforce with your saved authentication.
+
+<Note>
+  You control when to log in and what accounts to save. The agent only uses profiles you've explicitly set up.
+</Note>
