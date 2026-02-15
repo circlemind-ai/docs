@@ -54,7 +54,8 @@
                   "methods/tools-overview",
                   "methods/tools-screenshot",
                   "methods/tools-hover",
-                  "methods/tools-print-page"
+                  "methods/tools-print-page",
+                  "methods/tools-drag-drop"
                 ]
               },
               "methods/custom-tools"

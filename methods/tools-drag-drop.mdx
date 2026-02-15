@@ -1,0 +1,55 @@
+---
+title: 'Drag and Drop'
+description: 'Drag and drop elements on the page'
+---
+
+The Drag and Drop tool allows the agent to drag elements from one location to another on the page. This is useful for interacting with drag-and-drop interfaces like file uploaders, sortable lists, kanban boards, or any UI that requires drag interactions.
+
+## Usage
+
+<CodeGroup>
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+task = client.run(
+    task="Drag the item from the source container to the target container",
+    additional_tools={
+        "drag_drop": None
+    }
+)
+```
+</CodeGroup>
+
+## Parameters
+
+This tool has no configurable parameters. Pass `None` to enable it with default behavior.
+
+## Examples
+
+**Reordering items in a list:**
+
+<CodeGroup>
+```python Python
+task = client.run(
+    task="Drag the 'High Priority' task to the top of the list",
+    additional_tools={
+        "drag_drop": None
+    }
+)
+```
+</CodeGroup>
+
+**Moving cards on a kanban board:**
+
+<CodeGroup>
+```python Python
+task = client.run(
+    task="Drag the task card from 'To Do' column to 'In Progress'",
+    additional_tools={
+        "drag_drop": None
+    }
+)
+```
+</CodeGroup>
