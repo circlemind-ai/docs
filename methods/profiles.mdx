@@ -1,21 +1,61 @@
 ---
-title: 'Manage profiles'
-description: 'List and delete your browser profiles'
+title: 'Manage Profiles'
+description: 'Create, list, and delete browser profiles'
 ---
 
-## List all browser profiles using the Python SDK
+<Note>
+  For an overview of how profiles work, see [Persistent Sessions](/features/persistent-sessions).
+</Note>
 
-List all your existing browser profiles.
+## Create a Profile
+
+Before using a profile, you must create it:
 
 <CodeGroup>
 
 ```python Python
 from smooth import SmoothClient
 
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-response = smooth_client.list_profiles()
+client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
 
+# Create a new profile
+client.create_profile(profile_id="my-profile")
+```
+
+</CodeGroup>
+
+## Use a Profile
+
+Pass the `profile_id` when creating a session or running a task:
+
+<CodeGroup>
+
+```python Python
+# Use the profile in a session
+with client.session(profile_id="my-profile", url="https://example.com") as session:
+    session.run_task("Log in with my credentials")
+    # Authentication is now saved to the profile
+```
+
+</CodeGroup>
+
+## List Profiles
+
+<CodeGroup>
+
+```python Python
+response = client.list_profiles()
 print(f"Profile IDs: {response.profile_ids}")
+```
+
+</CodeGroup>
+
+## Delete a Profile
+
+<CodeGroup>
+
+```python Python
+client.delete_profile(profile_id="my-profile")
 ```
 
 </CodeGroup>
@@ -23,26 +63,3 @@ print(f"Profile IDs: {response.profile_ids}")
 <Note>
   If Python is not your language of choice, check out our [API Reference](/api-reference/introduction).
 </Note>
-
-## Response
-
-Returns a `BrowserProfilesResponse` with the following attributes.
-
-<ResponseField name="profile_ids" type="list[str]">
-  A list of all the profile IDs.
-</ResponseField>
-
-## Delete a browser profile
-
-Delete an existing browser profile and its associated data, such as cookies and authentication details.
-
-<CodeGroup>
-
-```python Python
-from smooth import SmoothClient
-
-smooth_client = SmoothClient(api_key="cmzr-YOUR_API_KEY")
-smooth_client.delete_profile(profile_id="my-profile-id")
-```
-
-</CodeGroup>

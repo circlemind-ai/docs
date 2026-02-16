@@ -9,12 +9,15 @@ This guide demonstrates how to use Smooth to automate sending a LinkedIn connect
 
 <Steps>
   <Step title="Launch Session and Authenticate">
-    Create a session with a profile ID for LinkedIn. The profile will persist your authentication cookies.
+    Create a profile and session for LinkedIn. The profile will persist your authentication cookies.
 
     ```python Python
     from smooth import SmoothClient
 
     client = SmoothClient()
+
+    # Create the profile first (only needed once)
+    client.create_profile(profile_id="linkedin-automation")
 
     with client.session(profile_id="linkedin-automation", url="https://www.linkedin.com") as session:
         # Get the live URL for manual authentication
