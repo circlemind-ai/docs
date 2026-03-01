@@ -1,10 +1,11 @@
 ---
-title: 'Use My IP'
-description: 'Run browser automations using your own IP address'
+title: 'P2P Tunnel'
+description: 'Run browser automations through a peer-to-peer tunnel to your machine'
 ---
 
-By setting `proxy_server` to `"self"`, Smooth creates a secure tunnel and routes all browser traffic through your machine's IP address. This is useful for:
+By setting `proxy_server` to `"self"`, Smooth creates a **peer-to-peer tunnel** between the remote Smooth browser and your local machine, routing all browser traffic through your network. This is useful for:
 
+- **Accessing localhost** — The tunnel lets the Smooth browser reach services running on your machine (e.g. `http://localhost:3000`), making it easy to test local development environments
 - **Avoiding bot detection** — Many websites trust residential IPs more than datacenter IPs
 - **Geo-localized automations** — Access location-specific content based on your actual location
 - **Location-aware queries** — Run searches like "restaurants near me" that rely on IP geolocation
@@ -28,6 +29,30 @@ print(task.result().output)
 ```
 
 </CodeGroup>
+
+## Accessing Localhost
+
+Because the P2P tunnel connects the Smooth browser directly to your machine, the browser can reach any service running locally — just use `localhost` or `127.0.0.1` as you normally would:
+
+<CodeGroup>
+
+```python Python
+from smooth import SmoothClient
+
+client = SmoothClient()
+
+# Access a local dev server running on port 3000
+task = client.run(
+    task="Go to the homepage and tell me what you see",
+    url="http://localhost:3000",
+    proxy_server="self"
+)
+print(task.result().output)
+```
+
+</CodeGroup>
+
+This makes it straightforward to run automations or tests against a local app without exposing it to the internet.
 
 ## With Sessions
 
@@ -69,10 +94,11 @@ with client.session(proxy_server="self") as session:
 
 When you set `proxy_server="self"`:
 
-1. Smooth establishes a secure tunnel between the remote browser and your machine
+1. Smooth establishes a peer-to-peer tunnel between the remote browser and your machine
 2. All browser traffic is routed through your local network
 3. Websites see your IP address instead of Smooth's datacenter IP
-4. The tunnel is automatically closed when the task or session ends
+4. Services running on `localhost` become reachable from the Smooth browser
+5. The tunnel is automatically closed when the task or session ends
 
 <Tip>
   **Pro Tip:** Using your own IP is the most effective way to avoid captchas. Websites see the same IP they would see if you were browsing manually.
