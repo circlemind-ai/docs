@@ -1063,7 +1063,7 @@
               },
               {"type": "null"}
             ],
-            "description": "List of allowed URL patterns using wildcard syntax (e.g., `https://*example.com/*`). If not provided, all URLs are allowed.",
+            "description": "List of allowed URL patterns using glob syntax on the domain and path. If not provided, all URLs are allowed. To match everything on example.com, use `https://**.example.com/**`.",
             "title": "Allowed URLs"
           },
           "enable_recording": {
